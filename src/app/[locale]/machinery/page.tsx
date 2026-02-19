@@ -5,44 +5,34 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { machinery } from "@/lib/data";
 import { MoreHorizontal, PlusCircle } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 export default function MachineryPage() {
-  const getStatusVariant = (status: string) => {
-    switch (status) {
-      case 'Operational':
-        return 'success';
-      case 'Maintenance Due':
-        return 'warning';
-      case 'In Workshop':
-        return 'destructive';
-      default:
-        return 'secondary';
-    }
-  };
+  const t = useTranslations('MachineryPage');
 
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
         <div>
-          <CardTitle>Machinery</CardTitle>
+          <CardTitle>{t('title')}</CardTitle>
           <CardDescription>
-            Manage your fleet of tractors, harvesters, and other equipment.
+            {t('description')}
           </CardDescription>
         </div>
         <Button size="sm" className="gap-1">
           <PlusCircle className="h-4 w-4" />
-          Add Machine
+          {t('addMachine')}
         </Button>
       </CardHeader>
       <CardContent>
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Name</TableHead>
-              <TableHead>Type</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Next Service</TableHead>
-              <TableHead><span className="sr-only">Actions</span></TableHead>
+              <TableHead>{t('name')}</TableHead>
+              <TableHead>{t('type')}</TableHead>
+              <TableHead>{t('status')}</TableHead>
+              <TableHead>{t('nextService')}</TableHead>
+              <TableHead><span className="sr-only">{t('actions')}</span></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -75,12 +65,12 @@ export default function MachineryPage() {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                      <DropdownMenuItem>Edit</DropdownMenuItem>
-                      <DropdownMenuItem>View Maintenance</DropdownMenuItem>
-                      <DropdownMenuItem>Report Repair</DropdownMenuItem>
+                      <DropdownMenuLabel>{t('actions')}</DropdownMenuLabel>
+                      <DropdownMenuItem>{t('edit')}</DropdownMenuItem>
+                      <DropdownMenuItem>{t('viewMaintenance')}</DropdownMenuItem>
+                      <DropdownMenuItem>{t('reportRepair')}</DropdownMenuItem>
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem className="text-destructive">Delete</DropdownMenuItem>
+                      <DropdownMenuItem className="text-destructive">{t('delete')}</DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </TableCell>

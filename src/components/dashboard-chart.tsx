@@ -1,22 +1,24 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, XAxis, YAxis } from "recharts"
 import { chartData } from "@/lib/data"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartConfig } from "@/components/ui/chart"
-
-const chartConfig = {
-  revenue: {
-    label: "Revenue",
-    color: "hsl(var(--primary))",
-  },
-  cost: {
-    label: "Cost",
-    color: "hsl(var(--destructive))",
-  },
-} satisfies ChartConfig
+import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 
 export function DashboardChart() {
+  const t = useTranslations('Dashboard');
+
+  const chartConfig = {
+    revenue: {
+      label: t('revenue'),
+      color: "hsl(var(--primary))",
+    },
+    cost: {
+      label: t('cost'),
+      color: "hsl(var(--destructive))",
+    },
+  } satisfies ChartConfig
+
   return (
     <ChartContainer config={chartConfig} className="min-h-[200px] w-full">
       <BarChart accessibilityLayer data={chartData}>
@@ -29,9 +31,9 @@ export function DashboardChart() {
           tickFormatter={(value) => value.slice(0, 3)}
         />
         <YAxis
-          tickFormatter={(value) => `$${value / 1000}k`}
+          tickFormatter={(value) => `€${value / 1000}k`}
         />
-        <ChartTooltip content={<ChartTooltipContent />} />
+        <ChartTooltip content={<ChartTooltipContent formatter={(value, name, item) => (`${item.payload.month}: ${new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(value as number)}`)} />} />
         <Bar dataKey="revenue" fill="var(--color-revenue)" radius={4} />
         <Bar dataKey="cost" fill="var(--color-cost)" radius={4} />
       </BarChart>

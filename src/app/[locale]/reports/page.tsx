@@ -1,21 +1,23 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { BarChart3 } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 export default function ReportsPage() {
+  const t = useTranslations('ReportsPage');
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Reports</CardTitle>
+        <CardTitle>{t('title')}</CardTitle>
         <CardDescription>
-          Analyze costs, contribution margins, and overall performance.
+          {t('description')}
         </CardDescription>
       </CardHeader>
       <CardContent>
         <div className="flex flex-col items-center justify-center text-center gap-4 py-24 border-2 border-dashed rounded-lg">
           <BarChart3 className="w-16 h-16 text-muted-foreground" />
-          <h3 className="text-xl font-semibold">Analytics & Reports Coming Soon</h3>
+          <h3 className="text-xl font-semibold">{t('comingSoonTitle')}</h3>
           <p className="text-muted-foreground max-w-md">
-            Dashboards and reports for transparent insights into full costs, contribution margins, labor hours, and machinery costs will be available here.
+            {t('comingSoonDescription')}
           </p>
         </div>
       </CardContent>

@@ -14,9 +14,11 @@ import { PlaceHolderImages } from "@/lib/placeholder-images"
 import { SidebarTrigger } from "@/components/ui/sidebar"
 import { CircleUser, Settings, LogOut } from "lucide-react"
 import Link from "next/link"
+import { useTranslations } from "next-intl"
 
 export function Header() {
   const userAvatar = PlaceHolderImages.find(p => p.id === 'user-avatar');
+  const t = useTranslations('Header');
 
   return (
     <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
@@ -40,12 +42,12 @@ export function Header() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuLabel>My Account</DropdownMenuLabel>
+              <DropdownMenuLabel>{t('myAccount')}</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem asChild><Link href="/settings"><Settings className="mr-2 h-4 w-4" />Settings</Link></DropdownMenuItem>
-              <DropdownMenuItem>Support</DropdownMenuItem>
+              <DropdownMenuItem asChild><Link href="/settings"><Settings className="mr-2 h-4 w-4" />{t('settings')}</Link></DropdownMenuItem>
+              <DropdownMenuItem>{t('support')}</DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>Logout<LogOut className="ml-auto h-4 w-4" /></DropdownMenuItem>
+              <DropdownMenuItem>{t('logout')}<LogOut className="ml-auto h-4 w-4" /></DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
     </header>

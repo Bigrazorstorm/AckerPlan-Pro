@@ -2,28 +2,28 @@ import { AreaChart, Bell, Eye, Tractor } from "lucide-react";
 
 export const kpis = [
   {
-    label: "Total Revenue",
+    labelKey: "TotalRevenue",
     value: "€45,231.89",
     icon: AreaChart,
     change: "+20.1%",
     changeType: "increase",
   },
   {
-    label: "Total Costs",
+    labelKey: "TotalCosts",
     value: "€28,102.50",
     icon: Tractor,
     change: "+12.5%",
     changeType: "increase",
   },
   {
-    label: "Open Observations",
+    labelKey: "OpenObservations",
     value: "12",
     icon: Eye,
     change: "+2",
     changeType: "increase",
   },
   {
-    label: "Maintenance Due",
+    labelKey: "MaintenanceDue",
     value: "3",
     icon: Bell,
     change: "1 overdue",

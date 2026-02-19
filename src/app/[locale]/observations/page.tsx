@@ -1,21 +1,23 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Map } from 'lucide-react';
+import { Siren } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
-export default function FieldsPage() {
+export default function ObservationsPage() {
+  const t = useTranslations('ObservationsPage');
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Fields</CardTitle>
+        <CardTitle>{t('title')}</CardTitle>
         <CardDescription>
-          Manage your field boundaries and view GIS data.
+          {t('description')}
         </CardDescription>
       </CardHeader>
       <CardContent>
         <div className="flex flex-col items-center justify-center text-center gap-4 py-24 border-2 border-dashed rounded-lg">
-          <Map className="w-16 h-16 text-muted-foreground" />
-          <h3 className="text-xl font-semibold">GIS Map View Coming Soon</h3>
+          <Siren className="w-16 h-16 text-muted-foreground" />
+          <h3 className="text-xl font-semibold">{t('comingSoonTitle')}</h3>
           <p className="text-muted-foreground max-w-md">
-            An interactive map to view and select your fields, import GIS data, and overlay observation information will be available here.
+            {t('comingSoonDescription')}
           </p>
         </div>
       </CardContent>

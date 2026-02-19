@@ -1,0 +1,89 @@
+{
+  "Metadata": {
+    "title": "FieldSense Agro",
+    "description": "GIS-gestütztes, Mobile-First Produktions- und Wirtschaftlichkeits-Controlling für Ackerbau"
+  },
+  "Sidebar": {
+    "title": "FieldSense",
+    "dashboard": "Dashboard",
+    "fields": "Flächen",
+    "operations": "Maßnahmen",
+    "observations": "Beobachtungen",
+    "machinery": "Maschinen",
+    "reports": "Auswertungen",
+    "settings": "Einstellungen",
+    "logout": "Abmelden",
+    "userName": "John Doe",
+    "userRole": "Administrator"
+  },
+  "Header": {
+    "myAccount": "Mein Konto",
+    "settings": "Einstellungen",
+    "support": "Support",
+    "logout": "Abmelden"
+  },
+  "Dashboard": {
+    "welcome": "Willkommen bei FieldSense",
+    "description": "Hier ist ein schneller Überblick über die Leistung Ihres Betriebs.",
+    "fromLastMonth": "zum Vormonat",
+    "performanceTitle": "Leistung",
+    "performanceDescription": "Ihre Kosten- und Ertragsübersicht für das laufende Jahr.",
+    "recentActivitiesTitle": "Letzte Aktivitäten",
+    "recentActivitiesDescription": "Eine Übersicht der zuletzt protokollierten Aktivitäten.",
+    "activity": "Aktivität",
+    "field": "Feld",
+    "status": "Status",
+    "revenue": "Umsatz",
+    "cost": "Kosten"
+  },
+  "Kpis": {
+    "TotalRevenue": "Gesamtertrag",
+    "TotalCosts": "Gesamtkosten",
+    "OpenObservations": "Offene Beobachtungen",
+    "MaintenanceDue": "Fällige Wartungen"
+  },
+  "FieldsPage": {
+    "title": "Flächen",
+    "description": "Verwalten Sie Ihre Feldgrenzen und sehen Sie GIS-Daten ein.",
+    "comingSoonTitle": "GIS-Kartenansicht in Kürze verfügbar",
+    "comingSoonDescription": "Eine interaktive Karte zur Ansicht und Auswahl Ihrer Felder, zum Import von GIS-Daten und zur Überlagerung von Beobachtungsinformationen wird hier verfügbar sein."
+  },
+  "MachineryPage": {
+    "title": "Maschinen",
+    "description": "Verwalten Sie Ihre Flotte von Traktoren, Erntemaschinen und anderen Geräten.",
+    "addMachine": "Maschine hinzufügen",
+    "name": "Name",
+    "type": "Typ",
+    "status": "Status",
+    "nextService": "Nächster Service",
+    "actions": "Aktionen",
+    "edit": "Bearbeiten",
+    "viewMaintenance": "Wartung anzeigen",
+    "reportRepair": "Reparatur melden",
+    "delete": "Löschen"
+  },
+  "ObservationsPage": {
+    "title": "Beobachtungen",
+    "description": "Dokumentieren Sie Pflanzenwachstum, Schäden und andere Feldbeobachtungen.",
+    "comingSoonTitle": "Protokollierung von Beobachtungen in Kürze verfügbar",
+    "comingSoonDescription": "Das Werkzeug zur georeferenzierten Dokumentation von Feldbeobachtungen, einschließlich des Anhängens von Fotos und Notizen, wird hier verfügbar sein."
+  },
+  "OperationsPage": {
+    "title": "Maßnahmen",
+    "description": "Protokollieren Sie alle Produktionsmaßnahmen und den Ressourceneinsatz.",
+    "comingSoonTitle": "Aktivitätsprotokollierung in Kürze verfügbar",
+    "comingSoonDescription": "Die Mobile-First-Schnittstelle zur effizienten Erfassung aller Produktionsmaßnahmen (z. B. Bodenbearbeitung, Aussaat, Ernte) wird hier verfügbar sein."
+  },
+  "ReportsPage": {
+    "title": "Auswertungen",
+    "description": "Analysieren Sie Kosten, Deckungsbeiträge und die Gesamtleistung.",
+    "comingSoonTitle": "Analysen & Berichte in Kürze verfügbar",
+    "comingSoonDescription": "Dashboards und Berichte für transparente Einblicke in Vollkosten, Deckungsbeiträge, Arbeitsstunden und Maschinenkosten werden hier verfügbar sein."
+  },
+  "SettingsPage": {
+    "title": "Einstellungen",
+    "description": "Verwalten Sie Stammdaten, Benutzerrollen und Systemkonfigurationen.",
+    "comingSoonTitle": "Systemeinstellungen in Kürze verfügbar",
+    "comingSoonDescription": "Die Konfiguration für Stammdaten (Kulturen, Materialien, Preise), Benutzerberechtigungen und andere systemweite Einstellungen wird hier verfügbar sein."
+  }
+}

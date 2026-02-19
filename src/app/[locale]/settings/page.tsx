@@ -1,21 +1,23 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Settings } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 export default function SettingsPage() {
+  const t = useTranslations('SettingsPage');
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Settings</CardTitle>
+        <CardTitle>{t('title')}</CardTitle>
         <CardDescription>
-          Manage master data, user roles, and system configurations.
+          {t('description')}
         </CardDescription>
       </CardHeader>
       <CardContent>
         <div className="flex flex-col items-center justify-center text-center gap-4 py-24 border-2 border-dashed rounded-lg">
           <Settings className="w-16 h-16 text-muted-foreground" />
-          <h3 className="text-xl font-semibold">System Settings Coming Soon</h3>
+          <h3 className="text-xl font-semibold">{t('comingSoonTitle')}</h3>
           <p className="text-muted-foreground max-w-md">
-            Configuration for master data (crops, materials, prices), user permissions, and other system-wide settings will be available here.
+            {t('comingSoonDescription')}
           </p>
         </div>
       </CardContent>

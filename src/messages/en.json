@@ -1,0 +1,93 @@
+{
+  "Metadata": {
+    "title": "FieldSense Agro",
+    "description": "GIS-based, mobile-first production and profitability controlling for agriculture"
+  },
+  "Sidebar": {
+    "title": "FieldSense",
+    "dashboard": "Dashboard",
+    "fields": "Fields",
+    "operations": "Operations",
+    "observations": "Observations",
+    "machinery": "Machinery",
+    "reports": "Reports",
+    "settings": "Settings",
+    "logout": "Log out",
+    "userName": "John Doe",
+    "userRole": "Administrator"
+  },
+  "Header": {
+    "myAccount": "My Account",
+    "settings": "Settings",
+    "support": "Support",
+    "logout": "Logout"
+  },
+  "Dashboard": {
+    "welcome": "Welcome to FieldSense",
+    "description": "Here's a quick overview of your farm's performance.",
+    "totalRevenue": "Total Revenue",
+    "totalCosts": "Total Costs",
+    "openObservations": "Open Observations",
+    "maintenanceDue": "Maintenance Due",
+    "fromLastMonth": "from last month",
+    "performanceTitle": "Performance",
+    "performanceDescription": "Your cost and revenue overview for the current year.",
+    "recentActivitiesTitle": "Recent Activities",
+    "recentActivitiesDescription": "An overview of the latest logged activities.",
+    "activity": "Activity",
+    "field": "Field",
+    "status": "Status",
+    "revenue": "Revenue",
+    "cost": "Cost"
+  },
+  "Kpis": {
+    "TotalRevenue": "Total Revenue",
+    "TotalCosts": "Total Costs",
+    "OpenObservations": "Open Observations",
+    "MaintenanceDue": "Maintenance Due"
+  },
+  "FieldsPage": {
+    "title": "Fields",
+    "description": "Manage your field boundaries and view GIS data.",
+    "comingSoonTitle": "GIS Map View Coming Soon",
+    "comingSoonDescription": "An interactive map to view and select your fields, import GIS data, and overlay observation information will be available here."
+  },
+  "MachineryPage": {
+    "title": "Machinery",
+    "description": "Manage your fleet of tractors, harvesters, and other equipment.",
+    "addMachine": "Add Machine",
+    "name": "Name",
+    "type": "Type",
+    "status": "Status",
+    "nextService": "Next Service",
+    "actions": "Actions",
+    "edit": "Edit",
+    "viewMaintenance": "View Maintenance",
+    "reportRepair": "Report Repair",
+    "delete": "Delete"
+  },
+  "ObservationsPage": {
+    "title": "Observations",
+    "description": "Document crop growth, damages, and other field observations.",
+    "comingSoonTitle": "Observation Logging Coming Soon",
+    "comingSoonDescription": "The tool for geo-referenced documentation of field observations, including attaching photos and notes, will be available here."
+  },
+  "OperationsPage": {
+    "title": "Operations",
+    "description": "Log all production measures and resource usage.",
+    "comingSoonTitle": "Activity Logging Coming Soon",
+    "comingSoonDescription": "The mobile-first interface to efficiently capture all production measures (e.g., tillage, seeding, harvesting) will be available here."
+  },
+  "ReportsPage": {
+    "title": "Reports",
+    "description": "Analyze costs, contribution margins, and overall performance.",
+    "comingSoonTitle": "Analytics & Reports Coming Soon",
+    "comingSoonDescription": "Dashboards and reports for transparent insights into full costs, contribution margins, labor hours, and machinery costs will be available here."
+  },
+  "SettingsPage": {
+    "title": "Settings",
+    "description": "Manage master data, user roles, and system configurations.",
+    "comingSoonTitle": "System Settings Coming Soon",
+    "comingSoonDescription": "Configuration for master data (crops, materials, prices), user permissions, and other system-wide settings will be available here."
+  }
+}
