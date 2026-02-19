@@ -1,9 +1,9 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { BarChart3 } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+import { getTranslations } from 'next-intl/server';
 
-export default function ReportsPage() {
-  const t = useTranslations('ReportsPage');
+export default async function ReportsPage() {
+  const t = await getTranslations('ReportsPage');
   return (
     <Card>
       <CardHeader>

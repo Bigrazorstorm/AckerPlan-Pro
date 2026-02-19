@@ -1,13 +1,30 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { kpis, recentActivities } from "@/lib/data";
+import dataService from "@/services";
 import { DashboardChart } from "@/components/dashboard-chart";
-import { useTranslations } from "next-intl";
+import { getTranslations } from "next-intl/server";
+import { AreaChart, Bell, Eye, Tractor } from "lucide-react";
 
-export default function Home() {
-  const t = useTranslations('Dashboard');
-  const tKpi = useTranslations('Kpis');
+export default async function Home() {
+  const t = await getTranslations('Dashboard');
+  const tKpi = await getTranslations('Kpis');
+
+  // In a real app, tenantId and companyId would come from the user's session or context.
+  // For now, we'll use dummy values.
+  const tenantId = 'tenant-123';
+  const companyId = 'company-456';
+
+  const kpis = await dataService.getKpis(tenantId, companyId);
+  const recentActivities = await dataService.getRecentActivities(tenantId, companyId);
+  const chartData = await dataService.getChartData(tenantId, companyId);
+
+  const kpiIcons: Record<string, React.ElementType> = {
+    TotalRevenue: AreaChart,
+    TotalCosts: Tractor,
+    OpenObservations: Eye,
+    MaintenanceDue: Bell,
+  };
 
   return (
     <div className="space-y-8">
@@ -17,25 +34,28 @@ export default function Home() {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {kpis.map((kpi) => (
-          <Card key={kpi.labelKey}>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">{tKpi(kpi.labelKey)}</CardTitle>
-              <kpi.icon className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{kpi.value}</div>
-              {kpi.change && (
-                <p className="text-xs text-muted-foreground">
-                  <span className={kpi.changeType === 'increase' ? 'text-green-600' : 'text-red-600'}>
-                    {kpi.change}
-                  </span>
-                  {' '}{t('fromLastMonth')}
-                </p>
-              )}
-            </CardContent>
-          </Card>
-        ))}
+        {kpis.map((kpi) => {
+          const Icon = kpiIcons[kpi.labelKey];
+          return (
+            <Card key={kpi.labelKey}>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">{tKpi(kpi.labelKey)}</CardTitle>
+                {Icon && <Icon className="h-4 w-4 text-muted-foreground" />}
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{kpi.value}</div>
+                {kpi.change && (
+                  <p className="text-xs text-muted-foreground">
+                    <span className={kpi.changeType === 'increase' ? 'text-green-600' : 'text-red-600'}>
+                      {kpi.change}
+                    </span>
+                    {' '}{t('fromLastMonth')}
+                  </p>
+                )}
+              </CardContent>
+            </Card>
+          );
+        })}
       </div>
 
       <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-7">
@@ -47,7 +67,7 @@ export default function Home() {
             </CardDescription>
           </CardHeader>
           <CardContent className="pl-2">
-            <DashboardChart />
+            <DashboardChart chartData={chartData} />
           </CardContent>
         </Card>
         <Card className="lg:col-span-3">

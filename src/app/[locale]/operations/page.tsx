@@ -1,9 +1,9 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Combine } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+import { getTranslations } from 'next-intl/server';
 
-export default function OperationsPage() {
-  const t = useTranslations('OperationsPage');
+export default async function OperationsPage() {
+  const t = await getTranslations('OperationsPage');
   return (
     <Card>
       <CardHeader>

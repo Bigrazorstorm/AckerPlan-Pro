@@ -1,9 +1,9 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Settings } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+import { getTranslations } from 'next-intl/server';
 
-export default function SettingsPage() {
-  const t = useTranslations('SettingsPage');
+export default async function SettingsPage() {
+  const t = await getTranslations('SettingsPage');
   return (
     <Card>
       <CardHeader>

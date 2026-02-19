@@ -2,10 +2,14 @@
 
 import { useTranslations } from "next-intl"
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, XAxis, YAxis } from "recharts"
-import { chartData } from "@/lib/data"
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
+import { ChartDataPoint } from "@/services/types"
 
-export function DashboardChart() {
+interface DashboardChartProps {
+  chartData: ChartDataPoint[];
+}
+
+export function DashboardChart({ chartData }: DashboardChartProps) {
   const t = useTranslations('Dashboard');
 
   const chartConfig = {

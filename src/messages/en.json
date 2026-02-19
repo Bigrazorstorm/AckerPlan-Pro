@@ -64,7 +64,25 @@
     "edit": "Edit",
     "viewMaintenance": "View Maintenance",
     "reportRepair": "Report Repair",
-    "delete": "Delete"
+    "delete": "Delete",
+    "addMachineSheetTitle": "Add New Machine",
+    "addMachineForm": {
+      "nameLabel": "Machine Name",
+      "typeLabel": "Machine Type",
+      "typePlaceholder": "Select a type",
+      "modelLabel": "Model",
+      "submit": "Add Machine",
+      "submitting": "Adding...",
+      "successToastTitle": "Success",
+      "errorToastTitle": "Error"
+    }
+  },
+  "MachineryTypes": {
+    "Tractor": "Tractor",
+    "CombineHarvester": "Combine Harvester",
+    "Tillage": "Tillage",
+    "Seeding": "Seeding",
+    "Baler": "Baler"
   },
   "ObservationsPage": {
     "title": "Observations",

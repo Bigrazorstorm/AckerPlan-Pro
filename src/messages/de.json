@@ -60,7 +60,25 @@
     "edit": "Bearbeiten",
     "viewMaintenance": "Wartung anzeigen",
     "reportRepair": "Reparatur melden",
-    "delete": "Löschen"
+    "delete": "Löschen",
+    "addMachineSheetTitle": "Neue Maschine hinzufügen",
+    "addMachineForm": {
+      "nameLabel": "Name der Maschine",
+      "typeLabel": "Maschinentyp",
+      "typePlaceholder": "Typ auswählen",
+      "modelLabel": "Modell",
+      "submit": "Maschine hinzufügen",
+      "submitting": "Wird hinzugefügt...",
+      "successToastTitle": "Erfolg",
+      "errorToastTitle": "Fehler"
+    }
+  },
+  "MachineryTypes": {
+    "Tractor": "Traktor",
+    "CombineHarvester": "Mähdrescher",
+    "Tillage": "Bodenbearbeitung",
+    "Seeding": "Sämaschine",
+    "Baler": "Ballenpresse"
   },
   "ObservationsPage": {
     "title": "Beobachtungen",

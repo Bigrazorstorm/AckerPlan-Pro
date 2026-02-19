@@ -1,9 +1,9 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Map } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+import { getTranslations } from 'next-intl/server';
 
-export default function FieldsPage() {
-  const t = useTranslations('FieldsPage');
+export default async function FieldsPage() {
+  const t = await getTranslations('FieldsPage');
   return (
     <Card>
       <CardHeader>

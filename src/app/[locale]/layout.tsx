@@ -24,7 +24,7 @@ export async function generateMetadata({params: {locale}}: {params: {locale: str
 
 export default async function RootLayout({
   children,
-  params: {locale}
+  params: {locale},
 }: Readonly<{
   children: React.ReactNode;
   params: {locale: string};
@@ -42,7 +42,7 @@ export default async function RootLayout({
         />
       </head>
       <body className="font-body antialiased">
-        <NextIntlClientProvider messages={messages}>
+        <NextIntlClientProvider locale={locale} messages={messages}>
           <SidebarProvider>
               <Sidebar>
                 <SidebarNav />
