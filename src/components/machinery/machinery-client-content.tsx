@@ -8,7 +8,7 @@ import { Machinery } from '@/services/types'
 import { addMachine } from '@/app/machinery/actions'
 import { useSession } from '@/context/session-context'
 import dataService from '@/services'
-import { Link } from "next-intl/navigation";
+import Link from "next/link";
 import { useParams } from 'next/navigation'
 
 import { Badge } from "@/components/ui/badge"
@@ -214,7 +214,7 @@ export function MachineryClientContent() {
             {machinery.map((machine) => (
               <TableRow key={machine.id}>
                 <TableCell className="font-medium">
-                  <Link href={`/machinery/${machine.id}`} className="hover:underline">
+                  <Link href={`/${locale}/machinery/${machine.id}`} className="hover:underline">
                     {machine.name}
                   </Link>
                 </TableCell>
