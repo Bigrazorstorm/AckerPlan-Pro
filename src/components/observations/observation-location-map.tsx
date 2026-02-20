@@ -25,8 +25,13 @@ interface ObservationLocationMapProps {
 export function ObservationLocationMap({ latitude, longitude }: ObservationLocationMapProps) {
     const position: L.LatLngExpression = [latitude, longitude];
 
+    // By giving MapContainer a key that changes, we tell React to create a new instance
+    // instead of updating the old one. This is a simple way to avoid the "already initialized" error
+    // for maps that don't need to preserve state (like this one).
+    const mapKey = `${latitude}-${longitude}`;
+
     return (
-        <MapContainer center={position} zoom={13} style={{ height: '100%', width: '100%', borderRadius: 'inherit', zIndex: 0 }} zoomControl={false} scrollWheelZoom={false} dragging={false}>
+        <MapContainer key={mapKey} center={position} zoom={13} style={{ height: '100%', width: '100%', borderRadius: 'inherit', zIndex: 0 }} zoomControl={false} scrollWheelZoom={false} dragging={false}>
             <TileLayer
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
