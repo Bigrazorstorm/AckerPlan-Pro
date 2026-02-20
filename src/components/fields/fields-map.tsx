@@ -63,7 +63,7 @@ export function FieldsMap({ fields, observations }: FieldsMapProps) {
                     .addTo(observationLayer);
             });
 
-            const layersControl = L.control.layers(undefined, {
+            L.control.layers(undefined, {
                 [t('fieldsLayer')]: fieldLayer,
                 [t('observationsLayer')]: observationLayer
             }).addTo(map);
