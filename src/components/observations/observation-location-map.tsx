@@ -39,6 +39,7 @@ export function ObservationLocationMap({ latitude, longitude }: ObservationLocat
                 layers: 'dop20-th',
                 format: 'image/jpeg',
                 transparent: false,
+                version: '1.3.0',
                 attribution: "DOP &copy; TLBG"
             });
 

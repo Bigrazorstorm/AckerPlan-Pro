@@ -44,6 +44,7 @@ export function FieldsMap({ fields, observations }: FieldsMapProps) {
                 layers: 'dop20-th',
                 format: 'image/jpeg',
                 transparent: false,
+                version: '1.3.0',
                 attribution: "DOP &copy; TLBG"
             });
 
