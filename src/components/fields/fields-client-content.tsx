@@ -3,35 +3,17 @@
 import { useState, useEffect } from 'react';
 import { useSession } from '@/context/session-context';
 import dataService from '@/services';
-import { Field, Observation } from '@/services/types';
+import { Field } from '@/services/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useTranslations } from 'next-intl';
-import { Button } from '@/components/ui/button';
-import { PlusCircle } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import dynamic from 'next/dynamic';
-
-const FieldsMap = dynamic(() => import('@/components/fields/fields-map').then(mod => mod.FieldsMap), {
-  ssr: false,
-  loading: () => <Skeleton className="w-full aspect-video rounded-lg" />
-});
 
 function FieldsSkeleton() {
   return (
-    <div className="grid gap-6 lg:grid-cols-5">
-      <Card className="lg:col-span-3">
-        <CardHeader className="flex flex-row items-center justify-between">
-            <Skeleton className="h-6 w-1/3" />
-            <Skeleton className="h-9 w-40" />
-        </CardHeader>
-        <CardContent>
-           <Skeleton className="w-full aspect-video rounded-lg" />
-        </CardContent>
-      </Card>
-      <Card className="lg:col-span-2">
+      <Card>
         <CardHeader>
            <Skeleton className="h-6 w-1/2" />
         </CardHeader>
@@ -45,7 +27,7 @@ function FieldsSkeleton() {
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    {[...Array(4)].map((_, i) => (
+                    {[...Array(8)].map((_, i) => (
                         <TableRow key={i}>
                             <TableCell><Skeleton className="h-5 w-28" /></TableCell>
                             <TableCell><Skeleton className="h-5 w-20" /></TableCell>
@@ -56,7 +38,6 @@ function FieldsSkeleton() {
             </Table>
         </CardContent>
       </Card>
-    </div>
   );
 }
 
@@ -64,7 +45,6 @@ function FieldsSkeleton() {
 export function FieldsClientContent() {
   const { activeCompany, loading: sessionLoading } = useSession();
   const [fields, setFields] = useState<Field[]>([]);
-  const [observations, setObservations] = useState<Observation[]>([]);
   const [loading, setLoading] = useState(true);
   const t = useTranslations('FieldsPage');
   const { locale } = useParams<{ locale: string }>();
@@ -73,12 +53,10 @@ export function FieldsClientContent() {
     if (activeCompany) {
       const fetchData = async () => {
         setLoading(true);
-        const [fieldsData, observationsData] = await Promise.all([
+        const [fieldsData] = await Promise.all([
             dataService.getFields(activeCompany.tenantId, activeCompany.id),
-            dataService.getObservations(activeCompany.tenantId, activeCompany.id)
         ]);
         setFields(fieldsData);
-        setObservations(observationsData);
         setLoading(false);
       };
       fetchData();
@@ -90,22 +68,7 @@ export function FieldsClientContent() {
   }
 
   return (
-    <div className="grid gap-6 lg:grid-cols-5">
-      <Card className="lg:col-span-3">
-         <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle>{t('mapTitle')}</CardTitle>
-             <Button size="sm" className="gap-1">
-              <PlusCircle className="h-4 w-4" />
-              {t('importButton')}
-            </Button>
-        </CardHeader>
-        <CardContent>
-            <div className="aspect-video w-full overflow-hidden rounded-md border">
-              <FieldsMap fields={fields} observations={observations} />
-            </div>
-        </CardContent>
-      </Card>
-      <Card className="lg:col-span-2">
+      <Card>
         <CardHeader>
           <CardTitle>{t('listTitle')}</CardTitle>
         </CardHeader>
@@ -134,6 +97,5 @@ export function FieldsClientContent() {
           </Table>
         </CardContent>
       </Card>
-    </div>
   );
 }

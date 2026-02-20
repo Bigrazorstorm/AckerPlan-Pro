@@ -7,6 +7,7 @@ import {
   Leaf,
   LayoutDashboard,
   Map,
+  Layers,
   Tractor,
   Combine,
   Siren,
@@ -41,7 +42,8 @@ import { logout } from '@/app/auth/actions';
 
 const navItems = [
   { href: '/', icon: LayoutDashboard, labelKey: 'dashboard' },
-  { href: '/fields', icon: Map, labelKey: 'fields' },
+  { href: '/map', icon: Map, labelKey: 'map' },
+  { href: '/fields', icon: Layers, labelKey: 'fields' },
   { href: '/operations', icon: Combine, labelKey: 'operations' },
   { href: '/observations', icon: Siren, labelKey: 'observations' },
   { href: '/machinery', icon: Tractor, labelKey: 'machinery' },

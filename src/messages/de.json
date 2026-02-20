@@ -6,6 +6,7 @@
   "Sidebar": {
     "title": "FieldSense",
     "dashboard": "Dashboard",
+    "map": "Karte",
     "fields": "Flächen",
     "operations": "Maßnahmen",
     "observations": "Beobachtungen",
@@ -61,9 +62,19 @@
     "invalidCredentials": "Ungültige E-Mail-Adresse oder falsches Passwort.",
     "authenticationError": "Bei der Authentifizierung ist ein Fehler aufgetreten."
   },
+  "MapPage": {
+    "title": "Interaktive Karte",
+    "description": "Übersicht Ihrer Flächen, Beobachtungen und amtlicher Geodaten.",
+    "importButton": "GIS-Daten importieren"
+  },
+  "MapDebug": {
+    "layerErrorTitle": "Karten-Layer Fehler",
+    "layerErrorDescription": "Layer '{layerName}' konnte nicht geladen werden. Bitte prüfen Sie die Server-URL und Ihre Verbindung."
+  },
   "FieldsPage": {
     "title": "Flächen",
     "description": "Verwalten Sie Ihre Feldgrenzen und sehen Sie GIS-Daten ein.",
+    "description_list": "Verwalten und sehen Sie Ihre Schläge in einer Listenübersicht.",
     "mapTitle": "Kartenübersicht",
     "listTitle": "Flächenliste",
     "importButton": "GIS-Daten importieren",

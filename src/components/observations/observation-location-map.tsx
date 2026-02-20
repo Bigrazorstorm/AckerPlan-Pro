@@ -2,9 +2,11 @@
 
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import 'leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css';
 import 'leaflet-defaulticon-compatibility';
+import 'leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css';
 import { useMemo, useEffect, useRef } from 'react';
+import { useToast } from '@/hooks/use-toast';
+import { useTranslations } from 'next-intl';
 
 
 interface ObservationLocationMapProps {
@@ -16,6 +18,8 @@ export function ObservationLocationMap({ latitude, longitude }: ObservationLocat
     const mapContainerRef = useRef<HTMLDivElement>(null);
     const mapInstanceRef = useRef<L.Map | null>(null);
     const markerRef = useRef<L.Marker | null>(null);
+    const { toast } = useToast();
+    const tDebug = useTranslations('MapDebug');
 
     const mapStyle = useMemo(() => ({ height: '100%', width: '100%', borderRadius: 'inherit', zIndex: 0 }), []);
     
@@ -38,7 +42,7 @@ export function ObservationLocationMap({ latitude, longitude }: ObservationLocat
             const dop20Layer = L.tileLayer.wms("https://www.geoproxy.geoportal-th.de/geoproxy/services/DOP20", {
                 layers: 'DOP20',
                 format: 'image/png',
-                transparent: false,
+                transparent: true,
                 version: '1.3.0',
                 attribution: "DOP &copy; TLBG"
             });
@@ -49,6 +53,16 @@ export function ObservationLocationMap({ latitude, longitude }: ObservationLocat
                 transparent: true,
                 version: '1.3.0',
                 attribution: "ALKIS &copy; TLBG"
+            });
+
+            // Debugging
+            dop20Layer.on('tileerror', (error) => {
+                console.error('DOP20 Layer Error:', error);
+                toast({ variant: 'destructive', title: tDebug('layerErrorTitle'), description: tDebug('layerErrorDescription', { layerName: 'Digitale Orthophotos (DOP20)' }) });
+            });
+            alkisWmsLayer.on('tileerror', (error) => {
+                console.error('ALKIS Layer Error:', error);
+                toast({ variant: 'destructive', title: tDebug('layerErrorTitle'), description: tDebug('layerErrorDescription', { layerName: 'Liegenschaftskarte (ALKIS)' }) });
             });
 
             const baseLayers = {
@@ -78,7 +92,6 @@ export function ObservationLocationMap({ latitude, longitude }: ObservationLocat
                 mapInstanceRef.current = null;
             }
         };
-    // Empty array ensures this runs only on mount/unmount
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 

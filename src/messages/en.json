@@ -6,6 +6,7 @@
   "Sidebar": {
     "title": "FieldSense",
     "dashboard": "Dashboard",
+    "map": "Map",
     "fields": "Fields",
     "operations": "Operations",
     "observations": "Observations",
@@ -61,9 +62,19 @@
     "invalidCredentials": "Invalid email or password.",
     "authenticationError": "An error occurred during authentication."
   },
+  "MapPage": {
+    "title": "Interactive Map",
+    "description": "Overview of your fields, observations, and official geodata.",
+    "importButton": "Import GIS Data"
+  },
+  "MapDebug": {
+    "layerErrorTitle": "Map Layer Error",
+    "layerErrorDescription": "Layer '{layerName}' could not be loaded. Please check the server URL and your connection."
+  },
   "FieldsPage": {
     "title": "Fields",
     "description": "Manage your field boundaries and view GIS data.",
+    "description_list": "Manage and view your fields in a list overview.",
     "mapTitle": "Map Overview",
     "listTitle": "Field List",
     "importButton": "Import GIS Data",
