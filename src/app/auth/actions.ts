@@ -25,11 +25,11 @@ export async function authenticate(
         path: '/',
       });
     } else {
-      return 'Invalid email or password.';
+      return 'invalidCredentials';
     }
   } catch (error) {
     console.error(error);
-    return 'An error occurred during authentication.';
+    return 'authenticationError';
   }
   
   redirect('/');

@@ -58,8 +58,8 @@
     "submit": "Sign In",
     "submitting": "Signing in...",
     "errorToastTitle": "Sign In Failed",
-    "Invalid email or password.": "Invalid email or password.",
-    "An error occurred during authentication.": "An error occurred during authentication."
+    "invalidCredentials": "Invalid email or password.",
+    "authenticationError": "An error occurred during authentication."
   },
   "FieldsPage": {
     "title": "Fields",

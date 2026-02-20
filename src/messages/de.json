@@ -58,8 +58,8 @@
     "submit": "Anmelden",
     "submitting": "Anmeldung läuft...",
     "errorToastTitle": "Anmeldung fehlgeschlagen",
-    "Invalid email or password.": "Ungültige E-Mail-Adresse oder falsches Passwort.",
-    "An error occurred during authentication.": "Bei der Authentifizierung ist ein Fehler aufgetreten."
+    "invalidCredentials": "Ungültige E-Mail-Adresse oder falsches Passwort.",
+    "authenticationError": "Bei der Authentifizierung ist ein Fehler aufgetreten."
   },
   "FieldsPage": {
     "title": "Flächen",
