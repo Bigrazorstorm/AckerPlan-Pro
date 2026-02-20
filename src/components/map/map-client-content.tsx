@@ -4,12 +4,8 @@ import { useState, useEffect, useRef } from 'react';
 import { useSession } from '@/context/session-context';
 import dataService from '@/services';
 import { Field, Observation } from '@/services/types';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useTranslations } from 'next-intl';
-import { Button } from '@/components/ui/button';
-import { PlusCircle } from 'lucide-react';
-
 import L, { LatLngExpression, latLng, latLngBounds } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-defaulticon-compatibility';
@@ -17,7 +13,7 @@ import 'leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility
 import { useToast } from '@/hooks/use-toast';
 
 function MapSkeleton() {
-  return <Skeleton className="w-full h-full rounded-lg" />;
+  return <Skeleton className="w-full h-full" />;
 }
 
 export function MapClientContent() {
@@ -27,7 +23,6 @@ export function MapClientContent() {
   const [loading, setLoading] = useState(true);
   
   const t = useTranslations('FieldsPage'); // Re-use some translations
-  const tMapPage = useTranslations('MapPage');
   const tDebug = useTranslations('MapDebug');
   const { toast } = useToast();
   
@@ -36,7 +31,7 @@ export function MapClientContent() {
   const fieldLayerRef = useRef<L.FeatureGroup | null>(null);
   const observationLayerRef = useRef<L.FeatureGroup | null>(null);
 
-  const mapStyle = { height: '100%', width: '100%', borderRadius: 'inherit', zIndex: 0 };
+  const mapStyle = { height: '100%', width: '100%' };
 
   useEffect(() => {
     if (activeCompany) {
@@ -56,84 +51,82 @@ export function MapClientContent() {
 
   // Effect for initializing the map - runs only once
   useEffect(() => {
-    if (mapContainerRef.current && !mapInstanceRef.current) {
-        const map = L.map(mapContainerRef.current, {
-            center: [50.9778, 11.0289], // Center on Thüringen
-            zoom: 9,
-            scrollWheelZoom: true,
+    if (!mapContainerRef.current) return;
+
+    const map = L.map(mapContainerRef.current, {
+        center: [50.9778, 11.0289], // Center on Thüringen
+        zoom: 9,
+        scrollWheelZoom: true,
+    });
+    mapInstanceRef.current = map;
+
+    const osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    });
+
+    const dop20Layer = L.tileLayer.wms("https://www.geoproxy.geoportal-th.de/geoproxy/services/DOP20", {
+        layers: 'DOP20',
+        format: 'image/png',
+        transparent: true,
+        version: '1.3.0',
+        attribution: "DOP &copy; TLBG"
+    });
+
+    const alkisWmsLayer = L.tileLayer.wms("https://www.geoproxy.geoportal-th.de/geoproxy/services/ALKISV", {
+        layers: 'Gemarkung,Flur,Flurstueck,Gebaeude,Hausnummer',
+        format: 'image/png',
+        transparent: true,
+        version: '1.3.0',
+        attribution: "ALKIS &copy; TLBG"
+    });
+
+    // Debugging event listeners
+    dop20Layer.on('tileerror', (error) => {
+        console.error('DOP20 Layer Error:', error);
+        toast({
+            variant: 'destructive',
+            title: tDebug('layerErrorTitle'),
+            description: tDebug('layerErrorDescription', { layerName: 'Digitale Orthophotos (DOP20)' }),
         });
-        mapInstanceRef.current = map;
-
-        const osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    });
+    alkisWmsLayer.on('tileerror', (error) => {
+        console.error('ALKIS Layer Error:', error);
+         toast({
+            variant: 'destructive',
+            title: tDebug('layerErrorTitle'),
+            description: tDebug('layerErrorDescription', { layerName: 'Liegenschaftskarte (ALKIS)' }),
         });
+    });
 
-        const dop20Layer = L.tileLayer.wms("https://www.geoproxy.geoportal-th.de/geoproxy/services/DOP20", {
-            layers: 'DOP20',
-            format: 'image/png',
-            transparent: true,
-            version: '1.3.0',
-            attribution: "DOP &copy; TLBG"
-        });
+    const fieldLayer = L.featureGroup();
+    const observationLayer = L.featureGroup();
+    
+    fieldLayerRef.current = fieldLayer;
+    observationLayerRef.current = observationLayer;
 
-        const alkisWmsLayer = L.tileLayer.wms("https://www.geoproxy.geoportal-th.de/geoproxy/services/ALKISV", {
-            layers: 'Gemarkung,Flur,Flurstueck,Gebaeude,Hausnummer',
-            format: 'image/png',
-            transparent: true,
-            version: '1.3.0',
-            attribution: "ALKIS &copy; TLBG"
-        });
+    osmLayer.addTo(map);
+    fieldLayer.addTo(map);
+    observationLayer.addTo(map);
+    
+    const baseLayers = {
+        "OpenStreetMap": osmLayer,
+        "Digitale Orthophotos (DOP20)": dop20Layer
+    };
 
-        // Debugging event listeners
-        dop20Layer.on('tileerror', (error) => {
-            console.error('DOP20 Layer Error:', error);
-            toast({
-                variant: 'destructive',
-                title: tDebug('layerErrorTitle'),
-                description: tDebug('layerErrorDescription', { layerName: 'Digitale Orthophotos (DOP20)' }),
-            });
-        });
-        alkisWmsLayer.on('tileerror', (error) => {
-            console.error('ALKIS Layer Error:', error);
-             toast({
-                variant: 'destructive',
-                title: tDebug('layerErrorTitle'),
-                description: tDebug('layerErrorDescription', { layerName: 'Liegenschaftskarte (ALKIS)' }),
-            });
-        });
+    const overlayLayers = {
+        [t('fieldsLayer')]: fieldLayer,
+        [t('observationsLayer')]: observationLayer,
+        "Liegenschaftskarte (ALKIS)": alkisWmsLayer,
+    };
 
-        const fieldLayer = L.featureGroup();
-        const observationLayer = L.featureGroup();
-        
-        fieldLayerRef.current = fieldLayer;
-        observationLayerRef.current = observationLayer;
-
-        osmLayer.addTo(map);
-        fieldLayer.addTo(map);
-        observationLayer.addTo(map);
-        
-        const baseLayers = {
-            "OpenStreetMap": osmLayer,
-            "Digitale Orthophotos (DOP20)": dop20Layer
-        };
-
-        const overlayLayers = {
-            [t('fieldsLayer')]: fieldLayer,
-            [t('observationsLayer')]: observationLayer,
-            "Liegenschaftskarte (ALKIS)": alkisWmsLayer,
-        };
-
-        L.control.layers(baseLayers, overlayLayers).addTo(map);
-    }
+    L.control.layers(baseLayers, overlayLayers).addTo(map);
 
     return () => {
-        if (mapInstanceRef.current) {
-            mapInstanceRef.current.remove();
-            mapInstanceRef.current = null;
-        }
+        map.remove();
+        mapInstanceRef.current = null;
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); 
+  }, [t]); 
 
   // Effect for updating data layers - runs when data changes
   useEffect(() => {
@@ -184,17 +177,6 @@ export function MapClientContent() {
   }
 
   return (
-    <Card className="h-full">
-      <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle>{tMapPage('title')}</CardTitle>
-           <Button size="sm" className="gap-1">
-            <PlusCircle className="h-4 w-4" />
-            {tMapPage('importButton')}
-          </Button>
-      </CardHeader>
-      <CardContent className="h-[calc(100%-4.5rem)] p-0">
-          <div ref={mapContainerRef} style={mapStyle} />
-      </CardContent>
-    </Card>
+      <div ref={mapContainerRef} style={mapStyle} />
   );
 }

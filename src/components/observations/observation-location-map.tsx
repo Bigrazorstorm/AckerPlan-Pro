@@ -21,76 +21,74 @@ export function ObservationLocationMap({ latitude, longitude }: ObservationLocat
     const { toast } = useToast();
     const tDebug = useTranslations('MapDebug');
 
-    const mapStyle = useMemo(() => ({ height: '100%', width: '100%', borderRadius: 'inherit', zIndex: 0 }), []);
+    const mapStyle = useMemo(() => ({ height: '100%', width: '100%', borderRadius: 'inherit' }), []);
     
     // Init effect
     useEffect(() => {
-        if (mapContainerRef.current && !mapInstanceRef.current) {
-            const map = L.map(mapContainerRef.current, {
-                center: [latitude, longitude],
-                zoom: 15,
-                zoomControl: true,
-                scrollWheelZoom: true,
-                dragging: true,
-            });
-            mapInstanceRef.current = map;
+        if (!mapContainerRef.current) return;
 
-            const osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            });
+        const map = L.map(mapContainerRef.current, {
+            center: [latitude, longitude],
+            zoom: 15,
+            zoomControl: true,
+            scrollWheelZoom: true,
+            dragging: true,
+        });
+        mapInstanceRef.current = map;
 
-            const dop20Layer = L.tileLayer.wms("https://www.geoproxy.geoportal-th.de/geoproxy/services/DOP20", {
-                layers: 'DOP20',
-                format: 'image/png',
-                transparent: true,
-                version: '1.3.0',
-                attribution: "DOP &copy; TLBG"
-            });
+        const osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        });
 
-            const alkisWmsLayer = L.tileLayer.wms("https://www.geoproxy.geoportal-th.de/geoproxy/services/ALKISV", {
-                layers: 'Gemarkung,Flur,Flurstueck,Gebaeude,Hausnummer',
-                format: 'image/png',
-                transparent: true,
-                version: '1.3.0',
-                attribution: "ALKIS &copy; TLBG"
-            });
+        const dop20Layer = L.tileLayer.wms("https://www.geoproxy.geoportal-th.de/geoproxy/services/DOP20", {
+            layers: 'DOP20',
+            format: 'image/png',
+            transparent: true,
+            version: '1.3.0',
+            attribution: "DOP &copy; TLBG"
+        });
 
-            // Debugging
-            dop20Layer.on('tileerror', (error) => {
-                console.error('DOP20 Layer Error:', error);
-                toast({ variant: 'destructive', title: tDebug('layerErrorTitle'), description: tDebug('layerErrorDescription', { layerName: 'Digitale Orthophotos (DOP20)' }) });
-            });
-            alkisWmsLayer.on('tileerror', (error) => {
-                console.error('ALKIS Layer Error:', error);
-                toast({ variant: 'destructive', title: tDebug('layerErrorTitle'), description: tDebug('layerErrorDescription', { layerName: 'Liegenschaftskarte (ALKIS)' }) });
-            });
+        const alkisWmsLayer = L.tileLayer.wms("https://www.geoproxy.geoportal-th.de/geoproxy/services/ALKISV", {
+            layers: 'Gemarkung,Flur,Flurstueck,Gebaeude,Hausnummer',
+            format: 'image/png',
+            transparent: true,
+            version: '1.3.0',
+            attribution: "ALKIS &copy; TLBG"
+        });
 
-            const baseLayers = {
-                "OpenStreetMap": osmLayer,
-                "Digitale Orthophotos (DOP20)": dop20Layer
-            };
+        // Debugging
+        dop20Layer.on('tileerror', (error) => {
+            console.error('DOP20 Layer Error:', error);
+            toast({ variant: 'destructive', title: tDebug('layerErrorTitle'), description: tDebug('layerErrorDescription', { layerName: 'Digitale Orthophotos (DOP20)' }) });
+        });
+        alkisWmsLayer.on('tileerror', (error) => {
+            console.error('ALKIS Layer Error:', error);
+            toast({ variant: 'destructive', title: tDebug('layerErrorTitle'), description: tDebug('layerErrorDescription', { layerName: 'Liegenschaftskarte (ALKIS)' }) });
+        });
 
-            const overlayLayers = {
-                "Liegenschaftskarte (ALKIS)": alkisWmsLayer
-            };
+        const baseLayers = {
+            "OpenStreetMap": osmLayer,
+            "Digitale Orthophotos (DOP20)": dop20Layer
+        };
 
-            L.control.layers(baseLayers, overlayLayers).addTo(map);
-            osmLayer.addTo(map); // Default base layer
+        const overlayLayers = {
+            "Liegenschaftskarte (ALKIS)": alkisWmsLayer
+        };
 
-            const marker = L.marker([latitude, longitude])
-              .bindTooltip('Beobachtungsstandort')
-              .addTo(map)
-              .openTooltip();
-            
-            markerRef.current = marker;
-        }
+        L.control.layers(baseLayers, overlayLayers).addTo(map);
+        osmLayer.addTo(map); // Default base layer
 
+        const marker = L.marker([latitude, longitude])
+            .bindTooltip('Beobachtungsstandort')
+            .addTo(map)
+            .openTooltip();
+        
+        markerRef.current = marker;
+        
         // Cleanup function for when the component unmounts
         return () => {
-            if (mapInstanceRef.current) {
-                mapInstanceRef.current.remove();
-                mapInstanceRef.current = null;
-            }
+            map.remove();
+            mapInstanceRef.current = null;
         };
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);

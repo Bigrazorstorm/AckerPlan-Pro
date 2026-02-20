@@ -1,5 +1,7 @@
 import { MapClientContent } from "@/components/map/map-client-content";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { Button } from "@/components/ui/button";
+import { PlusCircle } from "lucide-react";
 
 export default async function MapPage({params: {locale}}: {params: {locale: string}}) {
   setRequestLocale(locale);
@@ -14,8 +16,12 @@ export default async function MapPage({params: {locale}}: {params: {locale: stri
             {t('description')}
           </p>
         </div>
+         <Button size="sm" className="gap-1">
+            <PlusCircle className="h-4 w-4" />
+            {tMapPage('importButton')}
+          </Button>
       </div>
-      <div className="flex-1 min-h-0">
+      <div className="flex-1 min-h-0 rounded-lg border overflow-hidden">
         <MapClientContent />
       </div>
     </div>
