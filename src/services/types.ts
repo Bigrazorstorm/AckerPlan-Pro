@@ -38,6 +38,16 @@ export interface Machinery {
   updatedAt: string; // ISO-8601 date string
 };
 
+// Represents a Field entity in the database.
+export interface Field {
+  id: string; // UUID
+  tenantId: string;
+  companyId: string;
+  name: string;
+  area: number; // in hectares
+  crop: string;
+};
+
 export type Role = "Tenant Admin" | "Firmen Admin" | "Betriebsleitung" | "Mitarbeiter" | "Werkstatt" | "Leser";
 
 export interface Company {

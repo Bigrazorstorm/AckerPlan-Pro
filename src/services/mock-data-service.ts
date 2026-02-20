@@ -1,5 +1,5 @@
 import { DataService } from './data-service';
-import { Kpi, ChartDataPoint, RecentActivity, Machinery, Session } from './types';
+import { Kpi, ChartDataPoint, RecentActivity, Machinery, Session, Field } from './types';
 
 const session: Session = {
   user: {
@@ -127,6 +127,16 @@ const machinery: Machinery[] = [
   { id: 'M008', tenantId: 'tenant-123', companyId: 'company-789', name: "New Holland CR9.90", type: "Combine Harvester", model: "CR9.90", status: "Operational", nextService: "In 150h", lastMaintenance: "2024-07-01", createdAt: "2023-09-01T09:00:00Z", updatedAt: "2024-07-01T14:00:00Z" },
 ];
 
+const fields: Field[] = [
+  { id: 'field-1', tenantId: 'tenant-123', companyId: 'company-456', name: 'Acker-Nord 1', area: 15.2, crop: 'Winterweizen' },
+  { id: 'field-2', tenantId: 'tenant-123', companyId: 'company-456', name: 'Südhang', area: 8.5, crop: 'Zuckerrüben' },
+  { id: 'field-3', tenantId: 'tenant-123', companyId: 'company-456', name: 'Große Wiese', area: 22.0, crop: 'Gerste' },
+  { id: 'field-4', tenantId: 'tenant-123', companyId: 'company-456', name: 'An der B2', area: 5.7, crop: 'Raps' },
+  // Fields for company-789
+  { id: 'field-5', tenantId: 'tenant-123', companyId: 'company-789', name: 'Grünland-West', area: 12.0, crop: 'Weidegras' },
+  { id: 'field-6', tenantId: 'tenant-123', companyId: 'company-789', name: 'Weide am Bach', area: 7.8, crop: 'Klee-Gras-Mischung' },
+];
+
 
 export class MockDataService implements DataService {
   
@@ -159,6 +169,11 @@ export class MockDataService implements DataService {
   async getMachinery(tenantId: string, companyId: string): Promise<Machinery[]> {
     console.log(`Fetching Machinery for tenant ${tenantId} and company ${companyId}.`);
     return Promise.resolve(machinery.filter(m => m.tenantId === tenantId && m.companyId === companyId));
+  }
+  
+  async getFields(tenantId: string, companyId: string): Promise<Field[]> {
+    console.log(`Fetching Fields for tenant ${tenantId} and company ${companyId}.`);
+    return Promise.resolve(fields.filter(f => f.tenantId === tenantId && f.companyId === companyId));
   }
 
   async addMachinery(tenantId: string, companyId: string, machineData: { name: string; type: string; model: string; }): Promise<Machinery> {

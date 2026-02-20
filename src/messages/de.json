@@ -47,8 +47,12 @@
   "FieldsPage": {
     "title": "Flächen",
     "description": "Verwalten Sie Ihre Feldgrenzen und sehen Sie GIS-Daten ein.",
-    "comingSoonTitle": "GIS-Kartenansicht in Kürze verfügbar",
-    "comingSoonDescription": "Eine interaktive Karte zur Ansicht und Auswahl Ihrer Felder, zum Import von GIS-Daten und zur Überlagerung von Beobachtungsinformationen wird hier verfügbar sein."
+    "mapTitle": "Kartenübersicht",
+    "listTitle": "Flächenliste",
+    "importButton": "GIS-Daten importieren",
+    "listHeaderName": "Name",
+    "listHeaderCrop": "Kultur",
+    "listHeaderArea": "Fläche"
   },
   "MachineryPage": {
     "title": "Maschinen",

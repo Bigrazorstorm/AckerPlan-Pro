@@ -1,4 +1,4 @@
-import { Kpi, ChartDataPoint, RecentActivity, Machinery, Session } from './types';
+import { Kpi, ChartDataPoint, RecentActivity, Machinery, Session, Field } from './types';
 
 /**
  * Defines the contract for data access in the application.
@@ -46,4 +46,11 @@ export interface DataService {
    * @param machineData - The data for the new machine.
    */
   addMachinery(tenantId: string, companyId: string, machineData: { name: string; type: string; model: string; }): Promise<Machinery>;
+
+  /**
+   * Retrieves fields data for a given company and tenant.
+   * @param tenantId - The ID of the tenant.
+   * @param companyId - The ID of the company.
+   */
+  getFields(tenantId: string, companyId: string): Promise<Field[]>;
 }

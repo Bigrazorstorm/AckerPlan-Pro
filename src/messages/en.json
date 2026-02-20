@@ -51,8 +51,12 @@
   "FieldsPage": {
     "title": "Fields",
     "description": "Manage your field boundaries and view GIS data.",
-    "comingSoonTitle": "GIS Map View Coming Soon",
-    "comingSoonDescription": "An interactive map to view and select your fields, import GIS data, and overlay observation information will be available here."
+    "mapTitle": "Map Overview",
+    "listTitle": "Field List",
+    "importButton": "Import GIS Data",
+    "listHeaderName": "Name",
+    "listHeaderCrop": "Crop",
+    "listHeaderArea": "Area"
   },
   "MachineryPage": {
     "title": "Machinery",
