@@ -2,9 +2,8 @@
 
 import { MapContainer, TileLayer, Marker, Tooltip } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
-import 'leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.webpack.css';
-import * as L from 'leaflet';
 import 'leaflet-defaulticon-compatibility';
+import * as L from 'leaflet';
 
 interface ObservationLocationMapProps {
     latitude: number;

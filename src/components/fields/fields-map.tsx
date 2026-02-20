@@ -2,7 +2,6 @@
 
 import { MapContainer, TileLayer, Polygon, Tooltip, FeatureGroup, LayersControl, Marker } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
-import 'leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.webpack.css';
 import 'leaflet-defaulticon-compatibility';
 import { Field, Observation } from '@/services/types';
 import { LatLngExpression, LatLngTuple, latLng, latLngBounds } from 'leaflet';
