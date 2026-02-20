@@ -1,4 +1,4 @@
-import { Kpi, ChartDataPoint, RecentActivity, Machinery, Session, Field } from './types';
+import { Kpi, ChartDataPoint, Operation, Machinery, Session, Field } from './types';
 
 /**
  * Defines the contract for data access in the application.
@@ -26,11 +26,11 @@ export interface DataService {
   getChartData(tenantId: string, companyId: string): Promise<ChartDataPoint[]>;
 
   /**
-   * Retrieves recent activities for a given company and tenant.
+   * Retrieves recent operations for a given company and tenant.
    * @param tenantId - The ID of the tenant.
    * @param companyId - The ID of the company.
    */
-  getRecentActivities(tenantId: string, companyId: string): Promise<RecentActivity[]>;
+  getOperations(tenantId: string, companyId: string): Promise<Operation[]>;
 
   /**
    * Retrieves machinery data for a given company and tenant.
@@ -46,6 +46,14 @@ export interface DataService {
    * @param machineData - The data for the new machine.
    */
   addMachinery(tenantId: string, companyId: string, machineData: { name: string; type: string; model: string; }): Promise<Machinery>;
+
+  /**
+   * Adds a new operation to the data store.
+   * @param tenantId - The ID of the tenant.
+   * @param companyId - The ID of the company.
+   * @param operationData - The data for the new operation.
+   */
+  addOperation(tenantId: string, companyId: string, operationData: { type: string; field: string; date: string; status: "Completed" | "In Progress"; }): Promise<Operation>;
 
   /**
    * Retrieves fields data for a given company and tenant.

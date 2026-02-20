@@ -9,7 +9,7 @@ import dataService from "@/services";
 import { DashboardChart } from "@/components/dashboard-chart";
 import { useTranslations } from "next-intl";
 import { AreaChart, Bell, Eye, Tractor } from "lucide-react";
-import { Kpi, RecentActivity, ChartDataPoint } from '@/services/types';
+import { Kpi, Operation, ChartDataPoint } from '@/services/types';
 import { Skeleton } from '@/components/ui/skeleton';
 
 function DashboardSkeleton() {
@@ -74,7 +74,7 @@ export default function Home() {
   const { activeCompany, loading: sessionLoading } = useSession();
 
   const [kpis, setKpis] = useState<Kpi[]>([]);
-  const [recentActivities, setRecentActivities] = useState<RecentActivity[]>([]);
+  const [recentOperations, setRecentOperations] = useState<Operation[]>([]);
   const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -84,11 +84,11 @@ export default function Home() {
         setLoading(true);
         const [kpiData, activityData, chartDataResult] = await Promise.all([
           dataService.getKpis(activeCompany.tenantId, activeCompany.id),
-          dataService.getRecentActivities(activeCompany.tenantId, activeCompany.id),
+          dataService.getOperations(activeCompany.tenantId, activeCompany.id),
           dataService.getChartData(activeCompany.tenantId, activeCompany.id)
         ]);
         setKpis(kpiData);
-        setRecentActivities(activityData);
+        setRecentOperations(activityData);
         setChartData(chartDataResult);
         setLoading(false);
       };
@@ -153,9 +153,9 @@ export default function Home() {
         </Card>
         <Card className="lg:col-span-3">
           <CardHeader>
-            <CardTitle>{t('recentActivitiesTitle')}</CardTitle>
+            <CardTitle>{t('recentOperationsTitle')}</CardTitle>
             <CardDescription>
-              {t('recentActivitiesDescription')}
+              {t('recentOperationsDescription')}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -168,7 +168,7 @@ export default function Home() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {recentActivities.map((activity) => (
+                {recentOperations.map((activity) => (
                   <TableRow key={activity.id}>
                     <TableCell>
                       <div className="font-medium">{activity.type}</div>

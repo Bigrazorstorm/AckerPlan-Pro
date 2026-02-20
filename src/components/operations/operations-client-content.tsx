@@ -1,20 +1,22 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { useFormState, useFormStatus } from 'react-dom'
 import { useTranslations } from "next-intl"
 import { useToast } from '@/hooks/use-toast'
-import { Machinery } from '@/services/types'
-import { addMachine } from '@/app/machinery/actions'
+import { Operation, Field } from '@/services/types'
+import { addOperation } from '@/app/operations/actions'
 import { useSession } from '@/context/session-context'
 import dataService from '@/services'
+import { format } from "date-fns"
+import { de } from 'date-fns/locale'
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { MoreHorizontal, PlusCircle } from "lucide-react"
+import { MoreHorizontal, PlusCircle, Calendar as CalendarIcon } from "lucide-react"
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -25,7 +27,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { Calendar } from '@/components/ui/calendar'
 import { Skeleton } from '../ui/skeleton'
+import { cn } from '@/lib/utils'
 
 const initialState = {
   message: '',
@@ -34,7 +39,7 @@ const initialState = {
 
 function SubmitButton() {
   const { pending } = useFormStatus()
-  const t = useTranslations('MachineryPage.addMachineForm');
+  const t = useTranslations('OperationsPage.addOperationForm');
   return (
     <Button type="submit" aria-disabled={pending}>
       {pending ? t('submitting') : t('submit')}
@@ -42,20 +47,21 @@ function SubmitButton() {
   )
 }
 
-function AddMachineForm({ closeSheet, tenantId, companyId }: { closeSheet: () => void; tenantId: string; companyId: string; }) {
-  const [state, formAction] = useFormState(addMachine, initialState)
+function AddOperationForm({ closeSheet, tenantId, companyId, fields }: { closeSheet: () => void; tenantId: string; companyId: string; fields: Field[] }) {
+  const [state, formAction] = useFormState(addOperation, initialState)
   const { toast } = useToast()
-  const t = useTranslations('MachineryPage.addMachineForm');
-  const tMachineTypes = useTranslations('MachineryTypes');
+  const t = useTranslations('OperationsPage.addOperationForm');
+  const tOperationTypes = useTranslations('OperationTypes');
+  const [date, setDate] = useState<Date>()
 
   useEffect(() => {
-    if (state.message && state.errors && Object.keys(state.errors).length === 0) {
+    if (state.message && !state.errors) {
       toast({
         title: t('successToastTitle'),
         description: state.message,
       })
       closeSheet();
-    } else if (state.message && state.errors && Object.keys(state.errors).length > 0) {
+    } else if (state.message && state.errors) {
       toast({
         variant: 'destructive',
         title: t('errorToastTitle'),
@@ -64,17 +70,14 @@ function AddMachineForm({ closeSheet, tenantId, companyId }: { closeSheet: () =>
     }
   }, [state, toast, closeSheet, t]);
   
-  const machineTypes = ["Tractor", "CombineHarvester", "Tillage", "Seeding", "Baler"];
+  const operationTypes = ["Tillage", "Seeding", "Fertilizing", "PestControl", "Harvesting", "Baling", "Mowing"];
 
   return (
     <form action={formAction} className="space-y-4">
       <input type="hidden" name="tenantId" value={tenantId} />
       <input type="hidden" name="companyId" value={companyId} />
-      <div className="space-y-2">
-        <Label htmlFor="name">{t('nameLabel')}</Label>
-        <Input id="name" name="name" required />
-        {state.errors?.name && <p className="text-sm text-destructive">{state.errors.name.join(', ')}</p>}
-      </div>
+      <input type="hidden" name="date" value={date ? format(date, "yyyy-MM-dd") : ""} />
+      
       <div className="space-y-2">
         <Label htmlFor="type">{t('typeLabel')}</Label>
         <Select name="type" required>
@@ -82,40 +85,97 @@ function AddMachineForm({ closeSheet, tenantId, companyId }: { closeSheet: () =>
             <SelectValue placeholder={t('typePlaceholder')} />
           </SelectTrigger>
           <SelectContent>
-            {machineTypes.map((type) => (
-                <SelectItem key={type} value={type}>{tMachineTypes(type)}</SelectItem>
+            {operationTypes.map((type) => (
+                <SelectItem key={type} value={type}>{tOperationTypes(type)}</SelectItem>
             ))}
           </SelectContent>
         </Select>
         {state.errors?.type && <p className="text-sm text-destructive">{state.errors.type.join(', ')}</p>}
       </div>
-      <div className="space-y-2">
-        <Label htmlFor="model">{t('modelLabel')}</Label>
-        <Input id="model" name="model" required />
-        {state.errors?.model && <p className="text-sm text-destructive">{state.errors.model.join(', ')}</p>}
+
+       <div className="space-y-2">
+        <Label htmlFor="field">{t('fieldLabel')}</Label>
+        <Select name="field" required>
+          <SelectTrigger>
+            <SelectValue placeholder={t('fieldPlaceholder')} />
+          </SelectTrigger>
+          <SelectContent>
+            {fields.map((field) => (
+                <SelectItem key={field.id} value={field.name}>{field.name}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        {state.errors?.field && <p className="text-sm text-destructive">{state.errors.field.join(', ')}</p>}
       </div>
+
+       <div className="space-y-2">
+        <Label htmlFor="date">{t('dateLabel')}</Label>
+         <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant={"outline"}
+                className={cn(
+                  "w-full justify-start text-left font-normal",
+                  !date && "text-muted-foreground"
+                )}
+              >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {date ? format(date, "PPP", { locale: de }) : <span>{t('datePlaceholder')}</span>}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0">
+              <Calendar
+                mode="single"
+                selected={date}
+                onSelect={setDate}
+                initialFocus
+              />
+            </PopoverContent>
+          </Popover>
+        {state.errors?.date && <p className="text-sm text-destructive">{state.errors.date.join(', ')}</p>}
+      </div>
+
+       <div className="space-y-2">
+        <Label htmlFor="status">{t('statusLabel')}</Label>
+        <Select name="status" required defaultValue="Completed">
+          <SelectTrigger>
+            <SelectValue placeholder={t('statusPlaceholder')} />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="Completed">{t('statusCompleted')}</SelectItem>
+            <SelectItem value="In Progress">{t('statusInProgress')}</SelectItem>
+          </SelectContent>
+        </Select>
+        {state.errors?.status && <p className="text-sm text-destructive">{state.errors.status.join(', ')}</p>}
+      </div>
+
       <SubmitButton />
     </form>
   )
 }
 
-export function MachineryClientContent() {
-  const t = useTranslations('MachineryPage');
-  const tMachineTypes = useTranslations('MachineryTypes');
+export function OperationsClientContent() {
+  const t = useTranslations('OperationsPage');
+  const tOperationTypes = useTranslations('OperationTypes');
   const [isSheetOpen, setSheetOpen] = useState(false);
   const { activeCompany, loading: sessionLoading } = useSession();
-  const [machinery, setMachinery] = useState<Machinery[]>([]);
+  const [operations, setOperations] = useState<Operation[]>([]);
+  const [fields, setFields] = useState<Field[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (activeCompany) {
-      const fetchMachinery = async () => {
+      const fetchData = async () => {
         setLoading(true);
-        const data = await dataService.getMachinery(activeCompany.tenantId, activeCompany.id);
-        setMachinery(data);
+        const [operationsData, fieldsData] = await Promise.all([
+            dataService.getOperations(activeCompany.tenantId, activeCompany.id),
+            dataService.getFields(activeCompany.tenantId, activeCompany.id)
+        ]);
+        setOperations(operationsData);
+        setFields(fieldsData);
         setLoading(false);
       }
-      fetchMachinery();
+      fetchData();
     }
   }, [activeCompany]);
   
@@ -123,11 +183,8 @@ export function MachineryClientContent() {
       return (
           <Card>
               <CardHeader className="flex flex-row items-center justify-between">
-                  <div>
-                      <Skeleton className="h-6 w-32" />
-                      <Skeleton className="h-4 w-64 mt-2" />
-                  </div>
-                  <Skeleton className="h-9 w-32" />
+                  <div/>
+                  <Skeleton className="h-9 w-40" />
               </CardHeader>
               <CardContent>
                   <Table>
@@ -160,25 +217,20 @@ export function MachineryClientContent() {
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
-        <div>
-          <CardTitle>{t('title')}</CardTitle>
-          <CardDescription>
-            {t('description')}
-          </CardDescription>
-        </div>
+        <div/>
         <Sheet open={isSheetOpen} onOpenChange={setSheetOpen}>
           <SheetTrigger asChild>
             <Button size="sm" className="gap-1">
               <PlusCircle className="h-4 w-4" />
-              {t('addMachine')}
+              {t('addOperation')}
             </Button>
           </SheetTrigger>
           <SheetContent>
             <SheetHeader>
-              <SheetTitle>{t('addMachineSheetTitle')}</SheetTitle>
+              <SheetTitle>{t('addOperationSheetTitle')}</SheetTitle>
             </SheetHeader>
             <div className="py-4">
-              {activeCompany && <AddMachineForm closeSheet={() => setSheetOpen(false)} tenantId={activeCompany.tenantId} companyId={activeCompany.id} />}
+              {activeCompany && <AddOperationForm closeSheet={() => setSheetOpen(false)} tenantId={activeCompany.tenantId} companyId={activeCompany.id} fields={fields} />}
             </div>
           </SheetContent>
         </Sheet>
@@ -187,34 +239,22 @@ export function MachineryClientContent() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>{t('name')}</TableHead>
-              <TableHead>{t('type')}</TableHead>
-              <TableHead>{t('status')}</TableHead>
-              <TableHead>{t('nextService')}</TableHead>
+              <TableHead>{t('tableHeaderType')}</TableHead>
+              <TableHead>{t('tableHeaderField')}</TableHead>
+              <TableHead>{t('tableHeaderDate')}</TableHead>
+              <TableHead>{t('tableHeaderStatus')}</TableHead>
               <TableHead><span className="sr-only">{t('actions')}</span></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {machinery.map((machine) => (
-              <TableRow key={machine.id}>
-                <TableCell className="font-medium">{machine.name}</TableCell>
-                <TableCell>{tMachineTypes(machine.type)}</TableCell>
+            {operations.map((op) => (
+              <TableRow key={op.id}>
+                <TableCell className="font-medium">{tOperationTypes(op.type)}</TableCell>
+                <TableCell>{op.field}</TableCell>
+                <TableCell>{op.date}</TableCell>
                 <TableCell>
-                  <Badge variant={
-                    machine.status === 'Operational' ? 'default' 
-                    : machine.status === 'Maintenance Due' ? 'destructive' 
-                    : 'secondary'
-                  } 
-                  className={
-                    machine.status === 'Operational' ? 'bg-green-100 text-green-800' 
-                    : machine.status === 'Maintenance Due' ? 'bg-yellow-100 text-yellow-800'
-                    : machine.status === 'In Workshop' ? 'bg-red-100 text-red-800'
-                    : ''
-                  }>
-                    {machine.status}
-                  </Badge>
+                  <Badge variant={op.status === 'Completed' ? 'default' : 'secondary'} className={op.status === 'Completed' ? 'bg-green-100 text-green-800' : ''}>{op.status}</Badge>
                 </TableCell>
-                <TableCell>{machine.nextService}</TableCell>
                 <TableCell>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -226,9 +266,6 @@ export function MachineryClientContent() {
                     <DropdownMenuContent align="end">
                       <DropdownMenuLabel>{t('actions')}</DropdownMenuLabel>
                       <DropdownMenuItem>{t('edit')}</DropdownMenuItem>
-                      <DropdownMenuItem>{t('viewMaintenance')}</DropdownMenuItem>
-                      <DropdownMenuItem>{t('reportRepair')}</DropdownMenuItem>
-                      <DropdownMenuSeparator />
                       <DropdownMenuItem className="text-destructive">{t('delete')}</DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>

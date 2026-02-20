@@ -27,15 +27,11 @@
   "Dashboard": {
     "welcome": "Welcome to FieldSense",
     "description": "Here's a quick overview of your farm's performance.",
-    "totalRevenue": "Total Revenue",
-    "totalCosts": "Total Costs",
-    "openObservations": "Open Observations",
-    "maintenanceDue": "Maintenance Due",
     "fromLastMonth": "from last month",
     "performanceTitle": "Performance",
     "performanceDescription": "Your cost and revenue overview for the current year.",
-    "recentActivitiesTitle": "Recent Activities",
-    "recentActivitiesDescription": "An overview of the latest logged activities.",
+    "recentOperationsTitle": "Recent Operations",
+    "recentOperationsDescription": "An overview of the latest logged operations.",
     "activity": "Activity",
     "field": "Field",
     "status": "Status",
@@ -90,17 +86,49 @@
     "Seeding": "Seeding",
     "Baler": "Baler"
   },
+  "OperationsPage": {
+    "title": "Operations",
+    "description": "Log all production measures and resource usage.",
+    "addOperation": "Add Operation",
+    "addOperationSheetTitle": "Add New Operation",
+    "tableHeaderType": "Operation",
+    "tableHeaderField": "Field",
+    "tableHeaderDate": "Date",
+    "tableHeaderStatus": "Status",
+    "actions": "Actions",
+    "edit": "Edit",
+    "delete": "Delete",
+    "addOperationForm": {
+      "typeLabel": "Operation Type",
+      "typePlaceholder": "Select a type",
+      "fieldLabel": "Field",
+      "fieldPlaceholder": "Select a field",
+      "dateLabel": "Date",
+      "datePlaceholder": "Pick a date",
+      "statusLabel": "Status",
+      "statusPlaceholder": "Select a status",
+      "statusCompleted": "Completed",
+      "statusInProgress": "In Progress",
+      "submit": "Add Operation",
+      "submitting": "Adding...",
+      "successToastTitle": "Success",
+      "errorToastTitle": "Error"
+    }
+  },
+  "OperationTypes": {
+    "Tillage": "Tillage",
+    "Seeding": "Seeding",
+    "Fertilizing": "Fertilizing",
+    "PestControl": "Pest Control",
+    "Harvesting": "Harvesting",
+    "Baling": "Baling",
+    "Mowing": "Mowing"
+  },
   "ObservationsPage": {
     "title": "Observations",
     "description": "Document crop growth, damages, and other field observations.",
     "comingSoonTitle": "Observation Logging Coming Soon",
     "comingSoonDescription": "The tool for geo-referenced documentation of field observations, including attaching photos and notes, will be available here."
-  },
-  "OperationsPage": {
-    "title": "Operations",
-    "description": "Log all production measures and resource usage.",
-    "comingSoonTitle": "Activity Logging Coming Soon",
-    "comingSoonDescription": "The mobile-first interface to efficiently capture all production measures (e.g., tillage, seeding, harvesting) will be available here."
   },
   "ReportsPage": {
     "title": "Reports",

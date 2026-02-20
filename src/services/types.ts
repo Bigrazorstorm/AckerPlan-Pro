@@ -11,9 +11,8 @@ export interface ChartDataPoint {
   cost: number;
 };
 
-// Represents a summary of a recent operation, not a direct DB entity in its final form,
-// but includes tenant/company for filtering.
-export interface RecentActivity {
+// Represents a summary of an operation.
+export interface Operation {
   id: string; // Using string for UUID consistency
   tenantId: string;
   companyId: string;

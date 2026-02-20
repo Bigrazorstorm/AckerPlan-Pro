@@ -30,8 +30,8 @@
     "fromLastMonth": "zum Vormonat",
     "performanceTitle": "Leistung",
     "performanceDescription": "Ihre Kosten- und Ertragsübersicht für das laufende Jahr.",
-    "recentActivitiesTitle": "Letzte Aktivitäten",
-    "recentActivitiesDescription": "Eine Übersicht der zuletzt protokollierten Aktivitäten.",
+    "recentOperationsTitle": "Letzte Maßnahmen",
+    "recentOperationsDescription": "Eine Übersicht der zuletzt protokollierten Maßnahmen.",
     "activity": "Aktivität",
     "field": "Feld",
     "status": "Status",
@@ -86,17 +86,49 @@
     "Seeding": "Sämaschine",
     "Baler": "Ballenpresse"
   },
+  "OperationsPage": {
+    "title": "Maßnahmen",
+    "description": "Protokollieren Sie alle Produktionsmaßnahmen und den Ressourceneinsatz.",
+    "addOperation": "Maßnahme hinzufügen",
+    "addOperationSheetTitle": "Neue Maßnahme hinzufügen",
+    "tableHeaderType": "Maßnahme",
+    "tableHeaderField": "Fläche",
+    "tableHeaderDate": "Datum",
+    "tableHeaderStatus": "Status",
+    "actions": "Aktionen",
+    "edit": "Bearbeiten",
+    "delete": "Löschen",
+    "addOperationForm": {
+      "typeLabel": "Maßnahmentyp",
+      "typePlaceholder": "Typ auswählen",
+      "fieldLabel": "Fläche",
+      "fieldPlaceholder": "Fläche auswählen",
+      "dateLabel": "Datum",
+      "datePlaceholder": "Datum auswählen",
+      "statusLabel": "Status",
+      "statusPlaceholder": "Status auswählen",
+      "statusCompleted": "Abgeschlossen",
+      "statusInProgress": "In Bearbeitung",
+      "submit": "Maßnahme hinzufügen",
+      "submitting": "Wird hinzugefügt...",
+      "successToastTitle": "Erfolg",
+      "errorToastTitle": "Fehler"
+    }
+  },
+  "OperationTypes": {
+    "Tillage": "Bodenbearbeitung",
+    "Seeding": "Aussaat",
+    "Fertilizing": "Düngung",
+    "PestControl": "Pflanzenschutz",
+    "Harvesting": "Ernte",
+    "Baling": "Ballenpressen",
+    "Mowing": "Mähen"
+  },
   "ObservationsPage": {
     "title": "Beobachtungen",
     "description": "Dokumentieren Sie Pflanzenwachstum, Schäden und andere Feldbeobachtungen.",
     "comingSoonTitle": "Protokollierung von Beobachtungen in Kürze verfügbar",
     "comingSoonDescription": "Das Werkzeug zur georeferenzierten Dokumentation von Feldbeobachtungen, einschließlich des Anhängens von Fotos und Notizen, wird hier verfügbar sein."
-  },
-  "OperationsPage": {
-    "title": "Maßnahmen",
-    "description": "Protokollieren Sie alle Produktionsmaßnahmen und den Ressourceneinsatz.",
-    "comingSoonTitle": "Aktivitätsprotokollierung in Kürze verfügbar",
-    "comingSoonDescription": "Die Mobile-First-Schnittstelle zur effizienten Erfassung aller Produktionsmaßnahmen (z. B. Bodenbearbeitung, Aussaat, Ernte) wird hier verfügbar sein."
   },
   "ReportsPage": {
     "title": "Auswertungen",
