@@ -9,6 +9,7 @@ import { addMachine } from '@/app/machinery/actions'
 import { useSession } from '@/context/session-context'
 import dataService from '@/services'
 import Link from 'next/link'
+import { useParams } from 'next/navigation'
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -90,16 +91,21 @@ function AddMachineForm({ closeSheet, tenantId, companyId }: { closeSheet: () =>
         </Select>
         {state.errors?.type && <p className="text-sm text-destructive">{state.errors.type.join(', ')}</p>}
       </div>
+      <div className="space-y-2">
+        <Label htmlFor="model">{t('modelLabel')}</Label>
+        <Input id="model" name="model" required />
+        {state.errors?.model && <p className="text-sm text-destructive">{state.errors.model.join(', ')}</p>}
+      </div>
       <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-2">
-            <Label htmlFor="model">{t('modelLabel')}</Label>
-            <Input id="model" name="model" required />
-            {state.errors?.model && <p className="text-sm text-destructive">{state.errors.model.join(', ')}</p>}
-        </div>
         <div className="space-y-2">
             <Label htmlFor="standardFuelConsumption">{t('fuelConsumptionLabel')}</Label>
             <Input id="standardFuelConsumption" name="standardFuelConsumption" type="number" step="0.1" required placeholder="35.5" />
             {state.errors?.standardFuelConsumption && <p className="text-sm text-destructive">{state.errors.standardFuelConsumption.join(', ')}</p>}
+        </div>
+        <div className="space-y-2">
+            <Label htmlFor="maintenanceIntervalHours">{t('maintenanceIntervalLabel')}</Label>
+            <Input id="maintenanceIntervalHours" name="maintenanceIntervalHours" type="number" step="1" placeholder={t('maintenanceIntervalPlaceholder')} />
+            {state.errors?.maintenanceIntervalHours && <p className="text-sm text-destructive">{state.errors.maintenanceIntervalHours.join(', ')}</p>}
         </div>
       </div>
       <SubmitButton />
@@ -114,6 +120,7 @@ export function MachineryClientContent() {
   const { activeCompany, loading: sessionLoading } = useSession();
   const [machinery, setMachinery] = useState<Machinery[]>([]);
   const [loading, setLoading] = useState(true);
+  const { locale } = useParams<{ locale: string }>();
 
   useEffect(() => {
     if (activeCompany) {
@@ -198,7 +205,7 @@ export function MachineryClientContent() {
               <TableHead>{t('name')}</TableHead>
               <TableHead>{t('type')}</TableHead>
               <TableHead>{t('status')}</TableHead>
-              <TableHead>{t('nextService')}</TableHead>
+              <TableHead className="text-right">{t('operatingHours')}</TableHead>
               <TableHead><span className="sr-only">{t('actions')}</span></TableHead>
             </TableRow>
           </TableHeader>
@@ -226,7 +233,7 @@ export function MachineryClientContent() {
                     {machine.status}
                   </Badge>
                 </TableCell>
-                <TableCell>{machine.nextService}</TableCell>
+                <TableCell className="text-right">{machine.totalOperatingHours.toLocaleString(locale)} h</TableCell>
                 <TableCell>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>

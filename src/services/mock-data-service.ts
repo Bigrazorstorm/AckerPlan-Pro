@@ -105,15 +105,14 @@ const chartDataCompany789: ChartDataPoint[] = [
 ];
 
 const machinery: Machinery[] = [
-  { id: 'M001', tenantId: 'tenant-123', companyId: 'company-456', name: "John Deere 8R 370", type: "Tractor", model: "8R 370", status: "Operational", nextService: "In 250h", lastMaintenance: "2024-05-10", standardFuelConsumption: 35.5, createdAt: "2023-01-15T10:00:00Z", updatedAt: "2024-05-10T14:30:00Z" },
-  { id: 'M002', tenantId: 'tenant-123', companyId: 'company-456', name: "Claas Lexion 8900", type: "CombineHarvester", model: "Lexion 8900", status: "Maintenance Due", nextService: "Now (3000h)", lastMaintenance: "2023-09-15", standardFuelConsumption: 85.0, createdAt: "2022-08-20T11:00:00Z", updatedAt: "2023-09-15T09:00:00Z" },
-  { id: 'M003', tenantId: 'tenant-123', companyId: 'company-456', name: "Fendt 942 Vario", type: "Tractor", model: "942 Vario", status: "Operational", nextService: "In 450h", lastMaintenance: "2024-03-22", standardFuelConsumption: 42.0, createdAt: "2023-05-10T12:00:00Z", updatedAt: "2024-03-22T16:00:00Z" },
-  { id: 'M004', tenantId: 'tenant-123', companyId: 'company-456', name: "Amazone Catros XL", type: "Tillage", model: "Catros 6003-2TXL", status: "Operational", nextService: "2025-01-10", lastMaintenance: "2024-01-10", standardFuelConsumption: 15.0, createdAt: "2023-02-01T08:30:00Z", updatedAt: "2024-01-10T09:45:00Z" },
-  { id: 'M005', tenantId: 'tenant-123', companyId: 'company-456', name: "Horsch Maestro 12.50 SW", type: "Seeding", model: "Maestro 12.50 SW", status: "In Workshop", nextService: "After Repair", lastMaintenance: "2024-04-01", standardFuelConsumption: 12.0, createdAt: "2023-03-18T13:20:00Z", updatedAt: "2024-04-01T11:00:00Z" },
-  { id: 'M006', tenantId: 'tenant-123', companyId: 'company-456', name: "Krone Big Pack 1290", type: "Baler", model: "Big Pack 1290", status: "Operational", nextService: "In 120h", lastMaintenance: "2024-06-01", standardFuelConsumption: 25.0, createdAt: "2023-07-25T18:00:00Z", updatedAt: "2024-06-01T10:00:00Z" },
-  // Data for another company to test multi-tenancy
-  { id: 'M007', tenantId: 'tenant-123', companyId: 'company-789', name: "Case IH Magnum 380", type: "Tractor", model: "Magnum 380", status: "Operational", nextService: "In 300h", lastMaintenance: "2024-06-15", standardFuelConsumption: 38.0, createdAt: "2023-08-01T09:00:00Z", updatedAt: "2024-06-15T14:00:00Z" },
-  { id: 'M008', tenantId: 'tenant-123', companyId: 'company-789', name: "New Holland CR9.90", type: "CombineHarvester", model: "CR9.90", status: "Operational", nextService: "In 150h", lastMaintenance: "2024-07-01", standardFuelConsumption: 75.0, createdAt: "2023-09-01T09:00:00Z", updatedAt: "2024-07-01T14:00:00Z" },
+  { id: 'M001', tenantId: 'tenant-123', companyId: 'company-456', name: "John Deere 8R 370", type: "Tractor", model: "8R 370", status: "Operational", nextService: "In 260h", lastMaintenance: "2024-05-10", standardFuelConsumption: 35.5, totalOperatingHours: 1250, maintenanceIntervalHours: 500, lastMaintenanceHours: 1010, createdAt: "2023-01-15T10:00:00Z", updatedAt: "2024-05-10T14:30:00Z" },
+  { id: 'M002', tenantId: 'tenant-123', companyId: 'company-456', name: "Claas Lexion 8900", type: "CombineHarvester", model: "Lexion 8900", status: "Maintenance Due", nextService: "Now (3000h)", lastMaintenance: "2023-09-15", standardFuelConsumption: 85.0, totalOperatingHours: 3005, maintenanceIntervalHours: 1000, lastMaintenanceHours: 2000, createdAt: "2022-08-20T11:00:00Z", updatedAt: "2023-09-15T09:00:00Z" },
+  { id: 'M003', tenantId: 'tenant-123', companyId: 'company-456', name: "Fendt 942 Vario", type: "Tractor", model: "942 Vario", status: "Operational", nextService: "In 450h", lastMaintenance: "2024-03-22", standardFuelConsumption: 42.0, totalOperatingHours: 550, maintenanceIntervalHours: 500, lastMaintenanceHours: 500, createdAt: "2023-05-10T12:00:00Z", updatedAt: "2024-03-22T16:00:00Z" },
+  { id: 'M004', tenantId: 'tenant-123', companyId: 'company-456', name: "Amazone Catros XL", type: "Tillage", model: "Catros 6003-2TXL", status: "Operational", nextService: "2025-01-10", lastMaintenance: "2024-01-10", standardFuelConsumption: 15.0, totalOperatingHours: 320, lastMaintenanceHours: 280, createdAt: "2023-02-01T08:30:00Z", updatedAt: "2024-01-10T09:45:00Z" }, // No interval set
+  { id: 'M005', tenantId: 'tenant-123', companyId: 'company-456', name: "Horsch Maestro 12.50 SW", type: "Seeding", model: "Maestro 12.50 SW", status: "In Workshop", nextService: "After Repair", lastMaintenance: "2024-04-01", standardFuelConsumption: 12.0, totalOperatingHours: 890, maintenanceIntervalHours: 400, lastMaintenanceHours: 800, createdAt: "2023-03-18T13:20:00Z", updatedAt: "2024-04-01T11:00:00Z" },
+  { id: 'M006', tenantId: 'tenant-123', companyId: 'company-456', name: "Krone Big Pack 1290", type: "Baler", model: "Big Pack 1290", status: "Operational", nextService: "In 120h", lastMaintenance: "2024-06-01", standardFuelConsumption: 25.0, totalOperatingHours: 180, maintenanceIntervalHours: 300, lastMaintenanceHours: 0, createdAt: "2023-07-25T18:00:00Z", updatedAt: "2024-06-01T10:00:00Z" },
+  { id: 'M007', tenantId: 'tenant-123', companyId: 'company-789', name: "Case IH Magnum 380", type: "Tractor", model: "Magnum 380", status: "Operational", nextService: "In 300h", lastMaintenance: "2024-06-15", standardFuelConsumption: 38.0, totalOperatingHours: 1200, maintenanceIntervalHours: 500, lastMaintenanceHours: 1000, createdAt: "2023-08-01T09:00:00Z", updatedAt: "2024-06-15T14:00:00Z" },
+  { id: 'M008', tenantId: 'tenant-123', companyId: 'company-789', name: "New Holland CR9.90", type: "CombineHarvester", model: "CR9.90", status: "Operational", nextService: "In 150h", lastMaintenance: "2024-07-01", standardFuelConsumption: 75.0, totalOperatingHours: 850, maintenanceIntervalHours: 1000, lastMaintenanceHours: 0, createdAt: "2023-09-01T09:00:00Z", updatedAt: "2024-07-01T14:00:00Z" },
 ];
 
 const operations: Operation[] = [
@@ -227,17 +226,19 @@ export class MockDataService implements DataService {
     return Promise.resolve(repairEvents.filter(e => e.machineId === machineId && e.tenantId === tenantId && e.companyId === companyId).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
   }
 
-  async addMachinery(tenantId: string, companyId: string, machineData: { name: string; type: string; model: string; standardFuelConsumption: number; }): Promise<Machinery> {
+  async addMachinery(tenantId: string, companyId: string, machineData: { name: string; type: string; model: string; standardFuelConsumption: number; maintenanceIntervalHours?: number; }): Promise<Machinery> {
     console.log(`Adding Machinery for tenant ${tenantId} and company ${companyId}.`);
     const newMachine: Machinery = {
       id: `M${String(machinery.length + 1).padStart(3, '0')}`,
       tenantId: tenantId,
       companyId: companyId,
       status: 'Operational',
-      nextService: 'In 500h', // Default value
-      lastMaintenance: new Date().toISOString().split('T')[0], // Today's date
+      nextService: machineData.maintenanceIntervalHours ? `In ${machineData.maintenanceIntervalHours}h` : 'N/A',
+      lastMaintenance: new Date().toISOString().split('T')[0],
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
+      totalOperatingHours: 0,
+      lastMaintenanceHours: 0,
       ...machineData,
     };
     machinery.push(newMachine);
@@ -251,6 +252,16 @@ export class MockDataService implements DataService {
     if (!machine) {
         throw new Error('Machine not found');
     }
+
+    // Update machine operating hours and check for maintenance
+    machine.totalOperatingHours += operationData.laborHours;
+    machine.updatedAt = new Date().toISOString();
+    if (machine.maintenanceIntervalHours && machine.totalOperatingHours >= machine.lastMaintenanceHours + machine.maintenanceIntervalHours) {
+        if (machine.status !== 'In Workshop') {
+            machine.status = 'Maintenance Due';
+        }
+    }
+
 
     const fuelConsumed = machine.standardFuelConsumption * operationData.laborHours;
 
@@ -285,6 +296,15 @@ export class MockDataService implements DataService {
       ...eventData,
     };
     maintenanceEvents.unshift(newEvent);
+
+    if (machine) {
+        machine.lastMaintenanceHours = machine.totalOperatingHours;
+        machine.lastMaintenance = eventData.date;
+        if (machine.status === 'Maintenance Due') {
+            machine.status = 'Operational';
+        }
+        machine.updatedAt = new Date().toISOString();
+    }
 
     const costFormatted = new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(eventData.cost);
     logAuditEvent(tenantId, companyId, 'maintenance.log', `Wartung für "${machine?.name || eventData.machineId}" protokolliert: ${eventData.description} (Kosten: ${costFormatted}).`);

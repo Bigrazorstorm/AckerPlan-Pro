@@ -89,9 +89,15 @@ export interface Machinery {
   type: string;
   model: string;
   status: "Operational" | "Maintenance Due" | "In Workshop";
-  nextService: string;
+  nextService: string; // Legacy display string, will be calculated
   lastMaintenance: string;
   standardFuelConsumption: number; // in liters per hour
+  
+  // New fields for hour-based maintenance planning
+  totalOperatingHours: number;
+  maintenanceIntervalHours?: number; // The interval in hours when maintenance is due
+  lastMaintenanceHours: number; // The value of totalOperatingHours at the last maintenance
+
   createdAt: string; // ISO-8601 date string
   updatedAt: string; // ISO-8601 date string
 };

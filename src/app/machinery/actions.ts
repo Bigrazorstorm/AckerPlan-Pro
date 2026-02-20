@@ -9,6 +9,10 @@ const AddMachineSchema = z.object({
   type: z.string().min(1, { message: 'Type is required' }),
   model: z.string().min(1, { message: 'Model is required' }),
   standardFuelConsumption: z.coerce.number().min(0, { message: 'Consumption must be a positive number' }),
+  maintenanceIntervalHours: z.preprocess(
+    (val) => (val === '' ? undefined : val),
+    z.coerce.number().positive({ message: 'Interval must be a positive number' }).optional()
+  ),
   tenantId: z.string().min(1, { message: 'Tenant ID is required' }),
   companyId: z.string().min(1, { message: 'Company ID is required' }),
 })
@@ -19,6 +23,7 @@ export async function addMachine(prevState: any, formData: FormData) {
     type: formData.get('type'),
     model: formData.get('model'),
     standardFuelConsumption: formData.get('standardFuelConsumption'),
+    maintenanceIntervalHours: formData.get('maintenanceIntervalHours'),
     tenantId: formData.get('tenantId'),
     companyId: formData.get('companyId'),
   })

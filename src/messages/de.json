@@ -66,7 +66,7 @@
     "name": "Name",
     "type": "Typ",
     "status": "Status",
-    "nextService": "Nächster Service",
+    "operatingHours": "Betriebsstunden",
     "actions": "Aktionen",
     "edit": "Bearbeiten",
     "viewMaintenance": "Wartung anzeigen",
@@ -79,6 +79,8 @@
       "typePlaceholder": "Typ auswählen",
       "modelLabel": "Modell",
       "fuelConsumptionLabel": "Standardverbrauch (l/h)",
+      "maintenanceIntervalLabel": "Wartungsintervall (h)",
+      "maintenanceIntervalPlaceholder": "z.B. 500 (optional)",
       "submit": "Maschine hinzufügen",
       "submitting": "Wird hinzugefügt...",
       "successToastTitle": "Erfolg",
@@ -92,6 +94,7 @@
     "reportRepairButton": "Reparatur melden",
     "detailsTitle": "Details",
     "statusLabel": "Status",
+    "totalOperatingHoursLabel": "Betriebsstunden gesamt",
     "nextServiceLabel": "Nächster Service",
     "lastMaintenanceLabel": "Letzte Wartung",
     "createdAtLabel": "Erfasst am",
@@ -138,7 +141,10 @@
       "successToastTitle": "Erfolg",
       "successToastDescription": "Das Reparaturereignis wurde erfolgreich gespeichert.",
       "errorToastTitle": "Fehler"
-    }
+    },
+    "serviceDue": "Service fällig",
+    "serviceInHours": "In {hours}h",
+    "statusInWorkshop": "In Werkstatt"
   },
   "MachineryTypes": {
     "Tractor": "Traktor",

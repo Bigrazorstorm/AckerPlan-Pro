@@ -11,7 +11,7 @@ import { useTranslations } from 'next-intl';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import { PlusCircle, Wrench, ArrowLeft, Calendar as CalendarIcon } from 'lucide-react';
+import { PlusCircle, Wrench, ArrowLeft, Calendar as CalendarIcon, Info } from 'lucide-react';
 import { format } from 'date-fns';
 import { de, enUS } from 'date-fns/locale';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -248,7 +248,7 @@ function MachineDetailSkeleton() {
                     <Skeleton className="h-6 w-1/3" />
                 </CardHeader>
                 <CardContent className="grid gap-4">
-                    {[...Array(4)].map((_, i) => (
+                    {[...Array(5)].map((_, i) => (
                         <div key={i} className="flex justify-between">
                         <Skeleton className="h-4 w-24" />
                         <Skeleton className="h-5 w-32" />
@@ -311,6 +311,35 @@ export default function MachineDetailPage() {
     }
   }, [activeCompany, id]);
 
+  const currencyFormatter = new Intl.NumberFormat(locale, {
+    style: 'currency',
+    currency: 'EUR',
+  });
+  
+  const dateFormatter = (dateString: string) => {
+    try {
+        return format(new Date(dateString), 'PPP', { locale: locale === 'de' ? de : enUS });
+    } catch (e) {
+        return dateString;
+    }
+  }
+
+  const getNextServiceInfo = (m: Machinery) => {
+    if (m.status === 'In Workshop') {
+      return { text: t('statusInWorkshop'), isDue: true };
+    }
+    if (!m.maintenanceIntervalHours) {
+      return { text: 'N/A', isDue: false };
+    }
+    const nextServiceHours = m.lastMaintenanceHours + m.maintenanceIntervalHours;
+    const hoursRemaining = nextServiceHours - m.totalOperatingHours;
+    
+    if (hoursRemaining <= 0) {
+      return { text: t('serviceDue'), isDue: true };
+    }
+    return { text: t('serviceInHours', { hours: hoursRemaining.toFixed(0) }), isDue: false };
+  }
+
   if (sessionLoading || loading) {
     return <MachineDetailSkeleton />;
   }
@@ -334,18 +363,8 @@ export default function MachineDetailPage() {
     )
   }
 
-  const currencyFormatter = new Intl.NumberFormat(locale, {
-    style: 'currency',
-    currency: 'EUR',
-  });
-  
-  const dateFormatter = (dateString: string) => {
-    try {
-        return format(new Date(dateString), 'PPP', { locale: locale === 'de' ? de : enUS });
-    } catch (e) {
-        return dateString;
-    }
-  }
+  const nextServiceInfo = getNextServiceInfo(machine);
+
 
   return (
     <div className="space-y-4">
@@ -422,8 +441,12 @@ export default function MachineDetailPage() {
                         </Badge>
                     </div>
                     <div className="flex justify-between">
+                        <span className="text-muted-foreground">{t('totalOperatingHoursLabel')}</span>
+                        <span className="font-medium">{machine.totalOperatingHours.toLocaleString(locale)} h</span>
+                    </div>
+                    <div className="flex justify-between">
                     <span className="text-muted-foreground">{t('nextServiceLabel')}</span>
-                    <span className="font-medium">{machine.nextService}</span>
+                    <span className={cn("font-medium", nextServiceInfo.isDue && "text-destructive")}>{nextServiceInfo.text}</span>
                     </div>
                     <div className="flex justify-between">
                     <span className="text-muted-foreground">{t('lastMaintenanceLabel')}</span>

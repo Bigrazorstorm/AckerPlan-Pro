@@ -66,7 +66,7 @@
     "name": "Name",
     "type": "Type",
     "status": "Status",
-    "nextService": "Next Service",
+    "operatingHours": "Operating Hours",
     "actions": "Actions",
     "edit": "Edit",
     "viewMaintenance": "View Maintenance",
@@ -79,6 +79,8 @@
       "typePlaceholder": "Select a type",
       "modelLabel": "Model",
       "fuelConsumptionLabel": "Standard Consumption (l/h)",
+      "maintenanceIntervalLabel": "Maintenance Interval (h)",
+      "maintenanceIntervalPlaceholder": "e.g. 500 (optional)",
       "submit": "Add Machine",
       "submitting": "Adding...",
       "successToastTitle": "Success",
@@ -92,6 +94,7 @@
     "reportRepairButton": "Report Repair",
     "detailsTitle": "Details",
     "statusLabel": "Status",
+    "totalOperatingHoursLabel": "Total Operating Hours",
     "nextServiceLabel": "Next Service",
     "lastMaintenanceLabel": "Last Maintenance",
     "createdAtLabel": "Registered On",
@@ -138,7 +141,10 @@
       "successToastTitle": "Success",
       "successToastDescription": "The repair event was saved successfully.",
       "errorToastTitle": "Error"
-    }
+    },
+    "serviceDue": "Service Due",
+    "serviceInHours": "In {hours}h",
+    "statusInWorkshop": "In Workshop"
   },
   "MachineryTypes": {
     "Tractor": "Tractor",
