@@ -47,3 +47,17 @@ export async function addObservation(prevState: any, formData: FormData) {
     }
   }
 }
+
+export async function deleteObservation(observationId: string, tenantId: string, companyId: string) {
+  if (!observationId || !tenantId || !companyId) {
+    return { message: 'Failed to delete observation: Missing required IDs.' };
+  }
+  try {
+    await dataService.deleteObservation(tenantId, companyId, observationId);
+    revalidatePath('/observations');
+    return { message: 'Observation deleted successfully.' };
+  } catch (e) {
+    const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
+    return { message: `Failed to delete observation: ${errorMessage}` };
+  }
+}

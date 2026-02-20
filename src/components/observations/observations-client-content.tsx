@@ -1,11 +1,12 @@
 'use client'
 
-import { useEffect, useState, useActionState } from 'react'
+import { React, useEffect, useState } from 'react'
+import { useActionState } from 'react'
 import { useFormStatus } from 'react-dom'
 import { useTranslations } from "next-intl"
 import { useToast } from '@/hooks/use-toast'
 import { Observation, Field } from '@/services/types'
-import { addObservation } from '@/app/observations/actions'
+import { addObservation, deleteObservation } from '@/app/observations/actions'
 import { useSession } from '@/context/session-context'
 import dataService from '@/services'
 import { format } from "date-fns"
@@ -18,7 +19,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { MoreHorizontal, PlusCircle, Calendar as CalendarIcon, Camera } from "lucide-react"
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetDescription } from '@/components/ui/sheet'
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
@@ -33,6 +34,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Calendar } from '@/components/ui/calendar'
 import { Skeleton } from '../ui/skeleton'
 import { cn } from '@/lib/utils'
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
 
 const initialState = {
   message: '',
@@ -180,13 +182,17 @@ function ObservationsSkeleton() {
 
 export function ObservationsClientContent() {
   const t = useTranslations('ObservationsPage');
+  const { toast } = useToast();
   const [isAddSheetOpen, setAddSheetOpen] = useState(false);
-  const { activeCompany, loading: sessionLoading } = useSession();
+  const { activeCompany, loading: sessionLoading, activeRole } = useSession();
   const [observations, setObservations] = useState<Observation[]>([]);
   const [fields, setFields] = useState<Field[]>([]);
   const [loading, setLoading] = useState(true);
   const { locale } = useParams<{ locale: string }>();
   const [observationToView, setObservationToView] = useState<Observation | null>(null);
+  const [observationToDelete, setObservationToDelete] = useState<Observation | null>(null);
+  
+  const canManageObservations = activeRole === 'Firmen Admin' || activeRole === 'Tenant Admin';
 
   useEffect(() => {
     if (activeCompany) {
@@ -203,6 +209,26 @@ export function ObservationsClientContent() {
       fetchData();
     }
   }, [activeCompany]);
+
+  const handleDelete = async () => {
+    if (observationToDelete && activeCompany) {
+      const result = await deleteObservation(observationToDelete.id, activeCompany.tenantId, activeCompany.id);
+      if (result.message.includes('successfully')) {
+        toast({
+          title: t('deleteSuccessToastTitle'),
+          description: result.message,
+        });
+      } else {
+        toast({
+          variant: 'destructive',
+          title: t('deleteErrorToastTitle'),
+          description: result.message,
+        });
+      }
+      setObservationToDelete(null); // Close dialog
+    }
+  };
+
 
   const dateFormatter = (dateString: string) => {
     if (!dateString) return '';
@@ -278,8 +304,12 @@ export function ObservationsClientContent() {
                         <DropdownMenuLabel>{t('actions')}</DropdownMenuLabel>
                         <DropdownMenuItem onSelect={() => setObservationToView(obs)}>{t('view')}</DropdownMenuItem>
                         <DropdownMenuItem>{t('edit')}</DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem className="text-destructive">{t('delete')}</DropdownMenuItem>
+                        {canManageObservations && (
+                          <>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem className="text-destructive" onSelect={() => setObservationToDelete(obs)}>{t('delete')}</DropdownMenuItem>
+                          </>
+                        )}
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>
@@ -323,6 +353,21 @@ export function ObservationsClientContent() {
             </div>
         </SheetContent>
     </Sheet>
+    
+    <AlertDialog open={!!observationToDelete} onOpenChange={(open) => !open && setObservationToDelete(null)}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>{t('deleteConfirmationTitle')}</AlertDialogTitle>
+          <AlertDialogDescription>
+            {t('deleteConfirmationDescription')}
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>{t('deleteConfirmationCancel')}</AlertDialogCancel>
+          <AlertDialogAction onClick={handleDelete} className="bg-destructive hover:bg-destructive/90">{t('deleteConfirmationConfirm')}</AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
     </>
   )
 }

@@ -166,6 +166,14 @@ export interface DataService {
   addObservation(tenantId: string, companyId: string, observationData: AddObservationInput): Promise<Observation>;
 
   /**
+   * Deletes an observation from the data store.
+   * @param tenantId The ID of the tenant.
+   * @param companyId The ID of the company.
+   * @param observationId The ID of the observation to delete.
+   */
+  deleteObservation(tenantId: string, companyId: string, observationId: string): Promise<void>;
+
+  /**
    * Retrieves data for the labor hours by crop report.
    * @param tenantId - The ID of the tenant.
    * @param companyId - The ID of the company.

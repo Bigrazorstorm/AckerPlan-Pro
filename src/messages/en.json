@@ -308,7 +308,13 @@
       "successToastTitle": "Success",
       "successToastDescription": "The observation was saved successfully.",
       "errorToastTitle": "Error"
-    }
+    },
+    "deleteConfirmationTitle": "Are you sure you want to delete this observation?",
+    "deleteConfirmationDescription": "This action cannot be undone. This will permanently remove the observation from your records.",
+    "deleteConfirmationCancel": "Cancel",
+    "deleteConfirmationConfirm": "Delete",
+    "deleteSuccessToastTitle": "Success",
+    "deleteErrorToastTitle": "Error"
   },
   "ReportsPage": {
     "title": "Reports",

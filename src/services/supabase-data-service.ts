@@ -180,6 +180,11 @@ export class SupabaseDataService implements DataService {
     return Promise.resolve(newObservation);
   }
 
+  async deleteObservation(tenantId: string, companyId: string, observationId: string): Promise<void> {
+    this.log('deleteObservation', { tenantId, companyId, observationId });
+    return Promise.resolve();
+  }
+
   async getLaborHoursByCropReport(tenantId: string, companyId: string): Promise<LaborHoursByCropReportData[]> {
     this.log('getLaborHoursByCropReport', { tenantId, companyId });
     return Promise.resolve([]);

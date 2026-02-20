@@ -308,7 +308,13 @@
       "successToastTitle": "Erfolg",
       "successToastDescription": "Die Beobachtung wurde erfolgreich gespeichert.",
       "errorToastTitle": "Fehler"
-    }
+    },
+    "deleteConfirmationTitle": "Beobachtung wirklich löschen?",
+    "deleteConfirmationDescription": "Diese Aktion kann nicht rückgängig gemacht werden. Dadurch wird die Beobachtung endgültig aus den Aufzeichnungen entfernt.",
+    "deleteConfirmationCancel": "Abbrechen",
+    "deleteConfirmationConfirm": "Löschen",
+    "deleteSuccessToastTitle": "Erfolg",
+    "deleteErrorToastTitle": "Fehler"
   },
   "ReportsPage": {
     "title": "Auswertungen",

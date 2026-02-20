@@ -475,6 +475,25 @@ export class MockDataService implements DataService {
     return Promise.resolve(newObservation);
   }
 
+  async deleteObservation(tenantId: string, companyId: string, observationId: string): Promise<void> {
+    console.log(`Deleting Observation ${observationId} for tenant ${tenantId} and company ${companyId}.`);
+    const initialLength = observations.length;
+    const observationToDelete = observations.find(o => o.id === observationId && o.tenantId === tenantId && o.companyId === companyId);
+    
+    if (!observationToDelete) {
+        return Promise.reject(new Error('Observation not found or not authorized to delete.'));
+    }
+
+    observations = observations.filter(o => o.id !== observationId);
+    
+    if (observations.length < initialLength) {
+        logAuditEvent(tenantId, companyId, 'observation.delete', `Beobachtung "${observationToDelete.title}" auf Fläche "${observationToDelete.field}" vom ${new Date(observationToDelete.date).toLocaleDateString('de-DE')} wurde gelöscht.`);
+        return Promise.resolve();
+    } else {
+        return Promise.reject(new Error('Deletion failed unexpectedly.'));
+    }
+  }
+
   async getLaborHoursByCropReport(tenantId: string, companyId: string): Promise<LaborHoursByCropReportData[]> {
     console.log(`Fetching Labor Hours by Crop Report for tenant ${tenantId} and company ${companyId}.`);
     const companyOps = operations.filter(op => op.tenantId === tenantId && op.companyId === companyId);
