@@ -355,7 +355,7 @@ function MachineDetailSkeleton() {
 
 export default function MachineDetailPage() {
   const { id, locale } = useParams<{ id: string, locale: string }>();
-  const { activeCompany, loading: sessionLoading } = useSession();
+  const { activeCompany, loading: sessionLoading, activeRole } = useSession();
   const [machine, setMachine] = useState<Machinery | null>(null);
   const [maintenanceHistory, setMaintenanceHistory] = useState<MaintenanceEvent[]>([]);
   const [repairHistory, setRepairHistory] = useState<RepairEvent[]>([]);
@@ -367,6 +367,10 @@ export default function MachineDetailPage() {
   const t = useTranslations('MachineDetailPage');
   const tMachineTypes = useTranslations('MachineryTypes');
   const tMachineStatuses = useTranslations('MachineryStatuses');
+  
+  const canManageMachinery = activeRole === 'Firmen Admin' || activeRole === 'Tenant Admin';
+  const canLogMaintenance = canManageMachinery || activeRole === 'Werkstatt';
+  const canReportRepair = canLogMaintenance || activeRole === 'Mitarbeiter';
 
   useEffect(() => {
     if (activeCompany) {
@@ -462,54 +466,60 @@ export default function MachineDetailPage() {
                 <p className="text-muted-foreground">{t('description', { model: machine.model, type: tMachineTypes(machine.type) })}</p>
                 </div>
                  <div className="flex gap-2">
-                    <Sheet open={isEditSheetOpen} onOpenChange={setEditSheetOpen}>
-                        <SheetTrigger asChild>
-                            <Button size="sm" variant="outline" className="gap-1">
-                                <Pencil className="h-4 w-4" />
-                                {t('editMachineButton')}
-                            </Button>
-                        </SheetTrigger>
-                        <SheetContent>
-                            <SheetHeader>
-                                <SheetTitle>{t('editMachineSheetTitle')}</SheetTitle>
-                            </SheetHeader>
-                            <div className="py-4">
-                                <EditMachineForm closeSheet={() => setEditSheetOpen(false)} machine={machine} />
-                            </div>
-                        </SheetContent>
-                    </Sheet>
-                    <Sheet open={isMaintenanceSheetOpen} onOpenChange={setMaintenanceSheetOpen}>
-                        <SheetTrigger asChild>
-                            <Button size="sm" className="gap-1">
-                                <PlusCircle className="h-4 w-4" />
-                                {t('logMaintenanceButton')}
-                            </Button>
-                        </SheetTrigger>
-                        <SheetContent>
-                            <SheetHeader>
-                                <SheetTitle>{t('logMaintenanceSheetTitle')}</SheetTitle>
-                            </SheetHeader>
-                            <div className="py-4">
-                                {activeCompany && <AddMaintenanceForm closeSheet={() => setMaintenanceSheetOpen(false)} tenantId={activeCompany.tenantId} companyId={activeCompany.id} machineId={machine.id} locale={locale} />}
-                            </div>
-                        </SheetContent>
-                    </Sheet>
-                     <Sheet open={isRepairSheetOpen} onOpenChange={setRepairSheetOpen}>
-                        <SheetTrigger asChild>
-                            <Button size="sm" variant="destructive" className="gap-1">
-                                <Wrench className="h-4 w-4" />
-                                {t('reportRepairButton')}
-                            </Button>
-                        </SheetTrigger>
-                        <SheetContent>
-                            <SheetHeader>
-                                <SheetTitle>{t('logRepairSheetTitle')}</SheetTitle>
-                            </SheetHeader>
-                            <div className="py-4">
-                                {activeCompany && <AddRepairForm closeSheet={() => setRepairSheetOpen(false)} tenantId={activeCompany.tenantId} companyId={activeCompany.id} machineId={machine.id} locale={locale} />}
-                            </div>
-                        </SheetContent>
-                    </Sheet>
+                    {canManageMachinery && (
+                      <Sheet open={isEditSheetOpen} onOpenChange={setEditSheetOpen}>
+                          <SheetTrigger asChild>
+                              <Button size="sm" variant="outline" className="gap-1">
+                                  <Pencil className="h-4 w-4" />
+                                  {t('editMachineButton')}
+                              </Button>
+                          </SheetTrigger>
+                          <SheetContent>
+                              <SheetHeader>
+                                  <SheetTitle>{t('editMachineSheetTitle')}</SheetTitle>
+                              </SheetHeader>
+                              <div className="py-4">
+                                  <EditMachineForm closeSheet={() => setEditSheetOpen(false)} machine={machine} />
+                              </div>
+                          </SheetContent>
+                      </Sheet>
+                    )}
+                    {canLogMaintenance && (
+                      <Sheet open={isMaintenanceSheetOpen} onOpenChange={setMaintenanceSheetOpen}>
+                          <SheetTrigger asChild>
+                              <Button size="sm" className="gap-1">
+                                  <PlusCircle className="h-4 w-4" />
+                                  {t('logMaintenanceButton')}
+                              </Button>
+                          </SheetTrigger>
+                          <SheetContent>
+                              <SheetHeader>
+                                  <SheetTitle>{t('logMaintenanceSheetTitle')}</SheetTitle>
+                              </SheetHeader>
+                              <div className="py-4">
+                                  {activeCompany && <AddMaintenanceForm closeSheet={() => setMaintenanceSheetOpen(false)} tenantId={activeCompany.tenantId} companyId={activeCompany.id} machineId={machine.id} locale={locale} />}
+                              </div>
+                          </SheetContent>
+                      </Sheet>
+                    )}
+                    {canReportRepair && (
+                      <Sheet open={isRepairSheetOpen} onOpenChange={setRepairSheetOpen}>
+                          <SheetTrigger asChild>
+                              <Button size="sm" variant="destructive" className="gap-1">
+                                  <Wrench className="h-4 w-4" />
+                                  {t('reportRepairButton')}
+                              </Button>
+                          </SheetTrigger>
+                          <SheetContent>
+                              <SheetHeader>
+                                  <SheetTitle>{t('logRepairSheetTitle')}</SheetTitle>
+                              </SheetHeader>
+                              <div className="py-4">
+                                  {activeCompany && <AddRepairForm closeSheet={() => setRepairSheetOpen(false)} tenantId={activeCompany.tenantId} companyId={activeCompany.id} machineId={machine.id} locale={locale} />}
+                              </div>
+                          </SheetContent>
+                      </Sheet>
+                    )}
                  </div>
             </div>
 

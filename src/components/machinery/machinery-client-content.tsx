@@ -121,11 +121,13 @@ export function MachineryClientContent() {
   const tMachineStatuses = useTranslations('MachineryStatuses');
   const { toast } = useToast();
   const [isSheetOpen, setSheetOpen] = useState(false);
-  const { activeCompany, loading: sessionLoading } = useSession();
+  const { activeCompany, loading: sessionLoading, activeRole } = useSession();
   const [machinery, setMachinery] = useState<Machinery[]>([]);
   const [loading, setLoading] = useState(true);
   const { locale } = useParams<{ locale: string }>();
   const [machineToDelete, setMachineToDelete] = useState<Machinery | null>(null);
+
+  const canManageMachinery = activeRole === 'Firmen Admin' || activeRole === 'Tenant Admin';
 
   useEffect(() => {
     if (activeCompany) {
@@ -206,22 +208,24 @@ export function MachineryClientContent() {
             {t('description')}
           </CardDescription>
         </div>
-        <Sheet open={isSheetOpen} onOpenChange={setSheetOpen}>
-          <SheetTrigger asChild>
-            <Button size="sm" className="gap-1">
-              <PlusCircle className="h-4 w-4" />
-              {t('addMachine')}
-            </Button>
-          </SheetTrigger>
-          <SheetContent>
-            <SheetHeader>
-              <SheetTitle>{t('addMachineSheetTitle')}</SheetTitle>
-            </SheetHeader>
-            <div className="py-4">
-              {activeCompany && <AddMachineForm closeSheet={() => setSheetOpen(false)} tenantId={activeCompany.tenantId} companyId={activeCompany.id} />}
-            </div>
-          </SheetContent>
-        </Sheet>
+        {canManageMachinery && (
+          <Sheet open={isSheetOpen} onOpenChange={setSheetOpen}>
+            <SheetTrigger asChild>
+              <Button size="sm" className="gap-1">
+                <PlusCircle className="h-4 w-4" />
+                {t('addMachine')}
+              </Button>
+            </SheetTrigger>
+            <SheetContent>
+              <SheetHeader>
+                <SheetTitle>{t('addMachineSheetTitle')}</SheetTitle>
+              </SheetHeader>
+              <div className="py-4">
+                {activeCompany && <AddMachineForm closeSheet={() => setSheetOpen(false)} tenantId={activeCompany.tenantId} companyId={activeCompany.id} />}
+              </div>
+            </SheetContent>
+          </Sheet>
+        )}
       </CardHeader>
       <CardContent>
         <Table>
@@ -270,12 +274,16 @@ export function MachineryClientContent() {
                     <DropdownMenuContent align="end">
                       <DropdownMenuLabel>{t('actions')}</DropdownMenuLabel>
                       <DropdownMenuItem asChild>
-                        <Link href={`/${locale}/machinery/${machine.id}`}>{t('edit')}</Link>
+                        <Link href={`/${locale}/machinery/${machine.id}`}>{t('viewDetails')}</Link>
                       </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem className="text-destructive" onSelect={() => setMachineToDelete(machine)}>
-                        {t('delete')}
-                      </DropdownMenuItem>
+                      {canManageMachinery && (
+                        <>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem className="text-destructive" onSelect={() => setMachineToDelete(machine)}>
+                            {t('delete')}
+                          </DropdownMenuItem>
+                        </>
+                      )}
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </TableCell>

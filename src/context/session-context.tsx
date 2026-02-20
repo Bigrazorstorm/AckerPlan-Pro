@@ -1,13 +1,14 @@
 'use client';
 
-import { createContext, useContext, useState, ReactNode, useEffect } from 'react';
-import { Company, Session } from '@/services/types';
+import { createContext, useContext, useState, ReactNode, useEffect, useMemo } from 'react';
+import { Company, Session, Role } from '@/services/types';
 
 interface SessionContextType {
   session: Session | null;
   loading: boolean;
   activeCompany: Company | null;
   switchCompany: (companyId: string) => void;
+  activeRole: Role | undefined;
 }
 
 const SessionContext = createContext<SessionContextType | undefined>(undefined);
@@ -27,6 +28,11 @@ export function SessionProvider({ children, session: initialSession }: { childre
     }
   }, [session]);
 
+  const activeRole = useMemo(() => {
+    if (!session?.user || !activeCompany) return undefined;
+    return session.user.companyRoles.find(cr => cr.companyId === activeCompany.id)?.role;
+  }, [session, activeCompany]);
+
   const switchCompany = (companyId: string) => {
     const company = session?.companies.find(c => c.id === companyId);
     if (company) {
@@ -35,7 +41,7 @@ export function SessionProvider({ children, session: initialSession }: { childre
     }
   };
 
-  const value = { session, loading, activeCompany, switchCompany };
+  const value = { session, loading, activeCompany, switchCompany, activeRole };
 
   return (
     <SessionContext.Provider value={value}>
