@@ -2,21 +2,9 @@
 
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import 'leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css';
+import 'leaflet-defaulticon-compatibility';
 import { useMemo, useEffect, useRef } from 'react';
-
-import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
-import markerIcon from 'leaflet/dist/images/marker-icon.png';
-import markerShadow from 'leaflet/dist/images/marker-shadow.png';
-
-// This setup configures the default icon for all Leaflet markers.
-// It's a workaround for a common issue with bundlers like Webpack/Turbopack.
-// @ts-ignore
-delete L.Icon.Default.prototype._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconUrl: markerIcon.src,
-  iconRetinaUrl: markerIcon2x.src,
-  shadowUrl: markerShadow.src,
-});
 
 
 interface ObservationLocationMapProps {
