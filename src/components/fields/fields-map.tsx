@@ -52,14 +52,14 @@ export function FieldsMap({ fields, observations }: FieldsMapProps) {
             fieldsWithGeometry.forEach(field => {
                 const geometry = field.geometry as LatLngExpression[];
                 L.polygon(geometry, { color: 'hsl(var(--primary))' })
-                    .bindTooltip(`&lt;strong&gt;${field.name}&lt;/strong&gt;&lt;br/&gt;${field.crop} - ${field.area} ha`)
+                    .bindTooltip(`<strong>${field.name}</strong><br/>${field.crop} - ${field.area} ha`)
                     .addTo(fieldLayer);
             });
 
             const observationLayer = L.featureGroup();
             observationsWithLocation.forEach(obs => {
                 L.marker([obs.latitude!, obs.longitude!])
-                    .bindTooltip(`&lt;strong&gt;${obs.title}&lt;/strong&gt;&lt;br/&gt;${obs.field} - ${new Date(obs.date).toLocaleDateString()}`)
+                    .bindTooltip(`<strong>${obs.title}</strong><br/>${obs.field} - ${new Date(obs.date).toLocaleDateString()}`)
                     .addTo(observationLayer);
             });
 
@@ -95,8 +95,8 @@ export function FieldsMap({ fields, observations }: FieldsMapProps) {
                 mapInstanceRef.current = null;
             }
         };
-    }, [fields, observations, t]); // Rerun effect if data changes
+    }, [fields, observations, t, fieldsWithGeometry, observationsWithLocation]); // Rerun effect if data changes
 
     // 3. We render a simple div that Leaflet will take control of.
-    return &lt;div ref={mapContainerRef} style={mapStyle} /&gt;;
+    return <div ref={mapContainerRef} style={mapStyle} />;
 }

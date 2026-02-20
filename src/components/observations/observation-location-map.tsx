@@ -38,7 +38,7 @@ export function ObservationLocationMap({ latitude, longitude }: ObservationLocat
             mapInstanceRef.current = map;
 
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; &lt;a href="https://www.openstreetmap.org/copyright"&gt;OpenStreetMap&lt;/a&gt; contributors'
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             }).addTo(map);
 
             L.marker([latitude, longitude])
@@ -56,5 +56,5 @@ export function ObservationLocationMap({ latitude, longitude }: ObservationLocat
         };
     }, [latitude, longitude]); // Re-run if coordinates change
 
-    return &lt;div ref={mapContainerRef} style={mapStyle} /&gt;;
+    return <div ref={mapContainerRef} style={mapStyle} />;
 }
