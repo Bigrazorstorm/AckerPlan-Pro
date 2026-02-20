@@ -105,6 +105,16 @@ export interface Machinery {
   updatedAt: string; // ISO-8601 date string
 };
 
+// Input type for updating an existing machine.
+export interface UpdateMachineInput {
+  name: string;
+  type: string;
+  model: string;
+  standardFuelConsumption: number;
+  maintenanceIntervalHours?: number;
+}
+
+
 // Represents a Field entity in the database.
 export interface Field {
   id: string; // UUID

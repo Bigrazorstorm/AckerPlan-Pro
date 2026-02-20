@@ -16,6 +16,10 @@ const AddMachineSchema = z.object({
   tenantId: z.string().min(1, { message: 'Tenant ID is required' }),
   companyId: z.string().min(1, { message: 'Company ID is required' }),
 })
+
+const UpdateMachineSchema = AddMachineSchema.extend({
+  id: z.string().min(1, { message: 'Machine ID is required' }),
+})
  
 export async function addMachine(prevState: any, formData: FormData) {
   const validatedFields = AddMachineSchema.safeParse({
@@ -46,6 +50,40 @@ export async function addMachine(prevState: any, formData: FormData) {
       errors: {},
     }
   }
+}
+
+export async function updateMachine(prevState: any, formData: FormData) {
+    const validatedFields = UpdateMachineSchema.safeParse({
+        id: formData.get('id'),
+        name: formData.get('name'),
+        type: formData.get('type'),
+        model: formData.get('model'),
+        standardFuelConsumption: formData.get('standardFuelConsumption'),
+        maintenanceIntervalHours: formData.get('maintenanceIntervalHours'),
+        tenantId: formData.get('tenantId'),
+        companyId: formData.get('companyId'),
+    })
+
+    if (!validatedFields.success) {
+        return {
+            errors: validatedFields.error.flatten().fieldErrors,
+            message: 'Validation failed. Please check the fields.',
+        }
+    }
+
+    try {
+        const { tenantId, companyId, id, ...machineData } = validatedFields.data;
+        await dataService.updateMachine(tenantId, companyId, id, machineData);
+        revalidatePath(`/machinery/${id}`);
+        revalidatePath('/machinery');
+        return { message: 'Machine updated successfully.', errors: {} };
+    } catch (e) {
+        const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
+        return {
+            message: `Failed to update machine: ${errorMessage}`,
+            errors: {},
+        }
+    }
 }
 
 export async function deleteMachine(machineId: string, tenantId: string, companyId: string) {

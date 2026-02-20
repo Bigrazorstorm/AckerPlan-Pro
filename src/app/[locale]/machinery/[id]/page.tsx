@@ -11,7 +11,7 @@ import { useTranslations } from 'next-intl';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import { PlusCircle, Wrench, ArrowLeft, Calendar as CalendarIcon, Info } from 'lucide-react';
+import { PlusCircle, Wrench, ArrowLeft, Calendar as CalendarIcon, Info, Pencil } from 'lucide-react';
 import { format } from 'date-fns';
 import { de, enUS } from 'date-fns/locale';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -25,8 +25,10 @@ import { Calendar } from '@/components/ui/calendar';
 import { useToast } from '@/hooks/use-toast';
 import { addMaintenanceEvent } from '@/app/machinery/maintenance/actions';
 import { addRepairEvent } from '@/app/machinery/repair/actions';
+import { updateMachine } from '@/app/machinery/actions';
 import { cn } from '@/lib/utils';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 
 const initialState = {
@@ -42,6 +44,82 @@ function SubmitButton({tKey = 'submit'}: {tKey?: string}) {
       {pending ? t('General.submitting') : t(tKey)}
     </Button>
   );
+}
+
+function EditMachineForm({
+  closeSheet,
+  machine,
+}: {
+  closeSheet: () => void;
+  machine: Machinery;
+}) {
+  const [state, formAction] = useFormState(updateMachine, initialState);
+  const { toast } = useToast();
+  const t = useTranslations('MachineDetailPage.editMachineForm');
+  const tMachineTypes = useTranslations('MachineryTypes');
+
+  useEffect(() => {
+    if (state.message && Object.keys(state.errors).length === 0) {
+      toast({
+        title: t('successToastTitle'),
+        description: t('successToastDescription'),
+      });
+      closeSheet();
+    } else if (state.message && Object.keys(state.errors).length > 0) {
+      toast({
+        variant: 'destructive',
+        title: t('errorToastTitle'),
+        description: state.message,
+      });
+    }
+  }, [state, toast, closeSheet, t]);
+  
+  const machineTypes = ["Tractor", "CombineHarvester", "Tillage", "Seeding", "Baler"];
+
+  return (
+    <form action={formAction} className="space-y-4">
+      <input type="hidden" name="id" value={machine.id} />
+      <input type="hidden" name="tenantId" value={machine.tenantId} />
+      <input type="hidden" name="companyId" value={machine.companyId} />
+      <div className="space-y-2">
+        <Label htmlFor="name">{t('nameLabel')}</Label>
+        <Input id="name" name="name" required defaultValue={machine.name} />
+        {state.errors?.name && <p className="text-sm text-destructive">{state.errors.name.join(', ')}</p>}
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="type">{t('typeLabel')}</Label>
+        <Select name="type" required defaultValue={machine.type}>
+          <SelectTrigger>
+            <SelectValue placeholder={t('typePlaceholder')} />
+          </SelectTrigger>
+          <SelectContent>
+            {machineTypes.map((type) => (
+                <SelectItem key={type} value={type}>{tMachineTypes(type)}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        {state.errors?.type && <p className="text-sm text-destructive">{state.errors.type.join(', ')}</p>}
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="model">{t('modelLabel')}</Label>
+        <Input id="model" name="model" required defaultValue={machine.model} />
+        {state.errors?.model && <p className="text-sm text-destructive">{state.errors.model.join(', ')}</p>}
+      </div>
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
+            <Label htmlFor="standardFuelConsumption">{t('fuelConsumptionLabel')}</Label>
+            <Input id="standardFuelConsumption" name="standardFuelConsumption" type="number" step="0.1" required defaultValue={machine.standardFuelConsumption} />
+            {state.errors?.standardFuelConsumption && <p className="text-sm text-destructive">{state.errors.standardFuelConsumption.join(', ')}</p>}
+        </div>
+        <div className="space-y-2">
+            <Label htmlFor="maintenanceIntervalHours">{t('maintenanceIntervalLabel')}</Label>
+            <Input id="maintenanceIntervalHours" name="maintenanceIntervalHours" type="number" step="1" placeholder={t('maintenanceIntervalPlaceholder')} defaultValue={machine.maintenanceIntervalHours} />
+            {state.errors?.maintenanceIntervalHours && <p className="text-sm text-destructive">{state.errors.maintenanceIntervalHours.join(', ')}</p>}
+        </div>
+      </div>
+      <SubmitButton tKey="MachineDetailPage.editMachineForm.submit" />
+    </form>
+  )
 }
 
 function AddMaintenanceForm({
@@ -284,6 +362,7 @@ export default function MachineDetailPage() {
   const [loading, setLoading] = useState(true);
   const [isMaintenanceSheetOpen, setMaintenanceSheetOpen] = useState(false);
   const [isRepairSheetOpen, setRepairSheetOpen] = useState(false);
+  const [isEditSheetOpen, setEditSheetOpen] = useState(false);
 
   const t = useTranslations('MachineDetailPage');
   const tMachineTypes = useTranslations('MachineryTypes');
@@ -383,6 +462,22 @@ export default function MachineDetailPage() {
                 <p className="text-muted-foreground">{t('description', { model: machine.model, type: tMachineTypes(machine.type) })}</p>
                 </div>
                  <div className="flex gap-2">
+                    <Sheet open={isEditSheetOpen} onOpenChange={setEditSheetOpen}>
+                        <SheetTrigger asChild>
+                            <Button size="sm" variant="outline" className="gap-1">
+                                <Pencil className="h-4 w-4" />
+                                {t('editMachineButton')}
+                            </Button>
+                        </SheetTrigger>
+                        <SheetContent>
+                            <SheetHeader>
+                                <SheetTitle>{t('editMachineSheetTitle')}</SheetTitle>
+                            </SheetHeader>
+                            <div className="py-4">
+                                <EditMachineForm closeSheet={() => setEditSheetOpen(false)} machine={machine} />
+                            </div>
+                        </SheetContent>
+                    </Sheet>
                     <Sheet open={isMaintenanceSheetOpen} onOpenChange={setMaintenanceSheetOpen}>
                         <SheetTrigger asChild>
                             <Button size="sm" className="gap-1">

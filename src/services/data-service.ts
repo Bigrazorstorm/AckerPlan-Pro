@@ -1,4 +1,4 @@
-import { Kpi, ChartDataPoint, Operation, Machinery, Session, Field, MaintenanceEvent, AddMaintenanceEventInput, AuditLogEvent, RepairEvent, AddRepairEventInput, AddOperationInput, LaborHoursByCropReportData, Observation, AddObservationInput, ProfitabilityByCropReportData } from './types';
+import { Kpi, ChartDataPoint, Operation, Machinery, Session, Field, MaintenanceEvent, AddMaintenanceEventInput, AuditLogEvent, RepairEvent, AddRepairEventInput, AddOperationInput, LaborHoursByCropReportData, Observation, AddObservationInput, ProfitabilityByCropReportData, UpdateMachineInput } from './types';
 
 /**
  * Defines the contract for data access in the application.
@@ -86,6 +86,15 @@ export interface DataService {
    * @param machineData - The data for the new machine.
    */
   addMachinery(tenantId: string, companyId: string, machineData: { name: string; type: string; model: string; standardFuelConsumption: number; maintenanceIntervalHours?: number; }): Promise<Machinery>;
+
+  /**
+   * Updates an existing machine in the data store.
+   * @param tenantId - The ID of the tenant.
+   * @param companyId - The ID of the company.
+   * @param machineId - The ID of the machine to update.
+   * @param machineData - The data to update for the machine.
+   */
+  updateMachine(tenantId: string, companyId: string, machineId: string, machineData: UpdateMachineInput): Promise<Machinery>;
 
   /**
    * Deletes a machine from the data store.

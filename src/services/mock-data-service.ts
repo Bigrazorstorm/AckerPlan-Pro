@@ -1,5 +1,5 @@
 import { DataService } from './data-service';
-import { Kpi, ChartDataPoint, Operation, Machinery, Session, Field, MaintenanceEvent, AddMaintenanceEventInput, AuditLogEvent, RepairEvent, AddRepairEventInput, AddOperationInput, LaborHoursByCropReportData, Observation, AddObservationInput, ProfitabilityByCropReportData } from './types';
+import { Kpi, ChartDataPoint, Operation, Machinery, Session, Field, MaintenanceEvent, AddMaintenanceEventInput, AuditLogEvent, RepairEvent, AddRepairEventInput, AddOperationInput, LaborHoursByCropReportData, Observation, AddObservationInput, ProfitabilityByCropReportData, UpdateMachineInput } from './types';
 
 const session: Session = {
   user: {
@@ -260,6 +260,18 @@ export class MockDataService implements DataService {
     machinery.push(newMachine);
     logAuditEvent(tenantId, companyId, 'machine.create', `Maschine "${machineData.name}" wurde erstellt.`);
     return Promise.resolve(newMachine);
+  }
+
+  async updateMachine(tenantId: string, companyId: string, machineId: string, machineData: UpdateMachineInput): Promise<Machinery> {
+    console.log(`Updating machine ${machineId} for tenant ${tenantId}, company ${companyId}.`);
+    const machineIndex = machinery.findIndex(m => m.id === machineId && m.tenantId === tenantId && m.companyId === companyId);
+    if (machineIndex === -1) {
+      throw new Error("Machine not found or not authorized to update.");
+    }
+    const updatedMachine = { ...machinery[machineIndex], ...machineData, updatedAt: new Date().toISOString() };
+    machinery[machineIndex] = updatedMachine;
+    logAuditEvent(tenantId, companyId, 'machine.update', `Maschinendetails für "${updatedMachine.name}" wurden aktualisiert.`);
+    return Promise.resolve(updatedMachine);
   }
 
   async deleteMachine(tenantId: string, companyId: string, machineId: string): Promise<void> {

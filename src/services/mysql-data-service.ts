@@ -1,5 +1,5 @@
 import { DataService } from './data-service';
-import { Kpi, ChartDataPoint, Operation, Machinery, Session, Field, MaintenanceEvent, AddMaintenanceEventInput, AddRepairEventInput, RepairEvent, AuditLogEvent, AddOperationInput, LaborHoursByCropReportData, Observation, AddObservationInput, ProfitabilityByCropReportData } from './types';
+import { Kpi, ChartDataPoint, Operation, Machinery, Session, Field, MaintenanceEvent, AddMaintenanceEventInput, AddRepairEventInput, RepairEvent, AuditLogEvent, AddOperationInput, LaborHoursByCropReportData, Observation, AddObservationInput, ProfitabilityByCropReportData, UpdateMachineInput } from './types';
 
 // Hardcoded session for demonstration purposes, as this is a placeholder service.
 const session: Session = {
@@ -111,6 +111,24 @@ export class MySqlDataService implements DataService {
     return Promise.resolve(newMachine);
   }
   
+  async updateMachine(tenantId: string, companyId: string, machineId: string, machineData: UpdateMachineInput): Promise<Machinery> {
+    this.log('updateMachine', { tenantId, companyId, machineId, machineData });
+    // This is a placeholder. In a real app, you'd update the DB record.
+    const updatedMachine: Machinery = {
+      id: machineId,
+      tenantId,
+      companyId,
+      status: 'Operational',
+      lastMaintenance: new Date().toISOString(),
+      createdAt: new Date().toISOString(), // Should be the original creation date
+      updatedAt: new Date().toISOString(),
+      totalOperatingHours: 500, // This should come from the existing record
+      lastMaintenanceHours: 500, // This should come from the existing record
+      ...machineData,
+    };
+    return Promise.resolve(updatedMachine);
+  }
+
   async deleteMachine(tenantId: string, companyId: string, machineId: string): Promise<void> {
     this.log('deleteMachine', { tenantId, companyId, machineId });
     return Promise.resolve();
