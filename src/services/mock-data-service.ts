@@ -1,17 +1,58 @@
 import { DataService } from './data-service';
-import { Kpi, ChartDataPoint, Operation, Machinery, Session, Field, MaintenanceEvent, AddMaintenanceEventInput, AuditLogEvent, RepairEvent, AddRepairEventInput, AddOperationInput, LaborHoursByCropReportData, Observation, AddObservationInput, ProfitabilityByCropReportData, UpdateMachineInput, FieldEconomics } from './types';
+import { Kpi, ChartDataPoint, Operation, Machinery, Session, Field, MaintenanceEvent, AddMaintenanceEventInput, AuditLogEvent, RepairEvent, AddRepairEventInput, AddOperationInput, LaborHoursByCropReportData, Observation, AddObservationInput, ProfitabilityByCropReportData, UpdateMachineInput, FieldEconomics, User } from './types';
+
+let users: User[] = [
+    {
+        id: 'user-1',
+        name: 'John Doe',
+        email: 'john.doe@example.com',
+        tenantId: 'tenant-123',
+        companyRoles: [
+            { companyId: 'company-456', role: 'Firmen Admin' },
+            { companyId: 'company-789', role: 'Mitarbeiter' },
+        ]
+    },
+    {
+        id: 'user-2',
+        name: 'Max Mustermann',
+        email: 'max.mustermann@example.com',
+        tenantId: 'tenant-123',
+        companyRoles: [
+            { companyId: 'company-456', role: 'Betriebsleitung' },
+        ]
+    },
+    {
+        id: 'user-3',
+        name: 'Erika Mustermann',
+        email: 'erika.mustermann@example.com',
+        tenantId: 'tenant-123',
+        companyRoles: [
+            { companyId: 'company-456', role: 'Mitarbeiter' },
+            { companyId: 'company-789', role: 'Mitarbeiter' },
+        ]
+    },
+    {
+        id: 'user-4',
+        name: 'Klaus Kleber',
+        email: 'klaus.kleber@example.com',
+        tenantId: 'tenant-123',
+        companyRoles: [
+            { companyId: 'company-456', role: 'Werkstatt' },
+        ]
+    },
+    {
+        id: 'user-5',
+        name: 'Anna Schmidt',
+        email: 'anna.schmidt@example.com',
+        tenantId: 'tenant-other', // Different tenant
+        companyRoles: [
+            { companyId: 'company-abc', role: 'Firmen Admin' },
+        ]
+    }
+];
 
 const session: Session = {
-  user: {
-    id: 'user-1',
-    name: 'John Doe',
-    email: 'john.doe@example.com',
-    tenantId: 'tenant-123',
-    companyRoles: [
-      { companyId: 'company-456', role: 'Firmen Admin' },
-      { companyId: 'company-789', role: 'Mitarbeiter' },
-    ]
-  },
+  user: users[0],
   companies: [
     { id: 'company-456', name: 'Ackerbau & Co. KG', tenantId: 'tenant-123' },
     { id: 'company-789', name: 'Grünland GmbH', tenantId: 'tenant-123' },
@@ -534,5 +575,14 @@ export class MockDataService implements DataService {
         costs: totalCosts,
         contributionMargin: totalRevenue - totalCosts,
     });
+  }
+
+  async getUsersForCompany(tenantId: string, companyId: string): Promise<User[]> {
+    console.log(`Fetching Users for tenant ${tenantId} and company ${companyId}.`);
+    const companyUsers = users.filter(u => 
+        u.tenantId === tenantId && 
+        u.companyRoles.some(cr => cr.companyId === companyId)
+    );
+    return Promise.resolve(companyUsers);
   }
 }

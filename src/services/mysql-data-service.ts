@@ -1,5 +1,5 @@
 import { DataService } from './data-service';
-import { Kpi, ChartDataPoint, Operation, Machinery, Session, Field, MaintenanceEvent, AddMaintenanceEventInput, AddRepairEventInput, RepairEvent, AuditLogEvent, AddOperationInput, LaborHoursByCropReportData, Observation, AddObservationInput, ProfitabilityByCropReportData, UpdateMachineInput, FieldEconomics } from './types';
+import { Kpi, ChartDataPoint, Operation, Machinery, Session, Field, MaintenanceEvent, AddMaintenanceEventInput, AddRepairEventInput, RepairEvent, AuditLogEvent, AddOperationInput, LaborHoursByCropReportData, Observation, AddObservationInput, ProfitabilityByCropReportData, UpdateMachineInput, FieldEconomics, User } from './types';
 
 // Hardcoded session for demonstration purposes, as this is a placeholder service.
 const session: Session = {
@@ -193,5 +193,10 @@ export class MySqlDataService implements DataService {
   async getFieldEconomics(tenantId: string, companyId: string, fieldId: string): Promise<FieldEconomics> {
     this.log('getFieldEconomics', { tenantId, companyId, fieldId });
     return Promise.resolve({ revenue: 0, costs: 0, contributionMargin: 0 });
+  }
+  
+  async getUsersForCompany(tenantId: string, companyId: string): Promise<User[]> {
+    this.log('getUsersForCompany', { tenantId, companyId });
+    return Promise.resolve([]);
   }
 }

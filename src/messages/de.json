@@ -344,11 +344,24 @@
     "tenantIdLabel": "Mandanten-ID",
     "activeRoleLabel": "Aktuelle Rolle",
     "manageUsersTitle": "Benutzerverwaltung",
-    "manageUsersDescription": "Fügen Sie neue Benutzer hinzu und verwalten Sie deren Berechtigungen.",
+    "manageUsersDescription": "Benutzer hinzufügen, Rollen bearbeiten und Berechtigungen für die aktuell ausgewählte Firma verwalten.",
     "companySettingsTitle": "Firmeneinstellungen",
     "companySettingsDescription": "Verwalten Sie die Stammdaten und Einstellungen Ihrer Firma.",
     "billingSettingsTitle": "Abrechnung & Lizenz",
-    "billingSettingsDescription": "Verwalten Sie Ihr Abonnement und sehen Sie Rechnungen ein."
+    "billingSettingsDescription": "Verwalten Sie Ihr Abonnement und sehen Sie Rechnungen ein.",
+    "userManagement": {
+      "title": "Benutzerverwaltung",
+      "description": "Benutzer hinzufügen, Rollen bearbeiten und Berechtigungen für die aktuell ausgewählte Firma verwalten.",
+      "addUserButton": "Benutzer hinzufügen",
+      "tableHeaderName": "Name",
+      "tableHeaderEmail": "E-Mail",
+      "tableHeaderRole": "Rolle",
+      "actions": "Aktionen",
+      "editRole": "Rolle bearbeiten",
+      "removeUser": "Benutzer entfernen",
+      "accessDeniedTitle": "Keine Berechtigung",
+      "accessDeniedDescription": "Sie haben nicht die erforderlichen Berechtigungen, um Benutzer für diese Firma zu verwalten."
+    }
   },
   "AuditLogPage": {
     "title": "Logbuch / Audit Trail",
@@ -357,5 +370,13 @@
     "tableHeaderAction": "Aktion",
     "tableHeaderDate": "Datum",
     "tableHeaderDetails": "Details"
+  },
+  "Roles": {
+    "Tenant Admin": "Mandanten-Admin",
+    "Firmen Admin": "Firmen-Admin",
+    "Betriebsleitung": "Betriebsleitung",
+    "Mitarbeiter": "Mitarbeiter",
+    "Werkstatt": "Werkstatt",
+    "Leser": "Leser"
   }
 }

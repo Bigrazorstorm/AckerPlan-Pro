@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Settings } from "lucide-react";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
+import { UserManagementContent } from "./user-management-content";
 
 function PlaceholderContent({ titleKey, descriptionKey }: { titleKey: string; descriptionKey: string; }) {
   const t = useTranslations('SettingsPage');
@@ -65,15 +66,7 @@ export function SettingsClientContent() {
         </Card>
       </TabsContent>
       <TabsContent value="users">
-        <Card>
-            <CardHeader>
-                <CardTitle>{t('manageUsersTitle')}</CardTitle>
-                <CardDescription>{t('manageUsersDescription')}</CardDescription>
-            </CardHeader>
-            <CardContent>
-                <PlaceholderContent titleKey="comingSoonTitle" descriptionKey="comingSoonDescription" />
-            </CardContent>
-        </Card>
+        <UserManagementContent />
       </TabsContent>
       <TabsContent value="company">
          <Card>
