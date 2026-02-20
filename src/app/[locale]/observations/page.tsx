@@ -2,8 +2,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Siren } from 'lucide-react';
 import { getTranslations } from 'next-intl/server';
 
-export default async function ObservationsPage({params: {locale}}: {params: {locale: string}}) {
-  const t = await getTranslations({locale, namespace: 'ObservationsPage'});
+export default async function ObservationsPage() {
+  const t = await getTranslations('ObservationsPage');
   return (
     <Card>
       <CardHeader>

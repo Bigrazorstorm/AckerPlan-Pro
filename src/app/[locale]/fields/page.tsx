@@ -1,8 +1,8 @@
 import { FieldsClientContent } from "@/components/fields/fields-client-content";
 import { getTranslations } from "next-intl/server";
 
-export default async function FieldsPage({params: {locale}}: {params: {locale: string}}) {
-  const t = await getTranslations({locale, namespace: 'FieldsPage'});
+export default async function FieldsPage() {
+  const t = await getTranslations('FieldsPage');
   
   return (
     <div className="space-y-6">

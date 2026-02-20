@@ -9,8 +9,8 @@ import {getMessages, getTranslations} from 'next-intl/server';
 import { SessionProvider } from '@/context/session-context';
 import { getSession } from '@/app/auth/actions';
 
-export async function generateMetadata({params: {locale}}: {params: {locale: string}}): Promise<Metadata> {
-  const t = await getTranslations({locale, namespace: 'Metadata'});
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations('Metadata');
  
   return {
     title: {
