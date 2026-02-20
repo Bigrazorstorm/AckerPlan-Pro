@@ -50,7 +50,7 @@ export function ObservationLocationMap({ latitude, longitude }: ObservationLocat
               .openTooltip();
         }
 
-        // Cleanup function for React StrictMode
+        // Cleanup function for when the component unmounts
         return () => {
             if (mapInstanceRef.current) {
                 mapInstanceRef.current.remove();
