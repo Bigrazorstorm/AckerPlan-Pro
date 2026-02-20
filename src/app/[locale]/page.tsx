@@ -1,23 +1,100 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import { useSession } from '@/context/session-context';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import dataService from "@/services";
 import { DashboardChart } from "@/components/dashboard-chart";
-import { getTranslations } from "next-intl/server";
+import { useTranslations } from "next-intl";
 import { AreaChart, Bell, Eye, Tractor } from "lucide-react";
+import { Kpi, RecentActivity, ChartDataPoint } from '@/services/types';
+import { Skeleton } from '@/components/ui/skeleton';
 
-export default async function Home() {
-  const t = await getTranslations('Dashboard');
-  const tKpi = await getTranslations('Kpis');
+function DashboardSkeleton() {
+    return (
+        <div className="space-y-8">
+            <div>
+                <Skeleton className="h-8 w-1/3" />
+                <Skeleton className="h-4 w-2/3 mt-2" />
+            </div>
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                {[...Array(4)].map((_, i) => (
+                    <Card key={i}>
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                            <Skeleton className="h-4 w-2/3" />
+                            <Skeleton className="h-4 w-4" />
+                        </CardHeader>
+                        <CardContent>
+                            <Skeleton className="h-7 w-1/2" />
+                            <Skeleton className="h-3 w-1/3 mt-1" />
+                        </CardContent>
+                    </Card>
+                ))}
+            </div>
+            <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-7">
+                <Card className="lg:col-span-4">
+                    <CardHeader>
+                        <Skeleton className="h-6 w-1/4" />
+                         <Skeleton className="h-4 w-1/2 mt-1" />
+                    </CardHeader>
+                    <CardContent className="pl-2">
+                        <Skeleton className="h-[300px] w-full" />
+                    </CardContent>
+                </Card>
+                <Card className="lg:col-span-3">
+                    <CardHeader>
+                        <Skeleton className="h-6 w-1/4" />
+                        <Skeleton className="h-4 w-1/2 mt-1" />
+                    </CardHeader>
+                    <CardContent>
+                        <div className="space-y-4">
+                            {[...Array(5)].map((_, i) => (
+                                <div key={i} className="flex justify-between items-center py-2">
+                                    <div className="space-y-2">
+                                        <Skeleton className="h-4 w-24" />
+                                        <Skeleton className="h-3 w-16" />
+                                    </div>
+                                    <Skeleton className="h-4 w-20" />
+                                    <Skeleton className="h-5 w-24" />
+                                </div>
+                            ))}
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
+        </div>
+    )
+}
 
-  // In a real app, tenantId and companyId would come from the user's session or context.
-  // For now, we'll use dummy values.
-  const tenantId = 'tenant-123';
-  const companyId = 'company-456';
+export default function Home() {
+  const t = useTranslations('Dashboard');
+  const tKpi = useTranslations('Kpis');
+  const { activeCompany, loading: sessionLoading } = useSession();
 
-  const kpis = await dataService.getKpis(tenantId, companyId);
-  const recentActivities = await dataService.getRecentActivities(tenantId, companyId);
-  const chartData = await dataService.getChartData(tenantId, companyId);
+  const [kpis, setKpis] = useState<Kpi[]>([]);
+  const [recentActivities, setRecentActivities] = useState<RecentActivity[]>([]);
+  const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (activeCompany) {
+      const fetchData = async () => {
+        setLoading(true);
+        const [kpiData, activityData, chartDataResult] = await Promise.all([
+          dataService.getKpis(activeCompany.tenantId, activeCompany.id),
+          dataService.getRecentActivities(activeCompany.tenantId, activeCompany.id),
+          dataService.getChartData(activeCompany.tenantId, activeCompany.id)
+        ]);
+        setKpis(kpiData);
+        setRecentActivities(activityData);
+        setChartData(chartDataResult);
+        setLoading(false);
+      };
+      fetchData();
+    }
+  }, [activeCompany]);
 
   const kpiIcons: Record<string, React.ElementType> = {
     TotalRevenue: AreaChart,
@@ -25,6 +102,10 @@ export default async function Home() {
     OpenObservations: Eye,
     MaintenanceDue: Bell,
   };
+
+  if (sessionLoading || (loading && !kpis.length)) {
+    return <DashboardSkeleton />
+  }
 
   return (
     <div className="space-y-8">

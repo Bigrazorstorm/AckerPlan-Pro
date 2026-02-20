@@ -20,7 +20,9 @@
     "myAccount": "My Account",
     "settings": "Settings",
     "support": "Support",
-    "logout": "Logout"
+    "logout": "Logout",
+    "selectCompany": "Select Company",
+    "loadingCompany": "Loading company..."
   },
   "Dashboard": {
     "welcome": "Welcome to FieldSense",

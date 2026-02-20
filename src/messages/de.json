@@ -20,7 +20,9 @@
     "myAccount": "Mein Konto",
     "settings": "Einstellungen",
     "support": "Support",
-    "logout": "Abmelden"
+    "logout": "Abmelden",
+    "selectCompany": "Firma auswählen",
+    "loadingCompany": "Firma wird geladen..."
   },
   "Dashboard": {
     "welcome": "Willkommen bei FieldSense",

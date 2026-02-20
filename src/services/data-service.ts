@@ -1,4 +1,4 @@
-import { Kpi, ChartDataPoint, RecentActivity, Machinery } from './types';
+import { Kpi, ChartDataPoint, RecentActivity, Machinery, Session } from './types';
 
 /**
  * Defines the contract for data access in the application.
@@ -6,6 +6,11 @@ import { Kpi, ChartDataPoint, RecentActivity, Machinery } from './types';
  * (e.g., mock data, MySQL, Supabase, Firestore) without changing the application logic.
  */
 export interface DataService {
+  /**
+   * Retrieves the current user's session information, including available companies.
+   */
+  getSession(): Promise<Session>;
+
   /**
    * Retrieves Key Performance Indicators for a given company and tenant.
    * @param tenantId - The ID of the tenant.

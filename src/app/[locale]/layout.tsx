@@ -6,6 +6,7 @@ import { Header } from '@/components/layout/header';
 import { SidebarNav } from '@/components/layout/sidebar-nav';
 import {NextIntlClientProvider} from 'next-intl';
 import {getMessages, getTranslations} from 'next-intl/server';
+import { SessionProvider } from '@/context/session-context';
 
 export async function generateMetadata({params: {locale}}: {params: {locale: string}}): Promise<Metadata> {
   const t = await getTranslations({locale, namespace: 'Metadata'});
@@ -43,18 +44,20 @@ export default async function RootLayout({
       </head>
       <body className="font-body antialiased">
         <NextIntlClientProvider locale={locale} messages={messages}>
-          <SidebarProvider>
-              <Sidebar>
-                <SidebarNav />
-              </Sidebar>
-              <div className="flex flex-col w-full">
-                <Header />
-                <main className="flex-1 bg-background p-4 sm:p-6 lg:p-8">
-                  {children}
-                </main>
-              </div>
-          </SidebarProvider>
-          <Toaster />
+          <SessionProvider>
+            <SidebarProvider>
+                <Sidebar>
+                  <SidebarNav />
+                </Sidebar>
+                <div className="flex flex-col w-full">
+                  <Header />
+                  <main className="flex-1 bg-background p-4 sm:p-6 lg:p-8">
+                    {children}
+                  </main>
+                </div>
+            </SidebarProvider>
+            <Toaster />
+          </SessionProvider>
         </NextIntlClientProvider>
       </body>
     </html>

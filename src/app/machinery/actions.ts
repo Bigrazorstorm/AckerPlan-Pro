@@ -8,6 +8,8 @@ const AddMachineSchema = z.object({
   name: z.string().min(1, { message: 'Name is required' }),
   type: z.string().min(1, { message: 'Type is required' }),
   model: z.string().min(1, { message: 'Model is required' }),
+  tenantId: z.string().min(1, { message: 'Tenant ID is required' }),
+  companyId: z.string().min(1, { message: 'Company ID is required' }),
 })
  
 export async function addMachine(prevState: any, formData: FormData) {
@@ -15,6 +17,8 @@ export async function addMachine(prevState: any, formData: FormData) {
     name: formData.get('name'),
     type: formData.get('type'),
     model: formData.get('model'),
+    tenantId: formData.get('tenantId'),
+    companyId: formData.get('companyId'),
   })
  
   if (!validatedFields.success) {
@@ -25,9 +29,8 @@ export async function addMachine(prevState: any, formData: FormData) {
   }
   
   try {
-    const tenantId = 'tenant-123' // Dummy value, replace with actual tenant from session
-    const companyId = 'company-456' // Dummy value, replace with actual company from session
-    await dataService.addMachinery(tenantId, companyId, validatedFields.data)
+    const { tenantId, companyId, ...machineData } = validatedFields.data;
+    await dataService.addMachinery(tenantId, companyId, machineData)
     revalidatePath('/machinery')
     return { message: 'Machine added successfully.', errors: {} }
   } catch (e) {

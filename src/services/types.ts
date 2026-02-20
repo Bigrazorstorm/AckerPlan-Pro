@@ -37,3 +37,25 @@ export interface Machinery {
   createdAt: string; // ISO-8601 date string
   updatedAt: string; // ISO-8601 date string
 };
+
+export type Role = "Tenant Admin" | "Firmen Admin" | "Betriebsleitung" | "Mitarbeiter" | "Werkstatt" | "Leser";
+
+export interface Company {
+  id: string;
+  name: string;
+  tenantId: string;
+}
+
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  tenantId: string;
+  // A user can have different roles for different companies
+  companyRoles: { companyId: string, role: Role }[];
+}
+
+export interface Session {
+  user: User;
+  companies: Company[];
+}

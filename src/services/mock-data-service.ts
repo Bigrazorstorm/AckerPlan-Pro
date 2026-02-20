@@ -1,5 +1,22 @@
 import { DataService } from './data-service';
-import { Kpi, ChartDataPoint, RecentActivity, Machinery } from './types';
+import { Kpi, ChartDataPoint, RecentActivity, Machinery, Session } from './types';
+
+const session: Session = {
+  user: {
+    id: 'user-1',
+    name: 'John Doe',
+    email: 'john.doe@example.com',
+    tenantId: 'tenant-123',
+    companyRoles: [
+      { companyId: 'company-456', role: 'Firmen Admin' },
+      { companyId: 'company-789', role: 'Mitarbeiter' },
+    ]
+  },
+  companies: [
+    { id: 'company-456', name: 'Ackerbau & Co. KG', tenantId: 'tenant-123' },
+    { id: 'company-789', name: 'Grünland GmbH', tenantId: 'tenant-123' },
+  ]
+};
 
 // This is mock data. In a real application, this would come from a database.
 const kpis: Kpi[] = [
@@ -29,6 +46,34 @@ const kpis: Kpi[] = [
   },
 ];
 
+const kpisCompany789: Kpi[] = [
+  {
+    labelKey: "TotalRevenue",
+    value: "€12,850.42",
+    change: "+5.2%",
+    changeType: "increase",
+  },
+  {
+    labelKey: "TotalCosts",
+    value: "€9,200.00",
+    change: "+8.1%",
+    changeType: "increase",
+  },
+  {
+    labelKey: "OpenObservations",
+    value: "4",
+    change: "-1",
+    changeType: "decrease",
+  },
+  {
+    labelKey: "MaintenanceDue",
+    value: "1",
+    change: "0 overdue",
+    changeType: "increase",
+  },
+];
+
+
 const chartData: ChartDataPoint[] = [
     { month: "January", revenue: 1860, cost: 800 },
     { month: "February", revenue: 3050, cost: 1200 },
@@ -44,6 +89,21 @@ const chartData: ChartDataPoint[] = [
     { month: "December", revenue: 500, cost: 200 },
 ];
 
+const chartDataCompany789: ChartDataPoint[] = [
+    { month: "January", revenue: 500, cost: 300 },
+    { month: "February", revenue: 800, cost: 400 },
+    { month: "March", revenue: 1200, cost: 600 },
+    { month: "April", revenue: 900, cost: 500 },
+    { month: "May", revenue: 1500, cost: 800 },
+    { month: "June", revenue: 1800, cost: 1000 },
+    { month: "July", revenue: 2500, cost: 1200 },
+    { month: "August", revenue: 3200, cost: 1500 },
+    { month: "September", revenue: 2800, cost: 1300 },
+    { month: "October", revenue: 1000, cost: 600 },
+    { month: "November", revenue: 700, cost: 400 },
+    { month: "December", revenue: 300, cost: 100 },
+];
+
 const recentActivities: RecentActivity[] = [
   { id: '1', tenantId: 'tenant-123', companyId: 'company-456', type: "Harvesting", field: "Field A-12", date: "2 days ago", status: "Completed" },
   { id: '2', tenantId: 'tenant-123', companyId: 'company-456', type: "Fertilizing", field: "Field C-04", date: "3 days ago", status: "Completed" },
@@ -51,7 +111,8 @@ const recentActivities: RecentActivity[] = [
   { id: '4', tenantId: 'tenant-123', companyId: 'company-456', type: "Seeding", field: "Field D-01", date: "1 week ago", status: "In Progress" },
   { id: '5', tenantId: 'tenant-123', companyId: 'company-456', type: "Tillage", field: "Field F-21", date: "2 weeks ago", status: "Completed" },
   // Data for another company to test multi-tenancy
-  { id: '6', tenantId: 'tenant-123', companyId: 'company-789', type: "Harvesting", field: "Miller's Acre", date: "5 days ago", status: "Completed" },
+  { id: '6', tenantId: 'tenant-123', companyId: 'company-789', type: "Mowing", field: "Miller's Acre", date: "5 days ago", status: "Completed" },
+  { id: '7', tenantId: 'tenant-123', companyId: 'company-789', type: "Baling", field: "South Pasture", date: "1 week ago", status: "Completed" },
 ];
 
 const machinery: Machinery[] = [
@@ -63,21 +124,30 @@ const machinery: Machinery[] = [
   { id: 'M006', tenantId: 'tenant-123', companyId: 'company-456', name: "Krone Big Pack 1290", type: "Baler", model: "Big Pack 1290", status: "Operational", nextService: "In 120h", lastMaintenance: "2024-06-01", createdAt: "2023-07-25T18:00:00Z", updatedAt: "2024-06-01T10:00:00Z" },
   // Data for another company to test multi-tenancy
   { id: 'M007', tenantId: 'tenant-123', companyId: 'company-789', name: "Case IH Magnum 380", type: "Tractor", model: "Magnum 380", status: "Operational", nextService: "In 300h", lastMaintenance: "2024-06-15", createdAt: "2023-08-01T09:00:00Z", updatedAt: "2024-06-15T14:00:00Z" },
+  { id: 'M008', tenantId: 'tenant-123', companyId: 'company-789', name: "New Holland CR9.90", type: "Combine Harvester", model: "CR9.90", status: "Operational", nextService: "In 150h", lastMaintenance: "2024-07-01", createdAt: "2023-09-01T09:00:00Z", updatedAt: "2024-07-01T14:00:00Z" },
 ];
 
 
 export class MockDataService implements DataService {
   
+  async getSession(): Promise<Session> {
+    console.log(`Fetching session.`);
+    return Promise.resolve(session);
+  }
+  
   async getKpis(tenantId: string, companyId: string): Promise<Kpi[]> {
-    // Mock KPIs are the same for all companies in this mock service.
-    // A real implementation would calculate these based on the provided IDs.
     console.log(`Fetching KPIs for tenant ${tenantId} and company ${companyId}.`);
+    if (companyId === 'company-789') {
+      return Promise.resolve(kpisCompany789);
+    }
     return Promise.resolve(kpis);
   }
   
   async getChartData(tenantId: string, companyId: string): Promise<ChartDataPoint[]> {
-    // Mock Chart data is the same for all companies in this mock service.
     console.log(`Fetching ChartData for tenant ${tenantId} and company ${companyId}.`);
+    if (companyId === 'company-789') {
+      return Promise.resolve(chartDataCompany789);
+    }
     return Promise.resolve(chartData);
   }
 

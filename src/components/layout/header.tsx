@@ -15,6 +15,7 @@ import { SidebarTrigger } from "@/components/ui/sidebar"
 import { CircleUser, Settings, LogOut } from "lucide-react"
 import Link from "next/link"
 import { useTranslations } from "next-intl"
+import { CompanySwitcher } from "./company-switcher"
 
 export function Header() {
   const userAvatar = PlaceHolderImages.find(p => p.id === 'user-avatar');
@@ -26,6 +27,7 @@ export function Header() {
           <SidebarTrigger />
        </div>
        <div className="flex-1" />
+       <CompanySwitcher />
        <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
