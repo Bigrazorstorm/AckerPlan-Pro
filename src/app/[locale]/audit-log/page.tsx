@@ -1,10 +1,9 @@
-import { getTranslations, setRequestLocale } from "next-intl/server";
+import { getTranslations } from "next-intl/server";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { AuditLogClientContent } from "@/components/audit-log/audit-log-client-content";
 
 export default async function AuditLogPage({params: {locale}}: {params: {locale: string}}) {
-  setRequestLocale(locale);
-  const t = await getTranslations('AuditLogPage');
+  const t = await getTranslations({locale, namespace: 'AuditLogPage'});
   
   return (
     <Card>

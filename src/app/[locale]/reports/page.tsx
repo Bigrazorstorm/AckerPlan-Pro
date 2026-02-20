@@ -1,10 +1,9 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { BarChart3 } from 'lucide-react';
-import { getTranslations, setRequestLocale } from 'next-intl/server';
+import { getTranslations } from 'next-intl/server';
 
 export default async function ReportsPage({params: {locale}}: {params: {locale: string}}) {
-  setRequestLocale(locale);
-  const t = await getTranslations('ReportsPage');
+  const t = await getTranslations({locale, namespace: 'ReportsPage'});
   return (
     <Card>
       <CardHeader>
