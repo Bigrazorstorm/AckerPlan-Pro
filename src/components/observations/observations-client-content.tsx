@@ -1,7 +1,6 @@
 'use client'
 
-import { React, useEffect, useState } from 'react'
-import { useActionState } from 'react'
+import { React, useEffect, useState, useActionState } from 'react'
 import { useFormStatus } from 'react-dom'
 import { useTranslations } from "next-intl"
 import { useToast } from '@/hooks/use-toast'
@@ -13,12 +12,13 @@ import { format } from "date-fns"
 import { de, enUS } from 'date-fns/locale'
 import { useParams } from 'next/navigation'
 import Image from 'next/image'
+import dynamic from 'next/dynamic'
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { MoreHorizontal, PlusCircle, Calendar as CalendarIcon, Camera } from "lucide-react"
+import { MoreHorizontal, PlusCircle, Calendar as CalendarIcon, Camera, MapPin } from "lucide-react"
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -35,6 +35,11 @@ import { Calendar } from '@/components/ui/calendar'
 import { Skeleton } from '../ui/skeleton'
 import { cn } from '@/lib/utils'
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
+
+const ObservationLocationMap = dynamic(() => import('@/components/observations/observation-location-map').then(mod => mod.ObservationLocationMap), {
+  ssr: false,
+  loading: () => <Skeleton className="w-full h-48 rounded-lg" />
+});
 
 const initialState = {
   message: '',
@@ -100,6 +105,19 @@ function AddObservationForm({ closeSheet, tenantId, companyId, fields }: { close
 
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
+          <Label htmlFor="latitude">{t('latitudeLabel')}</Label>
+          <Input id="latitude" name="latitude" type="number" step="any" placeholder="52.515" />
+          {state.errors?.latitude && <p className="text-sm text-destructive">{state.errors.latitude.join(', ')}</p>}
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="longitude">{t('longitudeLabel')}</Label>
+          <Input id="longitude" name="longitude" type="number" step="any" placeholder="13.360" />
+          {state.errors?.longitude && <p className="text-sm text-destructive">{state.errors.longitude.join(', ')}</p>}
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
           <Label htmlFor="field">{t('fieldLabel')}</Label>
             <Select name="field" required>
               <SelectTrigger>
@@ -160,6 +178,7 @@ function ObservationsSkeleton() {
                     <TableHead><Skeleton className="h-4 w-24" /></TableHead>
                     <TableHead><Skeleton className="h-4 w-24" /></TableHead>
                     <TableHead><Skeleton className="h-4 w-16" /></TableHead>
+                    <TableHead><Skeleton className="h-4 w-16" /></TableHead>
                     <TableHead><span className="sr-only">Actions</span></TableHead>
                 </TableRow>
             </TableHeader>
@@ -169,7 +188,8 @@ function ObservationsSkeleton() {
                         <TableCell><Skeleton className="h-5 w-48" /></TableCell>
                         <TableCell><Skeleton className="h-5 w-24" /></TableCell>
                         <TableCell><Skeleton className="h-5 w-32" /></TableCell>
-                        <TableCell><Skeleton className="h-8 w-8 rounded-full" /></TableCell>
+                        <TableCell><Skeleton className="h-8 w-10 rounded-md" /></TableCell>
+                        <TableCell><Skeleton className="h-5 w-10 mx-auto" /></TableCell>
                         <TableCell><Skeleton className="h-8 w-8" /></TableCell>
                       </TableRow>
                 ))}
@@ -274,6 +294,7 @@ export function ObservationsClientContent() {
                 <TableHead>{t('tableHeaderField')}</TableHead>
                 <TableHead>{t('tableHeaderDate')}</TableHead>
                 <TableHead>{t('tableHeaderPhoto')}</TableHead>
+                <TableHead className="text-center">{t('tableHeaderLocation')}</TableHead>
                 <TableHead><span className="sr-only">{t('actions')}</span></TableHead>
               </TableRow>
             </TableHeader>
@@ -290,6 +311,13 @@ export function ObservationsClientContent() {
                       <div className="w-10 h-10 flex items-center justify-center bg-muted rounded-md">
                         <Camera className="h-5 w-5 text-muted-foreground" />
                       </div>
+                    )}
+                  </TableCell>
+                  <TableCell className="text-center">
+                    {obs.latitude && obs.longitude ? (
+                       <MapPin className="h-5 w-5 mx-auto text-muted-foreground" />
+                    ) : (
+                      <span className="text-muted-foreground">-</span>
                     )}
                   </TableCell>
                   <TableCell>
@@ -350,6 +378,14 @@ export function ObservationsClientContent() {
                     </div>
                 )}
                 <p className="text-sm text-muted-foreground">{observationToView?.description}</p>
+                 {observationToView?.latitude && observationToView?.longitude && (
+                  <div className="space-y-2">
+                    <Label>{t('locationLabel')}</Label>
+                    <div className="aspect-video w-full overflow-hidden rounded-md border">
+                        <ObservationLocationMap latitude={observationToView.latitude} longitude={observationToView.longitude} />
+                    </div>
+                  </div>
+                )}
             </div>
         </SheetContent>
     </Sheet>

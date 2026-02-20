@@ -10,6 +10,14 @@ const AddObservationSchema = z.object({
   field: z.string().min(1, { message: 'Field is required' }),
   date: z.string().min(1, { message: 'Date is required' }),
   photoUrl: z.string().url({ message: 'Please enter a valid URL.' }).optional().or(z.literal('')),
+  latitude: z.preprocess(
+    (val) => (val === '' ? undefined : val),
+    z.coerce.number().optional()
+  ),
+  longitude: z.preprocess(
+    (val) => (val === '' ? undefined : val),
+    z.coerce.number().optional()
+  ),
   tenantId: z.string().min(1, { message: 'Tenant ID is required' }),
   companyId: z.string().min(1, { message: 'Company ID is required' }),
 })
@@ -21,6 +29,8 @@ export async function addObservation(prevState: any, formData: FormData) {
     field: formData.get('field'),
     date: formData.get('date'),
     photoUrl: formData.get('photoUrl'),
+    latitude: formData.get('latitude'),
+    longitude: formData.get('longitude'),
     tenantId: formData.get('tenantId'),
     companyId: formData.get('companyId'),
   })

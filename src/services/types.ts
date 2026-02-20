@@ -155,6 +155,8 @@ export interface Observation {
   title: string;
   description: string;
   photoUrl?: string; // Optional URL to an uploaded photo
+  latitude?: number;
+  longitude?: number;
 }
 
 // Input type for adding a new observation.
@@ -164,6 +166,8 @@ export interface AddObservationInput {
   title: string;
   description: string;
   photoUrl?: string;
+  latitude?: number;
+  longitude?: number;
 }
 
 export type Role = "Tenant Admin" | "Firmen Admin" | "Betriebsleitung" | "Mitarbeiter" | "Werkstatt" | "Leser";
