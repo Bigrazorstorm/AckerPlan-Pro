@@ -220,9 +220,83 @@ function AddOperationForm({ closeSheet, tenantId, companyId, fields, machinery }
   )
 }
 
+function OperationsSkeleton() {
+  const t = useTranslations('OperationsPage');
+  return (
+    <Card>
+      <CardHeader className="flex flex-row items-center justify-between">
+        <div />
+        <Skeleton className="h-9 w-40" />
+      </CardHeader>
+      <CardContent>
+        {/* Mobile Skeleton */}
+        <div className="md:hidden space-y-4">
+          {[...Array(3)].map((_, i) => (
+            <Card key={i}>
+              <CardHeader>
+                <div className="flex justify-between items-start">
+                  <div>
+                    <Skeleton className="h-6 w-32 mb-2" />
+                    <Skeleton className="h-4 w-24" />
+                  </div>
+                  <Skeleton className="h-8 w-8" />
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-3 pt-0">
+                <div className="flex justify-between">
+                  <Skeleton className="h-4 w-16" />
+                  <Skeleton className="h-5 w-24" />
+                </div>
+                <div className="flex justify-between">
+                  <Skeleton className="h-4 w-16" />
+                  <Skeleton className="h-4 w-28" />
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+        {/* Desktop Skeleton */}
+        <div className="hidden md:block">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead><Skeleton className="h-4 w-24" /></TableHead>
+                <TableHead><Skeleton className="h-4 w-24" /></TableHead>
+                <TableHead><Skeleton className="h-4 w-24" /></TableHead>
+                <TableHead><Skeleton className="h-4 w-24" /></TableHead>
+                <TableHead><Skeleton className="h-4 w-16" /></TableHead>
+                <TableHead><Skeleton className="h-4 w-16" /></TableHead>
+                <TableHead><Skeleton className="h-4 w-16" /></TableHead>
+                <TableHead><Skeleton className="h-4 w-24" /></TableHead>
+                <TableHead><span className="sr-only">{t('actions')}</span></TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {[...Array(5)].map((_, i) => (
+                <TableRow key={i}>
+                  <TableCell><Skeleton className="h-5 w-32" /></TableCell>
+                  <TableCell><Skeleton className="h-5 w-24" /></TableCell>
+                  <TableCell><Skeleton className="h-5 w-24" /></TableCell>
+                  <TableCell><Skeleton className="h-5 w-20" /></TableCell>
+                  <TableCell><Skeleton className="h-5 w-16" /></TableCell>
+                  <TableCell><Skeleton className="h-5 w-16" /></TableCell>
+                  <TableCell><Skeleton className="h-5 w-16" /></TableCell>
+                  <TableCell><Skeleton className="h-5 w-24" /></TableCell>
+                  <TableCell><Skeleton className="h-8 w-8" /></TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
 export function OperationsClientContent() {
   const t = useTranslations('OperationsPage');
   const tOperationTypes = useTranslations('OperationTypes');
+  const tOperationStatuses = useTranslations('OperationStatuses');
   const [isSheetOpen, setSheetOpen] = useState(false);
   const { activeCompany, loading: sessionLoading } = useSession();
   const [operations, setOperations] = useState<Operation[]>([]);
@@ -248,48 +322,17 @@ export function OperationsClientContent() {
       fetchData();
     }
   }, [activeCompany]);
+
+  const dateFormatter = (dateString: string) => {
+    try {
+        return format(new Date(dateString), 'PP', { locale: locale === 'de' ? de : enUS });
+    } catch (e) {
+        return dateString;
+    }
+  }
   
   if (sessionLoading || loading) {
-      return (
-          <Card>
-              <CardHeader className="flex flex-row items-center justify-between">
-                  <div/>
-                  <Skeleton className="h-9 w-40" />
-              </CardHeader>
-              <CardContent>
-                  <Table>
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead><Skeleton className="h-4 w-24" /></TableHead>
-                            <TableHead><Skeleton className="h-4 w-24" /></TableHead>
-                            <TableHead><Skeleton className="h-4 w-24" /></TableHead>
-                             <TableHead><Skeleton className="h-4 w-24" /></TableHead>
-                            <TableHead><Skeleton className="h-4 w-16" /></TableHead>
-                            <TableHead><Skeleton className="h-4 w-16" /></TableHead>
-                             <TableHead><Skeleton className="h-4 w-16" /></TableHead>
-                            <TableHead><Skeleton className="h-4 w-24" /></TableHead>
-                            <TableHead><span className="sr-only">{t('actions')}</span></TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {[...Array(5)].map((_, i) => (
-                             <TableRow key={i}>
-                                <TableCell><Skeleton className="h-5 w-32" /></TableCell>
-                                <TableCell><Skeleton className="h-5 w-24" /></TableCell>
-                                <TableCell><Skeleton className="h-5 w-24" /></TableCell>
-                                <TableCell><Skeleton className="h-5 w-20" /></TableCell>
-                                <TableCell><Skeleton className="h-5 w-16" /></TableCell>
-                                <TableCell><Skeleton className="h-5 w-16" /></TableCell>
-                                <TableCell><Skeleton className="h-5 w-16" /></TableCell>
-                                <TableCell><Skeleton className="h-5 w-24" /></TableCell>
-                                <TableCell><Skeleton className="h-8 w-8" /></TableCell>
-                             </TableRow>
-                        ))}
-                    </TableBody>
-                  </Table>
-              </CardContent>
-          </Card>
-      );
+      return <OperationsSkeleton />;
   }
 
   return (
@@ -314,34 +357,16 @@ export function OperationsClientContent() {
         </Sheet>
       </CardHeader>
       <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>{t('tableHeaderType')}</TableHead>
-              <TableHead>{t('tableHeaderField')}</TableHead>
-              <TableHead>{t('tableHeaderMachine')}</TableHead>
-              <TableHead>{t('tableHeaderDate')}</TableHead>
-              <TableHead className="text-right">{t('tableHeaderLaborHours')}</TableHead>
-              <TableHead className="text-right">{t('tableHeaderFuel')}</TableHead>
-              <TableHead className="text-right">{t('tableHeaderYield')}</TableHead>
-              <TableHead>{t('tableHeaderStatus')}</TableHead>
-              <TableHead><span className="sr-only">{t('actions')}</span></TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {operations.map((op) => (
-              <TableRow key={op.id}>
-                <TableCell className="font-medium">{tOperationTypes(op.type)}</TableCell>
-                <TableCell>{op.field}</TableCell>
-                <TableCell>{op.machine?.name}</TableCell>
-                <TableCell>{op.date}</TableCell>
-                <TableCell className="text-right">{op.laborHours.toLocaleString(locale)} h</TableCell>
-                <TableCell className="text-right">{op.fuelConsumed?.toLocaleString(locale)} l</TableCell>
-                <TableCell className="text-right">{op.yieldAmount ? `${op.yieldAmount.toLocaleString(locale)} t` : '-'}</TableCell>
-                <TableCell>
-                  <Badge variant={op.status === 'Completed' ? 'default' : 'secondary'} className={op.status === 'Completed' ? 'bg-green-100 text-green-800' : ''}>{op.status}</Badge>
-                </TableCell>
-                <TableCell>
+        {/* Mobile View */}
+        <div className="md:hidden space-y-4">
+           {operations.map((op) => (
+            <Card key={op.id}>
+              <CardHeader>
+                <div className="flex justify-between items-start">
+                  <div>
+                    <CardTitle className="text-lg">{tOperationTypes(op.type)}</CardTitle>
+                    <CardDescription>{op.field}</CardDescription>
+                  </div>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button aria-haspopup="true" size="icon" variant="ghost">
@@ -355,11 +380,93 @@ export function OperationsClientContent() {
                       <DropdownMenuItem className="text-destructive">{t('delete')}</DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-3 text-sm pt-0">
+                <div className="flex justify-between items-center">
+                    <span className="text-muted-foreground">{t('tableHeaderStatus')}</span>
+                    <Badge variant={op.status === 'Completed' ? 'default' : 'secondary'} className={op.status === 'Completed' ? 'bg-green-100 text-green-800' : ''}>{tOperationStatuses(op.status)}</Badge>
+                </div>
+                <div className="flex justify-between">
+                    <span className="text-muted-foreground">{t('tableHeaderDate')}</span>
+                    <span>{dateFormatter(op.date)}</span>
+                </div>
+                {op.machine && (
+                  <div className="flex justify-between">
+                      <span className="text-muted-foreground">{t('tableHeaderMachine')}</span>
+                      <span>{op.machine.name}</span>
+                  </div>
+                )}
+                <div className="flex justify-between">
+                    <span className="text-muted-foreground">{t('tableHeaderLaborHours')}</span>
+                    <span className="font-medium">{op.laborHours.toLocaleString(locale)} h</span>
+                </div>
+                {op.fuelConsumed && (
+                  <div className="flex justify-between">
+                      <span className="text-muted-foreground">{t('tableHeaderFuel')}</span>
+                      <span className="font-medium">{op.fuelConsumed.toLocaleString(locale)} l</span>
+                  </div>
+                )}
+                {op.yieldAmount && (
+                  <div className="flex justify-between">
+                      <span className="text-muted-foreground">{t('tableHeaderYield')}</span>
+                      <span className="font-medium">{op.yieldAmount.toLocaleString(locale)} t</span>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        {/* Desktop View */}
+        <div className="hidden md:block">
+            <Table>
+            <TableHeader>
+                <TableRow>
+                <TableHead>{t('tableHeaderType')}</TableHead>
+                <TableHead>{t('tableHeaderField')}</TableHead>
+                <TableHead>{t('tableHeaderMachine')}</TableHead>
+                <TableHead>{t('tableHeaderDate')}</TableHead>
+                <TableHead className="text-right">{t('tableHeaderLaborHours')}</TableHead>
+                <TableHead className="text-right">{t('tableHeaderFuel')}</TableHead>
+                <TableHead className="text-right">{t('tableHeaderYield')}</TableHead>
+                <TableHead>{t('tableHeaderStatus')}</TableHead>
+                <TableHead><span className="sr-only">{t('actions')}</span></TableHead>
+                </TableRow>
+            </TableHeader>
+            <TableBody>
+                {operations.map((op) => (
+                <TableRow key={op.id}>
+                    <TableCell className="font-medium">{tOperationTypes(op.type)}</TableCell>
+                    <TableCell>{op.field}</TableCell>
+                    <TableCell>{op.machine?.name}</TableCell>
+                    <TableCell>{dateFormatter(op.date)}</TableCell>
+                    <TableCell className="text-right">{op.laborHours.toLocaleString(locale)} h</TableCell>
+                    <TableCell className="text-right">{op.fuelConsumed?.toLocaleString(locale)} l</TableCell>
+                    <TableCell className="text-right">{op.yieldAmount ? `${op.yieldAmount.toLocaleString(locale)} t` : '-'}</TableCell>
+                    <TableCell>
+                      <Badge variant={op.status === 'Completed' ? 'default' : 'secondary'} className={op.status === 'Completed' ? 'bg-green-100 text-green-800' : ''}>{tOperationStatuses(op.status)}</Badge>
+                    </TableCell>
+                    <TableCell>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                        <Button aria-haspopup="true" size="icon" variant="ghost">
+                            <MoreHorizontal className="h-4 w-4" />
+                            <span className="sr-only">Toggle menu</span>
+                        </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                        <DropdownMenuLabel>{t('actions')}</DropdownMenuLabel>
+                        <DropdownMenuItem>{t('edit')}</DropdownMenuItem>
+                        <DropdownMenuItem className="text-destructive">{t('delete')}</DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                    </TableCell>
+                </TableRow>
+                ))}
+            </TableBody>
+            </Table>
+        </div>
       </CardContent>
     </Card>
   )
