@@ -1,5 +1,5 @@
 import { DataService } from './data-service';
-import { Kpi, ChartDataPoint, Operation, Machinery, Session, Field, MaintenanceEvent, AddMaintenanceEventInput } from './types';
+import { Kpi, ChartDataPoint, Operation, Machinery, Session, Field, MaintenanceEvent, AddMaintenanceEventInput, AuditLogEvent } from './types';
 
 const session: Session = {
   user: {
@@ -147,6 +147,26 @@ const maintenanceEvents: MaintenanceEvent[] = [
   { id: 'ME007', tenantId: 'tenant-123', companyId: 'company-789', machineId: 'M007', date: '2024-06-15', description: '1000h Service', cost: 850, createdAt: '2024-06-15T14:00:00Z' },
 ];
 
+const auditLogEvents: AuditLogEvent[] = [
+    { id: 'log-1', tenantId: 'tenant-123', companyId: 'company-456', date: '2024-07-22T10:05:00Z', user: { id: 'user-1', name: 'John Doe' }, action: 'machine.create', details: 'Maschine "Krone Big Pack 1290" wurde erstellt.' },
+    { id: 'log-2', tenantId: 'tenant-123', companyId: 'company-456', date: '2024-07-22T09:30:00Z', user: { id: 'user-1', name: 'John Doe' }, action: 'maintenance.log', details: 'Wartung für "John Deere 8R 370" protokolliert: Regulärer 500h Service (Kosten: €450,00).' },
+    { id: 'log-3', tenantId: 'tenant-123', companyId: 'company-456', date: '2024-07-21T14:00:00Z', user: { id: 'user-2', name: 'Max Mustermann' }, action: 'operation.create', details: 'Maßnahme "Ernte" auf Fläche "Acker-Nord 1" erstellt.' },
+    { id: 'log-4', tenantId: 'tenant-123', companyId: 'company-456', date: '2024-07-21T11:20:00Z', user: { id: 'user-1', name: 'John Doe' }, action: 'machine.update.status', details: 'Status von "Horsch Maestro 12.50 SW" auf "In Werkstatt" geändert.' },
+    { id: 'log-5', tenantId: 'tenant-123', companyId: 'company-789', date: '2024-07-22T08:00:00Z', user: { id: 'user-1', name: 'John Doe' }, action: 'operation.create', details: 'Maßnahme "Mähen" auf Fläche "Miller\'s Acre" erstellt.' },
+];
+
+function logAuditEvent(tenantId: string, companyId: string, action: string, details: string) {
+    const newLog: AuditLogEvent = {
+        id: `log-${auditLogEvents.length + 1}`,
+        tenantId,
+        companyId,
+        date: new Date().toISOString(),
+        user: { id: 'user-1', name: 'John Doe' }, // Hardcoded for mock service
+        action,
+        details,
+    };
+    auditLogEvents.unshift(newLog); // Add to the beginning to show newest first
+}
 
 export class MockDataService implements DataService {
   
@@ -211,6 +231,7 @@ export class MockDataService implements DataService {
       ...machineData,
     };
     machinery.push(newMachine);
+    logAuditEvent(tenantId, companyId, 'machine.create', `Maschine "${machineData.name}" wurde erstellt.`);
     return Promise.resolve(newMachine);
   }
 
@@ -222,12 +243,14 @@ export class MockDataService implements DataService {
       companyId: companyId,
       ...operationData,
     };
-    operations.push(newOperation);
+    operations.unshift(newOperation);
+    logAuditEvent(tenantId, companyId, 'operation.create', `Maßnahme "${operationData.type}" auf Fläche "${operationData.field}" erstellt.`);
     return Promise.resolve(newOperation);
   }
   
   async addMaintenanceEvent(tenantId: string, companyId: string, eventData: AddMaintenanceEventInput): Promise<MaintenanceEvent> {
     console.log(`Adding Maintenance Event for tenant ${tenantId} and company ${companyId}.`);
+    const machine = machinery.find(m => m.id === eventData.machineId);
     const newEvent: MaintenanceEvent = {
       id: `ME${String(maintenanceEvents.length + 1).padStart(3, '0')}`,
       tenantId,
@@ -235,8 +258,16 @@ export class MockDataService implements DataService {
       createdAt: new Date().toISOString(),
       ...eventData,
     };
-    // Add to the beginning of the list
     maintenanceEvents.unshift(newEvent);
+
+    const costFormatted = new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(eventData.cost);
+    logAuditEvent(tenantId, companyId, 'maintenance.log', `Wartung für "${machine?.name || eventData.machineId}" protokolliert: ${eventData.description} (Kosten: ${costFormatted}).`);
+
     return Promise.resolve(newEvent);
+  }
+
+  async getAuditLog(tenantId: string, companyId: string): Promise<AuditLogEvent[]> {
+    console.log(`Fetching AuditLog for tenant ${tenantId} and company ${companyId}.`);
+    return Promise.resolve(auditLogEvents.filter(e => e.tenantId === tenantId && e.companyId === companyId).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
   }
 }

@@ -14,7 +14,8 @@
     "settings": "Settings",
     "logout": "Log out",
     "userName": "John Doe",
-    "userRole": "Administrator"
+    "userRole": "Administrator",
+    "auditLog": "Audit Log"
   },
   "Header": {
     "myAccount": "My Account",
@@ -178,5 +179,13 @@
     "description": "Manage master data, user roles, and system configurations.",
     "comingSoonTitle": "System Settings Coming Soon",
     "comingSoonDescription": "Configuration for master data (crops, materials, prices), user permissions, and other system-wide settings will be available here."
+  },
+  "AuditLogPage": {
+    "title": "Audit Log / Trail",
+    "description": "A chronological record of all important events and changes within the system.",
+    "tableHeaderUser": "User",
+    "tableHeaderAction": "Action",
+    "tableHeaderDate": "Date",
+    "tableHeaderDetails": "Details"
   }
 }

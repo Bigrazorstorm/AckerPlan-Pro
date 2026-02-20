@@ -88,3 +88,16 @@ export interface Session {
   user: User;
   companies: Company[];
 }
+
+export interface AuditLogEvent {
+  id: string;
+  tenantId: string;
+  companyId: string;
+  date: string; // ISO-8601 date string
+  user: {
+    id: string;
+    name: string;
+  };
+  action: string; // e.g., 'machine.create', 'maintenance.log'
+  details: string; // e.g., 'Created machine "Fendt 942 Vario"'
+}

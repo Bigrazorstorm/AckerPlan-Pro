@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Leaf, LayoutDashboard, Map, Tractor, Combine, Siren, BarChart3, Settings, LogOut, ChevronDown } from "lucide-react"
+import { Leaf, LayoutDashboard, Map, Tractor, Combine, Siren, BarChart3, Settings, LogOut, ChevronDown, History } from "lucide-react"
 import { cn } from "@/lib/utils"
 import {
   SidebarHeader,
@@ -32,6 +32,7 @@ const navItems = [
   { href: "/observations", icon: Siren, labelKey: "observations" },
   { href: "/machinery", icon: Tractor, labelKey: "machinery" },
   { href: "/reports", icon: BarChart3, labelKey: "reports" },
+  { href: "/audit-log", icon: History, labelKey: "auditLog" },
 ];
 
 export function SidebarNav() {

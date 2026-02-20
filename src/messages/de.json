@@ -14,7 +14,8 @@
     "settings": "Einstellungen",
     "logout": "Abmelden",
     "userName": "John Doe",
-    "userRole": "Administrator"
+    "userRole": "Administrator",
+    "auditLog": "Logbuch"
   },
   "Header": {
     "myAccount": "Mein Konto",
@@ -178,5 +179,13 @@
     "description": "Verwalten Sie Stammdaten, Benutzerrollen und Systemkonfigurationen.",
     "comingSoonTitle": "Systemeinstellungen in Kürze verfügbar",
     "comingSoonDescription": "Die Konfiguration für Stammdaten (Kulturen, Materialien, Preise), Benutzerberechtigungen und andere systemweite Einstellungen wird hier verfügbar sein."
+  },
+  "AuditLogPage": {
+    "title": "Logbuch / Audit Trail",
+    "description": "Eine chronologische Aufzeichnung aller wichtigen Ereignisse und Änderungen im System.",
+    "tableHeaderUser": "Benutzer",
+    "tableHeaderAction": "Aktion",
+    "tableHeaderDate": "Datum",
+    "tableHeaderDetails": "Details"
   }
 }
