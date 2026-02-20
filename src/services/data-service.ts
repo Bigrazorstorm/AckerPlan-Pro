@@ -1,4 +1,4 @@
-import { Kpi, ChartDataPoint, Operation, Machinery, Session, Field, MaintenanceEvent, AddMaintenanceEventInput, AuditLogEvent, RepairEvent, AddRepairEventInput } from './types';
+import { Kpi, ChartDataPoint, Operation, Machinery, Session, Field, MaintenanceEvent, AddMaintenanceEventInput, AuditLogEvent, RepairEvent, AddRepairEventInput, AddOperationInput } from './types';
 
 /**
  * Defines the contract for data access in the application.
@@ -93,7 +93,7 @@ export interface DataService {
    * @param companyId - The ID of the company.
    * @param operationData - The data for the new operation.
    */
-  addOperation(tenantId: string, companyId: string, operationData: { type: string; field: string; date: string; status: "Completed" | "In Progress"; }): Promise<Operation>;
+  addOperation(tenantId: string, companyId: string, operationData: AddOperationInput): Promise<Operation>;
 
   /**
    * Retrieves fields data for a given company and tenant.

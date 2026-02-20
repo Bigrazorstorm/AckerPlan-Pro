@@ -71,6 +71,7 @@ function DashboardSkeleton() {
 export default function Home() {
   const t = useTranslations('Dashboard');
   const tKpi = useTranslations('Kpis');
+  const tOperationTypes = useTranslations('OperationTypes');
   const { activeCompany, loading: sessionLoading } = useSession();
 
   const [kpis, setKpis] = useState<Kpi[]>([]);
@@ -171,7 +172,7 @@ export default function Home() {
                 {recentOperations.map((activity) => (
                   <TableRow key={activity.id}>
                     <TableCell>
-                      <div className="font-medium">{activity.type}</div>
+                      <div className="font-medium">{tOperationTypes(activity.type)}</div>
                       <div className="text-sm text-muted-foreground">{activity.date}</div>
                     </TableCell>
                     <TableCell>{activity.field}</TableCell>

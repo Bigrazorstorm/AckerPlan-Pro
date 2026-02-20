@@ -9,7 +9,8 @@ import { addOperation } from '@/app/operations/actions'
 import { useSession } from '@/context/session-context'
 import dataService from '@/services'
 import { format } from "date-fns"
-import { de } from 'date-fns/locale'
+import { de, enUS } from 'date-fns/locale'
+import { useParams } from 'next/navigation'
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -53,6 +54,7 @@ function AddOperationForm({ closeSheet, tenantId, companyId, fields }: { closeSh
   const t = useTranslations('OperationsPage.addOperationForm');
   const tOperationTypes = useTranslations('OperationTypes');
   const [date, setDate] = useState<Date>()
+  const { locale } = useParams<{ locale: string }>();
 
   useEffect(() => {
     if (state.message && !state.errors) {
@@ -108,31 +110,38 @@ function AddOperationForm({ closeSheet, tenantId, companyId, fields }: { closeSh
         {state.errors?.field && <p className="text-sm text-destructive">{state.errors.field.join(', ')}</p>}
       </div>
 
-       <div className="space-y-2">
-        <Label htmlFor="date">{t('dateLabel')}</Label>
-         <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant={"outline"}
-                className={cn(
-                  "w-full justify-start text-left font-normal",
-                  !date && "text-muted-foreground"
-                )}
-              >
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                {date ? format(date, "PPP", { locale: de }) : <span>{t('datePlaceholder')}</span>}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0">
-              <Calendar
-                mode="single"
-                selected={date}
-                onSelect={setDate}
-                initialFocus
-              />
-            </PopoverContent>
-          </Popover>
-        {state.errors?.date && <p className="text-sm text-destructive">{state.errors.date.join(', ')}</p>}
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
+            <Label htmlFor="date">{t('dateLabel')}</Label>
+            <Popover>
+                <PopoverTrigger asChild>
+                <Button
+                    variant={"outline"}
+                    className={cn(
+                    "w-full justify-start text-left font-normal",
+                    !date && "text-muted-foreground"
+                    )}
+                >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {date ? format(date, "PPP", { locale: locale === 'de' ? de : enUS }) : <span>{t('datePlaceholder')}</span>}
+                </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0">
+                <Calendar
+                    mode="single"
+                    selected={date}
+                    onSelect={setDate}
+                    initialFocus
+                />
+                </PopoverContent>
+            </Popover>
+            {state.errors?.date && <p className="text-sm text-destructive">{state.errors.date.join(', ')}</p>}
+        </div>
+        <div className="space-y-2">
+            <Label htmlFor="laborHours">{t('laborHoursLabel')}</Label>
+            <Input id="laborHours" name="laborHours" type="number" step="0.1" required placeholder={t('laborHoursPlaceholder')} />
+            {state.errors?.laborHours && <p className="text-sm text-destructive">{state.errors.laborHours.join(', ')}</p>}
+        </div>
       </div>
 
        <div className="space-y-2">
@@ -162,6 +171,7 @@ export function OperationsClientContent() {
   const [operations, setOperations] = useState<Operation[]>([]);
   const [fields, setFields] = useState<Field[]>([]);
   const [loading, setLoading] = useState(true);
+  const { locale } = useParams<{ locale: string }>();
 
   useEffect(() => {
     if (activeCompany) {
@@ -193,6 +203,7 @@ export function OperationsClientContent() {
                             <TableHead><Skeleton className="h-4 w-24" /></TableHead>
                             <TableHead><Skeleton className="h-4 w-24" /></TableHead>
                             <TableHead><Skeleton className="h-4 w-24" /></TableHead>
+                            <TableHead><Skeleton className="h-4 w-16" /></TableHead>
                             <TableHead><Skeleton className="h-4 w-24" /></TableHead>
                             <TableHead><span className="sr-only">{t('actions')}</span></TableHead>
                         </TableRow>
@@ -203,6 +214,7 @@ export function OperationsClientContent() {
                                 <TableCell><Skeleton className="h-5 w-32" /></TableCell>
                                 <TableCell><Skeleton className="h-5 w-24" /></TableCell>
                                 <TableCell><Skeleton className="h-5 w-20" /></TableCell>
+                                <TableCell><Skeleton className="h-5 w-16" /></TableCell>
                                 <TableCell><Skeleton className="h-5 w-24" /></TableCell>
                                 <TableCell><Skeleton className="h-8 w-8" /></TableCell>
                              </TableRow>
@@ -242,6 +254,7 @@ export function OperationsClientContent() {
               <TableHead>{t('tableHeaderType')}</TableHead>
               <TableHead>{t('tableHeaderField')}</TableHead>
               <TableHead>{t('tableHeaderDate')}</TableHead>
+              <TableHead className="text-right">{t('tableHeaderLaborHours')}</TableHead>
               <TableHead>{t('tableHeaderStatus')}</TableHead>
               <TableHead><span className="sr-only">{t('actions')}</span></TableHead>
             </TableRow>
@@ -252,6 +265,7 @@ export function OperationsClientContent() {
                 <TableCell className="font-medium">{tOperationTypes(op.type)}</TableCell>
                 <TableCell>{op.field}</TableCell>
                 <TableCell>{op.date}</TableCell>
+                <TableCell className="text-right">{op.laborHours.toLocaleString(locale)} h</TableCell>
                 <TableCell>
                   <Badge variant={op.status === 'Completed' ? 'default' : 'secondary'} className={op.status === 'Completed' ? 'bg-green-100 text-green-800' : ''}>{op.status}</Badge>
                 </TableCell>

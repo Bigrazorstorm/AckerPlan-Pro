@@ -20,7 +20,17 @@ export interface Operation {
   field: string;
   date: string;
   status: "Completed" | "In Progress";
+  laborHours: number;
 };
+
+// Input type for adding a new operation
+export interface AddOperationInput {
+  type: string;
+  field: string;
+  date: string;
+  status: "Completed" | "In Progress";
+  laborHours: number;
+}
 
 // Represents a Maintenance Event for a machine.
 export interface MaintenanceEvent {

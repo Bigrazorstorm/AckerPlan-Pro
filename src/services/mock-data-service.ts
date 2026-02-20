@@ -1,5 +1,5 @@
 import { DataService } from './data-service';
-import { Kpi, ChartDataPoint, Operation, Machinery, Session, Field, MaintenanceEvent, AddMaintenanceEventInput, AuditLogEvent, RepairEvent, AddRepairEventInput } from './types';
+import { Kpi, ChartDataPoint, Operation, Machinery, Session, Field, MaintenanceEvent, AddMaintenanceEventInput, AuditLogEvent, RepairEvent, AddRepairEventInput, AddOperationInput } from './types';
 
 const session: Session = {
   user: {
@@ -105,14 +105,14 @@ const chartDataCompany789: ChartDataPoint[] = [
 ];
 
 const operations: Operation[] = [
-  { id: '1', tenantId: 'tenant-123', companyId: 'company-456', type: "Harvesting", field: "Field A-12", date: "2 days ago", status: "Completed" },
-  { id: '2', tenantId: 'tenant-123', companyId: 'company-456', type: "Fertilizing", field: "Field C-04", date: "3 days ago", status: "Completed" },
-  { id: '3', tenantId: 'tenant-123', companyId: 'company-456', type: "PestControl", field: "Field B-08", date: "4 days ago", status: "Completed" },
-  { id: '4', tenantId: 'tenant-123', companyId: 'company-456', type: "Seeding", field: "Field D-01", date: "1 week ago", status: "In Progress" },
-  { id: '5', tenantId: 'tenant-123', companyId: 'company-456', type: "Tillage", field: "Field F-21", date: "2 weeks ago", status: "Completed" },
+  { id: '1', tenantId: 'tenant-123', companyId: 'company-456', type: "Harvesting", field: "Field A-12", date: "2 days ago", status: "Completed", laborHours: 8.5 },
+  { id: '2', tenantId: 'tenant-123', companyId: 'company-456', type: "Fertilizing", field: "Field C-04", date: "3 days ago", status: "Completed", laborHours: 4 },
+  { id: '3', tenantId: 'tenant-123', companyId: 'company-456', type: "PestControl", field: "Field B-08", date: "4 days ago", status: "Completed", laborHours: 5.5 },
+  { id: '4', tenantId: 'tenant-123', companyId: 'company-456', type: "Seeding", field: "Field D-01", date: "1 week ago", status: "In Progress", laborHours: 12 },
+  { id: '5', tenantId: 'tenant-123', companyId: 'company-456', type: "Tillage", field: "Field F-21", date: "2 weeks ago", status: "Completed", laborHours: 6 },
   // Data for another company to test multi-tenancy
-  { id: '6', tenantId: 'tenant-123', companyId: 'company-789', type: "Mowing", field: "Miller's Acre", date: "5 days ago", status: "Completed" },
-  { id: '7', tenantId: 'tenant-123', companyId: 'company-789', type: "Baling", field: "South Pasture", date: "1 week ago", status: "Completed" },
+  { id: '6', tenantId: 'tenant-123', companyId: 'company-789', type: "Mowing", field: "Miller's Acre", date: "5 days ago", status: "Completed", laborHours: 7 },
+  { id: '7', tenantId: 'tenant-123', companyId: 'company-789', type: "Baling", field: "South Pasture", date: "1 week ago", status: "Completed", laborHours: 9 },
 ];
 
 const machinery: Machinery[] = [
@@ -244,7 +244,7 @@ export class MockDataService implements DataService {
     return Promise.resolve(newMachine);
   }
 
-  async addOperation(tenantId: string, companyId: string, operationData: { type: string; field: string; date: string; status: "Completed" | "In Progress"; }): Promise<Operation> {
+  async addOperation(tenantId: string, companyId: string, operationData: AddOperationInput): Promise<Operation> {
     console.log(`Adding Operation for tenant ${tenantId} and company ${companyId}.`);
     const newOperation: Operation = {
       id: `OP${String(operations.length + 1).padStart(3, '0')}`,
@@ -253,7 +253,7 @@ export class MockDataService implements DataService {
       ...operationData,
     };
     operations.unshift(newOperation);
-    logAuditEvent(tenantId, companyId, 'operation.create', `Maßnahme "${operationData.type}" auf Fläche "${operationData.field}" erstellt.`);
+    logAuditEvent(tenantId, companyId, 'operation.create', `Maßnahme "${operationData.type}" auf Fläche "${operationData.field}" erstellt (Arbeitszeit: ${operationData.laborHours}h).`);
     return Promise.resolve(newOperation);
   }
   

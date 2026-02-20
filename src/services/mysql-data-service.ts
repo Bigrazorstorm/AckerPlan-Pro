@@ -1,5 +1,5 @@
 import { DataService } from './data-service';
-import { Kpi, ChartDataPoint, Operation, Machinery, Session, Field, MaintenanceEvent, AddMaintenanceEventInput, AddRepairEventInput, RepairEvent, AuditLogEvent } from './types';
+import { Kpi, ChartDataPoint, Operation, Machinery, Session, Field, MaintenanceEvent, AddMaintenanceEventInput, AddRepairEventInput, RepairEvent, AuditLogEvent, AddOperationInput } from './types';
 
 /**
  * A DataService implementation that connects to a MySQL database.
@@ -62,7 +62,7 @@ export class MySqlDataService implements DataService {
     throw new Error('Method not implemented.');
   }
   
-  async addOperation(tenantId: string, companyId: string, operationData: { type: string; field: string; date: string; status: "Completed" | "In Progress"; }): Promise<Operation> {
+  async addOperation(tenantId: string, companyId: string, operationData: AddOperationInput): Promise<Operation> {
     console.log(`Adding Operation for tenant ${tenantId} and company ${companyId} to MySQL.`);
     throw new Error('Method not implemented.');
   }
