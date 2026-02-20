@@ -18,7 +18,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { MoreHorizontal, PlusCircle, Calendar as CalendarIcon, Camera } from "lucide-react"
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetDescription } from '@/components/ui/sheet'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
@@ -180,12 +180,13 @@ function ObservationsSkeleton() {
 
 export function ObservationsClientContent() {
   const t = useTranslations('ObservationsPage');
-  const [isSheetOpen, setSheetOpen] = useState(false);
+  const [isAddSheetOpen, setAddSheetOpen] = useState(false);
   const { activeCompany, loading: sessionLoading } = useSession();
   const [observations, setObservations] = useState<Observation[]>([]);
   const [fields, setFields] = useState<Field[]>([]);
   const [loading, setLoading] = useState(true);
   const { locale } = useParams<{ locale: string }>();
+  const [observationToView, setObservationToView] = useState<Observation | null>(null);
 
   useEffect(() => {
     if (activeCompany) {
@@ -204,6 +205,7 @@ export function ObservationsClientContent() {
   }, [activeCompany]);
 
   const dateFormatter = (dateString: string) => {
+    if (!dateString) return '';
     try {
       return format(new Date(dateString), 'PP', { locale: locale === 'de' ? de : enUS });
     } catch (e) {
@@ -216,10 +218,11 @@ export function ObservationsClientContent() {
   }
 
   return (
+    <>
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
         <div/>
-        <Sheet open={isSheetOpen} onOpenChange={setSheetOpen}>
+        <Sheet open={isAddSheetOpen} onOpenChange={setAddSheetOpen}>
           <SheetTrigger asChild>
             <Button size="sm" className="gap-1">
               <PlusCircle className="h-4 w-4" />
@@ -231,7 +234,7 @@ export function ObservationsClientContent() {
               <SheetTitle>{t('addObservationSheetTitle')}</SheetTitle>
             </SheetHeader>
             <div className="py-4">
-              {activeCompany && <AddObservationForm closeSheet={() => setSheetOpen(false)} tenantId={activeCompany.tenantId} companyId={activeCompany.id} fields={fields} />}
+              {activeCompany && <AddObservationForm closeSheet={() => setAddSheetOpen(false)} tenantId={activeCompany.tenantId} companyId={activeCompany.id} fields={fields} />}
             </div>
           </SheetContent>
         </Sheet>
@@ -273,7 +276,7 @@ export function ObservationsClientContent() {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuLabel>{t('actions')}</DropdownMenuLabel>
-                        <DropdownMenuItem>{t('view')}</DropdownMenuItem>
+                        <DropdownMenuItem onSelect={() => setObservationToView(obs)}>{t('view')}</DropdownMenuItem>
                         <DropdownMenuItem>{t('edit')}</DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem className="text-destructive">{t('delete')}</DropdownMenuItem>
@@ -295,5 +298,31 @@ export function ObservationsClientContent() {
          )}
       </CardContent>
     </Card>
+
+    <Sheet open={!!observationToView} onOpenChange={(open) => !open && setObservationToView(null)}>
+        <SheetContent>
+            <SheetHeader>
+                <SheetTitle>{observationToView?.title}</SheetTitle>
+                <SheetDescription>
+                    {t('detailsSheetDescription', {field: observationToView?.field, date: dateFormatter(observationToView?.date || '')})}
+                </SheetDescription>
+            </SheetHeader>
+            <div className="py-4 space-y-4">
+                {observationToView?.photoUrl && (
+                    <div className="aspect-video w-full overflow-hidden rounded-md border">
+                        <Image
+                            src={observationToView.photoUrl}
+                            alt={observationToView.title || 'Observation photo'}
+                            width={600}
+                            height={400}
+                            className="w-full h-full object-cover"
+                        />
+                    </div>
+                )}
+                <p className="text-sm text-muted-foreground">{observationToView?.description}</p>
+            </div>
+        </SheetContent>
+    </Sheet>
+    </>
   )
 }

@@ -270,6 +270,7 @@
     "description": "Dokumentieren Sie Pflanzenwachstum, Schäden und andere Feldbeobachtungen.",
     "addObservation": "Beobachtung hinzufügen",
     "addObservationSheetTitle": "Neue Beobachtung hinzufügen",
+    "detailsSheetDescription": "Auf {field} am {date}",
     "tableHeaderTitle": "Titel",
     "tableHeaderField": "Fläche",
     "tableHeaderDate": "Datum",
