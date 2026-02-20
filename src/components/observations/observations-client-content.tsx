@@ -60,7 +60,7 @@ function AddObservationForm({ closeSheet, tenantId, companyId, fields }: { close
     if (state.message && Object.keys(state.errors).length === 0) {
       toast({
         title: t('successToastTitle'),
-        description: state.successToastDescription,
+        description: t('successToastDescription'),
       })
       closeSheet();
     } else if (state.message && Object.keys(state.errors).length > 0) {
@@ -88,6 +88,12 @@ function AddObservationForm({ closeSheet, tenantId, companyId, fields }: { close
         <Label htmlFor="description">{t('descriptionLabel')}</Label>
         <Textarea id="description" name="description" required placeholder={t('descriptionPlaceholder')} />
         {state.errors?.description && <p className="text-sm text-destructive">{state.errors.description.join(', ')}</p>}
+      </div>
+
+       <div className="space-y-2">
+        <Label htmlFor="photoUrl">{t('photoUrlLabel')}</Label>
+        <Input id="photoUrl" name="photoUrl" placeholder={t('photoUrlPlaceholder')} />
+        {state.errors?.photoUrl && <p className="text-sm text-destructive">{state.errors.photoUrl.join(', ')}</p>}
       </div>
 
       <div className="grid grid-cols-2 gap-4">

@@ -269,6 +269,8 @@
       "fieldPlaceholder": "Select a field",
       "dateLabel": "Date",
       "datePlaceholder": "Pick a date",
+      "photoUrlLabel": "Photo URL (optional)",
+      "photoUrlPlaceholder": "https://example.com/photo.jpg",
       "submit": "Save Observation",
       "submitting": "Saving...",
       "successToastTitle": "Success",

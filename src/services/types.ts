@@ -133,6 +133,7 @@ export interface AddObservationInput {
   date: string; // ISO-8601 date string
   title: string;
   description: string;
+  photoUrl?: string;
 }
 
 export type Role = "Tenant Admin" | "Firmen Admin" | "Betriebsleitung" | "Mitarbeiter" | "Werkstatt" | "Leser";

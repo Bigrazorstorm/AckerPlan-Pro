@@ -269,6 +269,8 @@
       "fieldPlaceholder": "Fläche auswählen",
       "dateLabel": "Datum",
       "datePlaceholder": "Datum auswählen",
+      "photoUrlLabel": "Foto-URL (optional)",
+      "photoUrlPlaceholder": "https://beispiel.com/foto.jpg",
       "submit": "Beobachtung speichern",
       "submitting": "Wird gespeichert...",
       "successToastTitle": "Erfolg",

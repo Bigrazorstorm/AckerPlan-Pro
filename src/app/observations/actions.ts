@@ -9,6 +9,7 @@ const AddObservationSchema = z.object({
   description: z.string().min(1, { message: 'Description is required' }),
   field: z.string().min(1, { message: 'Field is required' }),
   date: z.string().min(1, { message: 'Date is required' }),
+  photoUrl: z.string().url({ message: 'Please enter a valid URL.' }).optional().or(z.literal('')),
   tenantId: z.string().min(1, { message: 'Tenant ID is required' }),
   companyId: z.string().min(1, { message: 'Company ID is required' }),
 })
@@ -19,6 +20,7 @@ export async function addObservation(prevState: any, formData: FormData) {
     description: formData.get('description'),
     field: formData.get('field'),
     date: formData.get('date'),
+    photoUrl: formData.get('photoUrl'),
     tenantId: formData.get('tenantId'),
     companyId: formData.get('companyId'),
   })
@@ -32,7 +34,10 @@ export async function addObservation(prevState: any, formData: FormData) {
   
   try {
     const { tenantId, companyId, ...observationData } = validatedFields.data;
-    await dataService.addObservation(tenantId, companyId, observationData)
+    await dataService.addObservation(tenantId, companyId, {
+        ...observationData,
+        photoUrl: observationData.photoUrl || undefined,
+    })
     revalidatePath('/observations')
     return { message: 'Observation added successfully.', errors: {} }
   } catch (e) {
