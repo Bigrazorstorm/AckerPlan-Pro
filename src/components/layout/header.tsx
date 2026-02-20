@@ -13,7 +13,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { PlaceHolderImages } from "@/lib/placeholder-images"
 import { SidebarTrigger } from "@/components/ui/sidebar"
 import { CircleUser, Settings, LogOut } from "lucide-react"
-import Link from "next/link"
+import { Link } from "next-intl/navigation"
 import { useTranslations } from "next-intl"
 import { CompanySwitcher } from "./company-switcher"
 

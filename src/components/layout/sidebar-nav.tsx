@@ -1,7 +1,6 @@
 "use client"
 
-import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { Link, usePathname } from "next-intl/navigation";
 import { Leaf, LayoutDashboard, Map, Tractor, Combine, Siren, BarChart3, Settings, LogOut, ChevronDown, History } from "lucide-react"
 import { cn } from "@/lib/utils"
 import {
@@ -36,7 +35,8 @@ const navItems = [
 ];
 
 export function SidebarNav() {
-  const pathname = usePathname()
+  const pathname = usePathname();
+    
   const userAvatar = PlaceHolderImages.find(p => p.id === 'user-avatar');
   const t = useTranslations('Sidebar');
 
@@ -50,11 +50,13 @@ export function SidebarNav() {
       </SidebarHeader>
       <SidebarContent>
         <SidebarMenu>
-          {navItems.map((item) => (
+          {navItems.map((item) => {
+            const isActive = (item.href === "/" && pathname === item.href) || (item.href !== "/" && pathname.startsWith(item.href));
+            return (
             <SidebarMenuItem key={item.href}>
               <SidebarMenuButton
                 asChild
-                isActive={pathname.endsWith(item.href)}
+                isActive={isActive}
                 className="justify-start"
               >
                 <Link href={item.href}>
@@ -63,7 +65,7 @@ export function SidebarNav() {
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
-          ))}
+          )})}
         </SidebarMenu>
       </SidebarContent>
       <SidebarSeparator />

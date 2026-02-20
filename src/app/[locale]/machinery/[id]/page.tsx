@@ -15,7 +15,7 @@ import { PlusCircle, Wrench, ArrowLeft, Calendar as CalendarIcon, Info } from 'l
 import { format } from 'date-fns';
 import { de, enUS } from 'date-fns/locale';
 import { Skeleton } from '@/components/ui/skeleton';
-import Link from 'next/link';
+import { Link } from 'next-intl/navigation';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';

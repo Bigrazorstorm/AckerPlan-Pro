@@ -8,7 +8,7 @@ import { Machinery } from '@/services/types'
 import { addMachine } from '@/app/machinery/actions'
 import { useSession } from '@/context/session-context'
 import dataService from '@/services'
-import Link from 'next/link'
+import { Link } from "next-intl/navigation";
 import { useParams } from 'next/navigation'
 
 import { Badge } from "@/components/ui/badge"
