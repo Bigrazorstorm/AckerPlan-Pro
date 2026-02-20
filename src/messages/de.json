@@ -44,6 +44,10 @@
     "OpenObservations": "Offene Beobachtungen",
     "MaintenanceDue": "Fällige Wartungen"
   },
+  "General": {
+    "comingSoonTitle": "Bald verfügbar",
+    "comingSoonDescription": "Diese Funktion befindet sich in der Entwicklung und wird in Kürze verfügbar sein."
+  },
   "FieldsPage": {
     "title": "Flächen",
     "description": "Verwalten Sie Ihre Feldgrenzen und sehen Sie GIS-Daten ein.",
@@ -78,6 +82,26 @@
       "successToastTitle": "Erfolg",
       "errorToastTitle": "Fehler"
     }
+  },
+  "MachineDetailPage": {
+    "backToList": "Zurück zur Übersicht",
+    "description": "{type} - {model}",
+    "logMaintenanceButton": "Wartung protokollieren",
+    "detailsTitle": "Details",
+    "statusLabel": "Status",
+    "nextServiceLabel": "Nächster Service",
+    "lastMaintenanceLabel": "Letzte Wartung",
+    "createdAtLabel": "Erfasst am",
+    "maintenanceHistoryTitle": "Wartungshistorie",
+    "maintenanceHistoryDescription": "Eine Aufzeichnung aller Wartungs- und Reparaturarbeiten für diese Maschine.",
+    "dateHeader": "Datum",
+    "descriptionHeader": "Beschreibung",
+    "costHeader": "Kosten",
+    "noMaintenanceTitle": "Keine Wartungseinträge",
+    "noMaintenanceDescription": "Für diese Maschine wurden noch keine Wartungsarbeiten protokolliert. Protokollieren Sie eine neue Wartung, um hier zu beginnen.",
+    "notFoundTitle": "Maschine nicht gefunden",
+    "notFoundDescription": "Die angeforderte Maschine konnte nicht gefunden werden. Möglicherweise wurde sie gelöscht oder Sie haben keine Berechtigung.",
+    "backToMachinery": "Zurück zur Maschinenübersicht"
   },
   "MachineryTypes": {
     "Tractor": "Traktor",

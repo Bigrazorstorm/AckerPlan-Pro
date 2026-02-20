@@ -8,6 +8,7 @@ import { Machinery } from '@/services/types'
 import { addMachine } from '@/app/machinery/actions'
 import { useSession } from '@/context/session-context'
 import dataService from '@/services'
+import Link from 'next/link'
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -197,7 +198,11 @@ export function MachineryClientContent() {
           <TableBody>
             {machinery.map((machine) => (
               <TableRow key={machine.id}>
-                <TableCell className="font-medium">{machine.name}</TableCell>
+                <TableCell className="font-medium">
+                  <Link href={`/machinery/${machine.id}`} className="hover:underline">
+                    {machine.name}
+                  </Link>
+                </TableCell>
                 <TableCell>{tMachineTypes(machine.type)}</TableCell>
                 <TableCell>
                   <Badge variant={

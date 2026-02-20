@@ -1,5 +1,5 @@
 import { DataService } from './data-service';
-import { Kpi, ChartDataPoint, Operation, Machinery, Session, Field } from './types';
+import { Kpi, ChartDataPoint, Operation, Machinery, Session, Field, MaintenanceEvent } from './types';
 
 const session: Session = {
   user: {
@@ -137,6 +137,16 @@ const fields: Field[] = [
   { id: 'field-6', tenantId: 'tenant-123', companyId: 'company-789', name: 'Weide am Bach', area: 7.8, crop: 'Klee-Gras-Mischung' },
 ];
 
+const maintenanceEvents: MaintenanceEvent[] = [
+  { id: 'ME001', tenantId: 'tenant-123', companyId: 'company-456', machineId: 'M001', date: '2024-05-10', description: 'Regulärer 500h Service', cost: 450, createdAt: '2024-05-10T14:30:00Z' },
+  { id: 'ME002', tenantId: 'tenant-123', companyId: 'company-456', machineId: 'M001', date: '2023-11-20', description: 'Ölwechsel und Filter', cost: 280, createdAt: '2023-11-20T10:00:00Z' },
+  { id: 'ME003', tenantId: 'tenant-123', companyId: 'company-456', machineId: 'M002', date: '2023-09-15', description: 'Großer 3000h Service, Austausch Verschleißteile', cost: 2800, createdAt: '2023-09-15T09:00:00Z' },
+  { id: 'ME004', tenantId: 'tenant-123', companyId: 'company-456', machineId: 'M003', date: '2024-03-22', description: 'Software-Update und Hydraulik-Check', cost: 150, createdAt: '2024-03-22T16:00:00Z' },
+  { id: 'ME005', tenantId: 'tenant-123', companyId: 'company-456', machineId: 'M004', date: '2024-01-10', description: 'Jährliche Inspektion', cost: 200, createdAt: '2024-01-10T09:45:00Z' },
+  { id: 'ME006', tenantId: 'tenant-123', companyId: 'company-456', machineId: 'M005', date: '2024-04-01', description: 'Reparatur nach Schaden (Getriebe)', cost: 4500, createdAt: '2024-04-01T11:00:00Z' },
+  { id: 'ME007', tenantId: 'tenant-123', companyId: 'company-789', machineId: 'M007', date: '2024-06-15', description: '1000h Service', cost: 850, createdAt: '2024-06-15T14:00:00Z' },
+];
+
 
 export class MockDataService implements DataService {
   
@@ -174,6 +184,17 @@ export class MockDataService implements DataService {
   async getFields(tenantId: string, companyId: string): Promise<Field[]> {
     console.log(`Fetching Fields for tenant ${tenantId} and company ${companyId}.`);
     return Promise.resolve(fields.filter(f => f.tenantId === tenantId && f.companyId === companyId));
+  }
+
+  async getMachineById(tenantId: string, companyId: string, machineId: string): Promise<Machinery | null> {
+    console.log(`Fetching Machine ${machineId} for tenant ${tenantId} and company ${companyId}.`);
+    const machine = machinery.find(m => m.id === machineId && m.tenantId === tenantId && m.companyId === companyId);
+    return Promise.resolve(machine || null);
+  }
+
+  async getMaintenanceHistory(tenantId: string, companyId: string, machineId: string): Promise<MaintenanceEvent[]> {
+    console.log(`Fetching Maintenance History for machine ${machineId}.`);
+    return Promise.resolve(maintenanceEvents.filter(e => e.machineId === machineId && e.tenantId === tenantId && e.companyId === companyId).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
   }
 
   async addMachinery(tenantId: string, companyId: string, machineData: { name: string; type: string; model: string; }): Promise<Machinery> {

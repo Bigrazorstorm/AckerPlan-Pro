@@ -1,5 +1,5 @@
 import { DataService } from './data-service';
-import { Kpi, ChartDataPoint, Operation, Machinery, Session, Field } from './types';
+import { Kpi, ChartDataPoint, Operation, Machinery, Session, Field, MaintenanceEvent } from './types';
 
 /**
  * A DataService implementation that connects to a Supabase backend.
@@ -29,6 +29,16 @@ export class SupabaseDataService implements DataService {
 
   async getMachinery(tenantId: string, companyId: string): Promise<Machinery[]> {
     console.log(`Fetching Machinery for tenant ${tenantId} and company ${companyId} from Supabase.`);
+    throw new Error('Method not implemented.');
+  }
+
+  async getMachineById(tenantId: string, companyId: string, machineId: string): Promise<Machinery | null> {
+    console.log(`Fetching Machine ${machineId} for tenant ${tenantId} and company ${companyId} from Supabase.`);
+    throw new Error('Method not implemented.');
+  }
+
+  async getMaintenanceHistory(tenantId: string, companyId: string, machineId: string): Promise<MaintenanceEvent[]> {
+    console.log(`Fetching Maintenance History for machine ${machineId} from Supabase.`);
     throw new Error('Method not implemented.');
   }
 

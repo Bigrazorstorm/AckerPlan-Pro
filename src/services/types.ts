@@ -22,6 +22,18 @@ export interface Operation {
   status: "Completed" | "In Progress";
 };
 
+// Represents a Maintenance Event for a machine.
+export interface MaintenanceEvent {
+  id: string; // UUID
+  tenantId: string;
+  companyId: string;
+  machineId: string;
+  date: string; // ISO-8601 date string
+  description: string;
+  cost: number;
+  createdAt: string; // ISO-8601 date string
+}
+
 // Represents the Machinery entity in the database.
 export interface Machinery {
   id: string; // Should be a UUID

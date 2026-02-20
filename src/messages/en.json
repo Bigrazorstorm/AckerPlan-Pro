@@ -44,6 +44,10 @@
     "OpenObservations": "Open Observations",
     "MaintenanceDue": "Maintenance Due"
   },
+  "General": {
+    "comingSoonTitle": "Coming Soon",
+    "comingSoonDescription": "This feature is under development and will be available shortly."
+  },
   "FieldsPage": {
     "title": "Fields",
     "description": "Manage your field boundaries and view GIS data.",
@@ -78,6 +82,26 @@
       "successToastTitle": "Success",
       "errorToastTitle": "Error"
     }
+  },
+  "MachineDetailPage": {
+    "backToList": "Back to List",
+    "description": "{type} - {model}",
+    "logMaintenanceButton": "Log Maintenance",
+    "detailsTitle": "Details",
+    "statusLabel": "Status",
+    "nextServiceLabel": "Next Service",
+    "lastMaintenanceLabel": "Last Maintenance",
+    "createdAtLabel": "Registered On",
+    "maintenanceHistoryTitle": "Maintenance History",
+    "maintenanceHistoryDescription": "A record of all maintenance and repair work for this machine.",
+    "dateHeader": "Date",
+    "descriptionHeader": "Description",
+    "costHeader": "Cost",
+    "noMaintenanceTitle": "No Maintenance Records",
+    "noMaintenanceDescription": "No maintenance has been logged for this machine yet. Log a new maintenance event to get started.",
+    "notFoundTitle": "Machine Not Found",
+    "notFoundDescription": "The requested machine could not be found. It may have been deleted or you may not have permission to view it.",
+    "backToMachinery": "Back to Machinery List"
   },
   "MachineryTypes": {
     "Tractor": "Tractor",

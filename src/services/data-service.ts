@@ -1,4 +1,4 @@
-import { Kpi, ChartDataPoint, Operation, Machinery, Session, Field } from './types';
+import { Kpi, ChartDataPoint, Operation, Machinery, Session, Field, MaintenanceEvent } from './types';
 
 /**
  * Defines the contract for data access in the application.
@@ -38,6 +38,22 @@ export interface DataService {
    * @param companyId - The ID of the company.
    */
   getMachinery(tenantId: string, companyId: string): Promise<Machinery[]>;
+
+  /**
+   * Retrieves a single machine by its ID.
+   * @param tenantId - The ID of the tenant.
+   * @param companyId - The ID of the company.
+   * @param machineId - The ID of the machine to retrieve.
+   */
+  getMachineById(tenantId: string, companyId: string, machineId: string): Promise<Machinery | null>;
+
+  /**
+   * Retrieves the maintenance history for a specific machine.
+   * @param tenantId - The ID of the tenant.
+   * @param companyId - The ID of the company.
+   * @param machineId - The ID of the machine.
+   */
+  getMaintenanceHistory(tenantId: string, companyId: string, machineId: string): Promise<MaintenanceEvent[]>;
 
   /**
    * Adds a new machine to the data store.
