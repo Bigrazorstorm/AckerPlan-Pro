@@ -5,7 +5,7 @@ import { useFormState, useFormStatus } from 'react-dom'
 import { useTranslations } from "next-intl"
 import { useToast } from '@/hooks/use-toast'
 import { Machinery } from '@/services/types'
-import { addMachine } from '@/app/machinery/actions'
+import { addMachine, deleteMachine } from '@/app/machinery/actions'
 import { useSession } from '@/context/session-context'
 import dataService from '@/services'
 import Link from "next/link";
@@ -28,6 +28,8 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Skeleton } from '../ui/skeleton'
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
+
 
 const initialState = {
   message: '',
@@ -117,11 +119,13 @@ export function MachineryClientContent() {
   const t = useTranslations('MachineryPage');
   const tMachineTypes = useTranslations('MachineryTypes');
   const tMachineStatuses = useTranslations('MachineryStatuses');
+  const { toast } = useToast();
   const [isSheetOpen, setSheetOpen] = useState(false);
   const { activeCompany, loading: sessionLoading } = useSession();
   const [machinery, setMachinery] = useState<Machinery[]>([]);
   const [loading, setLoading] = useState(true);
   const { locale } = useParams<{ locale: string }>();
+  const [machineToDelete, setMachineToDelete] = useState<Machinery | null>(null);
 
   useEffect(() => {
     if (activeCompany) {
@@ -134,6 +138,25 @@ export function MachineryClientContent() {
       fetchMachinery();
     }
   }, [activeCompany]);
+
+  const handleDelete = async () => {
+    if (machineToDelete && activeCompany) {
+      const result = await deleteMachine(machineToDelete.id, activeCompany.tenantId, activeCompany.id);
+      if (result.message.includes('successfully')) {
+        toast({
+          title: t('deleteSuccessToastTitle'),
+          description: result.message,
+        });
+      } else {
+        toast({
+          variant: 'destructive',
+          title: t('deleteErrorToastTitle'),
+          description: result.message,
+        });
+      }
+      setMachineToDelete(null); // Close dialog
+    }
+  };
   
   if (sessionLoading || loading) {
       return (
@@ -174,6 +197,7 @@ export function MachineryClientContent() {
   }
 
   return (
+    <>
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
         <div>
@@ -245,11 +269,13 @@ export function MachineryClientContent() {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                       <DropdownMenuLabel>{t('actions')}</DropdownMenuLabel>
-                      <DropdownMenuItem>{t('edit')}</DropdownMenuItem>
-                      <DropdownMenuItem>{t('viewMaintenance')}</DropdownMenuItem>
-                      <DropdownMenuItem>{t('reportRepair')}</DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link href={`/${locale}/machinery/${machine.id}`}>{t('edit')}</Link>
+                      </DropdownMenuItem>
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem className="text-destructive">{t('delete')}</DropdownMenuItem>
+                      <DropdownMenuItem className="text-destructive" onSelect={() => setMachineToDelete(machine)}>
+                        {t('delete')}
+                      </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </TableCell>
@@ -259,5 +285,21 @@ export function MachineryClientContent() {
         </Table>
       </CardContent>
     </Card>
+
+    <AlertDialog open={!!machineToDelete} onOpenChange={(open) => !open && setMachineToDelete(null)}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>{t('deleteConfirmationTitle')}</AlertDialogTitle>
+          <AlertDialogDescription>
+            {t('deleteConfirmationDescription')}
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>{t('deleteConfirmationCancel')}</AlertDialogCancel>
+          <AlertDialogAction onClick={handleDelete} className="bg-destructive hover:bg-destructive/90">{t('deleteConfirmationConfirm')}</AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+    </>
   )
 }

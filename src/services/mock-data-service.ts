@@ -104,7 +104,7 @@ const chartDataCompany789: ChartDataPoint[] = [
     { month: "December", revenue: 300, cost: 100 },
 ];
 
-const machinery: Machinery[] = [
+let machinery: Machinery[] = [
   { id: 'M001', tenantId: 'tenant-123', companyId: 'company-456', name: "John Deere 8R 370", type: "Tractor", model: "8R 370", status: "Operational", lastMaintenance: "2024-05-10", standardFuelConsumption: 35.5, totalOperatingHours: 1250, maintenanceIntervalHours: 500, lastMaintenanceHours: 1010, createdAt: "2023-01-15T10:00:00Z", updatedAt: "2024-05-10T14:30:00Z" },
   { id: 'M002', tenantId: 'tenant-123', companyId: 'company-456', name: "Claas Lexion 8900", type: "CombineHarvester", model: "Lexion 8900", status: "Maintenance Due", lastMaintenance: "2023-09-15", standardFuelConsumption: 85.0, totalOperatingHours: 3005, maintenanceIntervalHours: 1000, lastMaintenanceHours: 2000, createdAt: "2022-08-20T11:00:00Z", updatedAt: "2023-09-15T09:00:00Z" },
   { id: 'M003', tenantId: 'tenant-123', companyId: 'company-456', name: "Fendt 942 Vario", type: "Tractor", model: "942 Vario", status: "Operational", lastMaintenance: "2024-03-22", standardFuelConsumption: 42.0, totalOperatingHours: 550, maintenanceIntervalHours: 500, lastMaintenanceHours: 500, createdAt: "2023-05-10T12:00:00Z", updatedAt: "2024-03-22T16:00:00Z" },
@@ -115,7 +115,7 @@ const machinery: Machinery[] = [
   { id: 'M008', tenantId: 'tenant-123', companyId: 'company-789', name: "New Holland CR9.90", type: "CombineHarvester", model: "CR9.90", status: "Operational", lastMaintenance: "2024-07-01", standardFuelConsumption: 75.0, totalOperatingHours: 850, maintenanceIntervalHours: 1000, lastMaintenanceHours: 0, createdAt: "2023-09-01T09:00:00Z", updatedAt: "2024-07-01T14:00:00Z" },
 ];
 
-const operations: Operation[] = [
+let operations: Operation[] = [
   { id: '1', tenantId: 'tenant-123', companyId: 'company-456', type: "Harvesting", field: "Große Wiese", date: "2024-07-22T10:00:00Z", status: "Completed", laborHours: 8.5, machine: { id: 'M002', name: 'Claas Lexion 8900' }, fuelConsumed: 722.5, yieldAmount: 176, revenue: 38720 },
   { id: '2', tenantId: 'tenant-123', companyId: 'company-456', type: "Fertilizing", field: "Südhang", date: "2024-07-21T10:00:00Z", status: "Completed", laborHours: 4, machine: { id: 'M003', name: 'Fendt 942 Vario' }, fuelConsumed: 168.0 },
   { id: '3', tenantId: 'tenant-123', companyId: 'company-456', type: "PestControl", field: "Acker-Nord 1", date: "2024-07-20T10:00:00Z", status: "Completed", laborHours: 5.5, machine: { id: 'M001', name: 'John Deere 8R 370' }, fuelConsumed: 195.2 },
@@ -137,7 +137,7 @@ const fields: Field[] = [
   { id: 'field-6', tenantId: 'tenant-123', companyId: 'company-789', name: 'Weide am Bach', area: 7.8, crop: 'Klee-Gras-Mischung' },
 ];
 
-const maintenanceEvents: MaintenanceEvent[] = [
+let maintenanceEvents: MaintenanceEvent[] = [
   { id: 'ME001', tenantId: 'tenant-123', companyId: 'company-456', machineId: 'M001', date: '2024-05-10', description: 'Regulärer 500h Service', cost: 450, createdAt: '2024-05-10T14:30:00Z' },
   { id: 'ME002', tenantId: 'tenant-123', companyId: 'company-456', machineId: 'M001', date: '2023-11-20', description: 'Ölwechsel und Filter', cost: 280, createdAt: '2023-11-20T10:00:00Z' },
   { id: 'ME003', tenantId: 'tenant-123', companyId: 'company-456', machineId: 'M002', date: '2023-09-15', description: 'Großer 3000h Service, Austausch Verschleißteile', cost: 2800, createdAt: '2023-09-15T09:00:00Z' },
@@ -146,12 +146,12 @@ const maintenanceEvents: MaintenanceEvent[] = [
   { id: 'ME006', tenantId: 'tenant-123', companyId: 'company-789', machineId: 'M007', date: '2024-06-15', description: '1000h Service', cost: 850, createdAt: '2024-06-15T14:00:00Z' },
 ];
 
-const repairEvents: RepairEvent[] = [
+let repairEvents: RepairEvent[] = [
     { id: 'RE001', tenantId: 'tenant-123', companyId: 'company-456', machineId: 'M005', date: '2024-04-01', description: 'Getriebeschaden nach Überlastung', cost: 4500, downtimeHours: 120, createdAt: '2024-04-01T11:00:00Z' },
     { id: 'RE002', tenantId: 'tenant-123', companyId: 'company-456', machineId: 'M002', date: '2023-08-20', description: 'Hydraulikschlauch geplatzt', cost: 350, downtimeHours: 8, createdAt: '2023-08-20T15:00:00Z' },
 ];
 
-const auditLogEvents: AuditLogEvent[] = [
+let auditLogEvents: AuditLogEvent[] = [
     { id: 'log-1', tenantId: 'tenant-123', companyId: 'company-456', date: '2024-07-22T10:05:00Z', user: { id: 'user-1', name: 'John Doe' }, action: 'machine.create', details: 'Maschine "Krone Big Pack 1290" wurde erstellt.' },
     { id: 'log-2', tenantId: 'tenant-123', companyId: 'company-456', date: '2024-07-22T09:30:00Z', user: { id: 'user-1', name: 'John Doe' }, action: 'maintenance.log', details: 'Wartung für "John Deere 8R 370" protokolliert: Regulärer 500h Service (Kosten: €450,00).' },
     { id: 'log-3', tenantId: 'tenant-123', companyId: 'company-456', date: '2024-07-21T14:00:00Z', user: { id: 'user-2', name: 'Max Mustermann' }, action: 'operation.create', details: 'Maßnahme "Ernte" auf Fläche "Acker-Nord 1" erstellt.' },
@@ -159,7 +159,7 @@ const auditLogEvents: AuditLogEvent[] = [
     { id: 'log-5', tenantId: 'tenant-123', companyId: 'company-789', date: '2024-07-22T08:00:00Z', user: { id: 'user-1', name: 'John Doe' }, action: 'operation.create', details: 'Maßnahme "Mähen" auf Fläche "Miller\'s Acre" erstellt.' },
 ];
 
-const observations: Observation[] = [
+let observations: Observation[] = [
     { id: 'obs-1', tenantId: 'tenant-123', companyId: 'company-456', field: 'Südhang', date: '2024-07-18T10:00:00Z', title: 'Verdacht auf Gelbrost', description: 'Im unteren Bereich des Schlags sind deutliche gelbe Pusteln auf den Blättern zu erkennen. Ca. 10-15% der Pflanzen betroffen.', photoUrl: 'https://picsum.photos/seed/rust/600/400' },
     { id: 'obs-2', tenantId: 'tenant-123', companyId: 'company-456', field: 'Acker-Nord 1', date: '2024-07-15T14:30:00Z', title: 'Wildschweinschaden', description: 'Am Waldrand wurden ca. 50-100qm von Wildschweinen umgebrochen. Schaden hält sich in Grenzen.', photoUrl: 'https://picsum.photos/seed/boar/600/400' },
     { id: 'obs-3', tenantId: 'tenant-123', companyId: 'company-789', field: 'Weide am Bach', date: '2024-07-20T08:00:00Z', title: 'Guter Klee-Anteil', description: 'Der Klee hat sich gut entwickelt, Bestand sieht sehr gut aus.' },
@@ -260,6 +260,23 @@ export class MockDataService implements DataService {
     machinery.push(newMachine);
     logAuditEvent(tenantId, companyId, 'machine.create', `Maschine "${machineData.name}" wurde erstellt.`);
     return Promise.resolve(newMachine);
+  }
+
+  async deleteMachine(tenantId: string, companyId: string, machineId: string): Promise<void> {
+    console.log(`Deleting Machinery ${machineId} for tenant ${tenantId} and company ${companyId}.`);
+    const initialLength = machinery.length;
+    const machineToDelete = machinery.find(m => m.id === machineId && m.tenantId === tenantId && m.companyId === companyId);
+    
+    if (!machineToDelete) {
+        return Promise.reject(new Error('Machine not found or not authorized to delete.'));
+    }
+
+    machinery = machinery.filter(m => m.id !== machineId || m.tenantId !== tenantId || m.companyId !== companyId);
+    
+    if (machinery.length < initialLength) {
+        logAuditEvent(tenantId, companyId, 'machine.delete', `Maschine "${machineToDelete.name}" wurde gelöscht.`);
+        return Promise.resolve();
+    }
   }
 
   async addOperation(tenantId: string, companyId: string, operationData: AddOperationInput): Promise<Operation[]> {

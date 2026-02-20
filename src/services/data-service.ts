@@ -88,6 +88,14 @@ export interface DataService {
   addMachinery(tenantId: string, companyId: string, machineData: { name: string; type: string; model: string; standardFuelConsumption: number; maintenanceIntervalHours?: number; }): Promise<Machinery>;
 
   /**
+   * Deletes a machine from the data store.
+   * @param tenantId - The ID of the tenant.
+   * @param companyId - The ID of the company.
+   * @param machineId - The ID of the machine to delete.
+   */
+  deleteMachine(tenantId: string, companyId: string, machineId: string): Promise<void>;
+
+  /**
    * Adds a new operation to the data store.
    * @param tenantId - The ID of the tenant.
    * @param companyId - The ID of the company.

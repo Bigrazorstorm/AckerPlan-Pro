@@ -111,6 +111,11 @@ export class SupabaseDataService implements DataService {
     return Promise.resolve(newMachine);
   }
 
+  async deleteMachine(tenantId: string, companyId: string, machineId: string): Promise<void> {
+    this.log('deleteMachine', { tenantId, companyId, machineId });
+    return Promise.resolve();
+  }
+
   async addOperation(tenantId: string, companyId: string, operationData: AddOperationInput): Promise<Operation[]> {
     this.log('addOperation', { tenantId, companyId, operationData });
     return Promise.resolve([]);

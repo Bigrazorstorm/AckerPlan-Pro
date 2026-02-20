@@ -47,3 +47,17 @@ export async function addMachine(prevState: any, formData: FormData) {
     }
   }
 }
+
+export async function deleteMachine(machineId: string, tenantId: string, companyId: string) {
+  if (!machineId || !tenantId || !companyId) {
+    return { message: 'Failed to delete machine: Missing required IDs.' };
+  }
+  try {
+    await dataService.deleteMachine(tenantId, companyId, machineId);
+    revalidatePath('/machinery');
+    return { message: 'Machine deleted successfully.' };
+  } catch (e) {
+    const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
+    return { message: `Failed to delete machine: ${errorMessage}` };
+  }
+}
