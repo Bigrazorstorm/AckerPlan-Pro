@@ -1,7 +1,6 @@
 'use client';
 
 import { Link } from 'next-intl/navigation';
-import { usePathname, useParams } from 'next/navigation';
 import {
   Leaf,
   LayoutDashboard,
@@ -36,7 +35,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useTranslations } from 'next-intl';
-import { useEffect, useState } from 'react';
+import { useActivePath } from '@/hooks/use-active-path';
 
 const navItems = [
   { href: '/', icon: LayoutDashboard, labelKey: 'dashboard' },
@@ -49,20 +48,8 @@ const navItems = [
 ];
 
 export function SidebarNav() {
-  const pathname = usePathname();
-  const params = useParams();
-  const [basePath, setBasePath] = useState('');
-  const [isClient, setIsClient] = useState(false);
-
-  useEffect(() => {
-    // This effect runs only on the client, after hydration.
-    // It safely calculates the base path without causing a server-client mismatch.
-    const locale = params && typeof params.locale === 'string' ? params.locale : '';
-    setBasePath(locale ? pathname.replace(`/${locale}`, '') || '/' : pathname);
-    setIsClient(true);
-  }, [pathname, params]);
-
-  const userAvatar = PlaceHolderImages.find((p) => p.id === 'user-avatar');
+  const activePath = useActivePath();
+  const userAvatar = PlaceHolderImages.find(p => p.id === 'user-avatar');
   const t = useTranslations('Sidebar');
 
   return (
@@ -76,11 +63,11 @@ export function SidebarNav() {
       <SidebarContent>
         <SidebarMenu>
           {navItems.map((item) => {
-            // Active state is only calculated on the client side to prevent hydration errors.
+            // The active state is determined using the client-side calculated 'activePath'.
+            // On the server, activePath is '', so all links are inactive, preventing a mismatch.
             const isActive =
-              isClient &&
-              ((item.href === '/' && basePath === item.href) ||
-                (item.href !== '/' && basePath.startsWith(item.href)));
+              (item.href === '/' && activePath === '/') ||
+              (item.href !== '/' && activePath.startsWith(item.href));
             return (
               <SidebarMenuItem key={item.href}>
                 <SidebarMenuButton asChild isActive={isActive} className="justify-start">
