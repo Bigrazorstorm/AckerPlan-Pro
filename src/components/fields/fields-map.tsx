@@ -4,15 +4,13 @@ import { MapContainer, TileLayer, Polygon, Tooltip, FeatureGroup, LayersControl,
 import 'leaflet/dist/leaflet.css';
 import { Field, Observation } from '@/services/types';
 import L, { LatLngExpression, LatLngTuple, latLng, latLngBounds } from 'leaflet';
-import { useMemo, useEffect } from 'react';
+import { useMemo, useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 
 // Fix for default marker icon with webpack
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
 import markerIcon from 'leaflet/dist/images/marker-icon.png';
 import markerShadow from 'leaflet/dist/images/marker-shadow.png';
-
-delete (L.Icon.Default.prototype as any)._getIconUrl;
 
 L.Icon.Default.mergeOptions({
   iconUrl: markerIcon.src,
@@ -37,6 +35,8 @@ function ChangeView({ bounds }: { bounds: L.LatLngBounds | null }) {
 
 export function FieldsMap({ fields, observations }: FieldsMapProps) {
     const t = useTranslations('FieldsPage');
+    const [isMounted, setIsMounted] = useState(false);
+
     const fieldsWithGeometry = useMemo(() => fields.filter(f => f.geometry && f.geometry.length > 0), [fields]);
     const observationsWithLocation = useMemo(() => observations.filter(o => o.latitude && o.longitude), [observations]);
 
@@ -53,6 +53,14 @@ export function FieldsMap({ fields, observations }: FieldsMapProps) {
     }, [hasData, fieldsWithGeometry, observationsWithLocation]);
 
     const center: LatLngTuple = [52.505, 13.37];
+
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
+
+    if (!isMounted) {
+        return null;
+    }
 
     return (
         <MapContainer center={center} zoom={10} scrollWheelZoom={true} style={{ height: '100%', width: '100%', borderRadius: 'inherit', zIndex: 0 }}>
