@@ -1,6 +1,6 @@
 'use client';
 
-import { Link } from 'next-intl/navigation';
+import { Link, usePathname } from 'next-intl/navigation';
 import {
   Leaf,
   LayoutDashboard,
@@ -35,7 +35,6 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useTranslations } from 'next-intl';
-import { useActivePath } from '@/hooks/use-active-path';
 
 const navItems = [
   { href: '/', icon: LayoutDashboard, labelKey: 'dashboard' },
@@ -48,7 +47,7 @@ const navItems = [
 ];
 
 export function SidebarNav() {
-  const activePath = useActivePath();
+  const activePath = usePathname();
   const userAvatar = PlaceHolderImages.find(p => p.id === 'user-avatar');
   const t = useTranslations('Sidebar');
 
@@ -63,8 +62,6 @@ export function SidebarNav() {
       <SidebarContent>
         <SidebarMenu>
           {navItems.map((item) => {
-            // The active state is determined using the client-side calculated 'activePath'.
-            // On the server, activePath is '', so all links are inactive, preventing a mismatch.
             const isActive =
               (item.href === '/' && activePath === '/') ||
               (item.href !== '/' && activePath.startsWith(item.href));
