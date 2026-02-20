@@ -8,6 +8,7 @@ import {NextIntlClientProvider} from 'next-intl';
 import {getMessages, getTranslations} from 'next-intl/server';
 import { SessionProvider } from '@/context/session-context';
 import { getSession } from '@/app/auth/actions';
+import { FirebaseClientProvider } from '@/firebase/client-provider';
 
 export async function generateMetadata({params: {locale}}: {params: {locale: string}}): Promise<Metadata> {
   const t = await getTranslations({locale, namespace: 'Metadata'});
@@ -47,22 +48,24 @@ export default async function RootLayout({
       <body className="font-body antialiased">
         <NextIntlClientProvider locale={locale} messages={messages}>
           <SessionProvider session={session}>
-            {session ? (
-              <SidebarProvider>
-                  <Sidebar>
-                    <SidebarNav />
-                  </Sidebar>
-                  <div className="flex flex-col w-full">
-                    <Header />
-                    <main className="flex-1 bg-background p-4 sm:p-6 lg:p-8">
-                      {children}
-                    </main>
-                  </div>
-              </SidebarProvider>
-            ) : (
-              <main>{children}</main>
-            )}
-            <Toaster />
+            <FirebaseClientProvider>
+              {session ? (
+                <SidebarProvider>
+                    <Sidebar>
+                      <SidebarNav />
+                    </Sidebar>
+                    <div className="flex flex-col w-full">
+                      <Header />
+                      <main className="flex-1 bg-background p-4 sm:p-6 lg:p-8">
+                        {children}
+                      </main>
+                    </div>
+                </SidebarProvider>
+              ) : (
+                <main>{children}</main>
+              )}
+              <Toaster />
+            </FirebaseClientProvider>
           </SessionProvider>
         </NextIntlClientProvider>
       </body>
