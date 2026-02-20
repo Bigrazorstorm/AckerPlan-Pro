@@ -1,6 +1,8 @@
 'use client';
 
-import { Link, usePathname } from 'next-intl/navigation';
+import { useState, useEffect } from 'react';
+import { usePathname, useParams } from 'next/navigation';
+import Link from 'next/link';
 import {
   Leaf,
   LayoutDashboard,
@@ -47,14 +49,28 @@ const navItems = [
 ];
 
 export function SidebarNav() {
-  const activePath = usePathname();
+  const pathname = usePathname();
+  const params = useParams();
+  const [activePath, setActivePath] = useState('');
+  const [locale, setLocale] = useState('de');
+  
+  useEffect(() => {
+    // This effect runs only on the client, preventing hydration errors.
+    if (pathname && params?.locale) {
+      const currentLocale = Array.isArray(params.locale) ? params.locale[0] : params.locale;
+      const pathWithoutLocale = pathname.replace(`/${currentLocale}`, '') || '/';
+      setActivePath(pathWithoutLocale);
+      setLocale(currentLocale);
+    }
+  }, [pathname, params]);
+
   const userAvatar = PlaceHolderImages.find(p => p.id === 'user-avatar');
   const t = useTranslations('Sidebar');
 
   return (
     <>
       <SidebarHeader>
-        <Link href="/" className="flex items-center gap-2 font-bold text-lg">
+        <Link href={`/${locale}/`} className="flex items-center gap-2 font-bold text-lg">
           <Leaf className="h-6 w-6 text-primary" />
           <span>{t('title')}</span>
         </Link>
@@ -68,7 +84,7 @@ export function SidebarNav() {
             return (
               <SidebarMenuItem key={item.href}>
                 <SidebarMenuButton asChild isActive={isActive} className="justify-start">
-                  <Link href={item.href}>
+                  <Link href={`/${locale}${item.href === '/' ? '' : item.href}`}>
                     <item.icon className="h-4 w-4" />
                     <span>{t(item.labelKey)}</span>
                   </Link>
@@ -98,7 +114,7 @@ export function SidebarNav() {
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-56 mb-2" side="top" align="start">
             <DropdownMenuItem asChild>
-              <Link href="/settings">
+              <Link href={`/${locale}/settings`}>
                 <Settings className="mr-2 h-4 w-4" />
                 <span>{t('settings')}</span>
               </Link>
