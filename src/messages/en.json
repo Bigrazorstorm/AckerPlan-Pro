@@ -69,7 +69,9 @@
     "importButton": "Import GIS Data",
     "listHeaderName": "Name",
     "listHeaderCrop": "Crop",
-    "listHeaderArea": "Area"
+    "listHeaderArea": "Area",
+    "fieldsLayer": "Fields",
+    "observationsLayer": "Observations"
   },
   "FieldDetailPage": {
     "backToList": "Back to Fields List",

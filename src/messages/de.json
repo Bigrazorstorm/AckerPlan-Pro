@@ -69,7 +69,9 @@
     "importButton": "GIS-Daten importieren",
     "listHeaderName": "Name",
     "listHeaderCrop": "Kultur",
-    "listHeaderArea": "Fläche"
+    "listHeaderArea": "Fläche",
+    "fieldsLayer": "Flächen",
+    "observationsLayer": "Beobachtungen"
   },
   "FieldDetailPage": {
     "backToList": "Zurück zur Flächenübersicht",

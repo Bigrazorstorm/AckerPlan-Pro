@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useSession } from '@/context/session-context';
 import dataService from '@/services';
-import { Field } from '@/services/types';
+import { Field, Observation } from '@/services/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -64,19 +64,24 @@ function FieldsSkeleton() {
 export function FieldsClientContent() {
   const { activeCompany, loading: sessionLoading } = useSession();
   const [fields, setFields] = useState<Field[]>([]);
+  const [observations, setObservations] = useState<Observation[]>([]);
   const [loading, setLoading] = useState(true);
   const t = useTranslations('FieldsPage');
   const { locale } = useParams<{ locale: string }>();
 
   useEffect(() => {
     if (activeCompany) {
-      const fetchFields = async () => {
+      const fetchData = async () => {
         setLoading(true);
-        const data = await dataService.getFields(activeCompany.tenantId, activeCompany.id);
-        setFields(data);
+        const [fieldsData, observationsData] = await Promise.all([
+            dataService.getFields(activeCompany.tenantId, activeCompany.id),
+            dataService.getObservations(activeCompany.tenantId, activeCompany.id)
+        ]);
+        setFields(fieldsData);
+        setObservations(observationsData);
         setLoading(false);
       };
-      fetchFields();
+      fetchData();
     }
   }, [activeCompany]);
 
@@ -96,7 +101,7 @@ export function FieldsClientContent() {
         </CardHeader>
         <CardContent>
             <div className="aspect-video w-full overflow-hidden rounded-md border">
-              <FieldsMap fields={fields} />
+              <FieldsMap fields={fields} observations={observations} />
             </div>
         </CardContent>
       </Card>
