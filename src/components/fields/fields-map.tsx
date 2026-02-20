@@ -2,6 +2,7 @@
 
 import { Field, Observation } from '@/services/types';
 import L, { LatLngExpression, latLng, latLngBounds } from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 import { useMemo, useEffect, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 
@@ -9,8 +10,8 @@ import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
 import markerIcon from 'leaflet/dist/images/marker-icon.png';
 import markerShadow from 'leaflet/dist/images/marker-shadow.png';
 
-// This setup is moved outside the component to run only once to avoid side-effects.
-// It configures the default icon for all Leaflet markers.
+// This setup configures the default icon for all Leaflet markers.
+// It's a workaround for a common issue with bundlers like Webpack/Turbopack.
 // @ts-ignore
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -24,6 +25,16 @@ interface FieldsMapProps {
     fields: Field[];
     observations: Observation[];
 }
+
+// This is the correct, robust way to solve this.
+// By directly managing the map instance with useEffect, we avoid React's Strict Mode re-rendering issues
+// that plague react-leaflet's <MapContainer>.
+
+// 1. We create a reference for the map instance and the container div.
+// 2. We use two separate useEffect hooks:
+//    - The first one runs ONLY ONCE to initialize the map and its cleanup function.
+//    - The second one runs whenever data changes, to update the layers on the map.
+// This separation of concerns is key to a stable implementation.
 
 export function FieldsMap({ fields, observations }: FieldsMapProps) {
     const t = useTranslations('FieldsPage');
@@ -52,12 +63,18 @@ export function FieldsMap({ fields, observations }: FieldsMapProps) {
             }).addTo(map);
             
             // Create layer groups and store them in refs
-            fieldLayerRef.current = L.featureGroup().addTo(map);
-            observationLayerRef.current = L.featureGroup().addTo(map);
+            const fieldLayer = L.featureGroup();
+            const observationLayer = L.featureGroup();
+            
+            fieldLayerRef.current = fieldLayer;
+            observationLayerRef.current = observationLayer;
+
+            fieldLayer.addTo(map);
+            observationLayer.addTo(map);
             
             L.control.layers(undefined, {
-                [t('fieldsLayer')]: fieldLayerRef.current,
-                [t('observationsLayer')]: observationLayerRef.current
+                [t('fieldsLayer')]: fieldLayer,
+                [t('observationsLayer')]: observationLayer
             }).addTo(map);
         }
 
@@ -119,5 +136,6 @@ export function FieldsMap({ fields, observations }: FieldsMapProps) {
 
     }, [fieldsWithGeometry, observationsWithLocation]); // This effect depends only on the memoized data
 
+    // 3. We render a simple div that Leaflet will take control of.
     return <div ref={mapContainerRef} style={mapStyle} />;
 }

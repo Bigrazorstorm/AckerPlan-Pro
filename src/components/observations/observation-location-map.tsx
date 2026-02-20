@@ -1,13 +1,15 @@
 'use client';
 
 import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 import { useMemo, useEffect, useRef } from 'react';
 
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
 import markerIcon from 'leaflet/dist/images/marker-icon.png';
 import markerShadow from 'leaflet/dist/images/marker-shadow.png';
 
-// Fix for default marker icon, run only once
+// This setup configures the default icon for all Leaflet markers.
+// It's a workaround for a common issue with bundlers like Webpack/Turbopack.
 // @ts-ignore
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -15,6 +17,7 @@ L.Icon.Default.mergeOptions({
   iconRetinaUrl: markerIcon2x.src,
   shadowUrl: markerShadow.src,
 });
+
 
 interface ObservationLocationMapProps {
     latitude: number;
@@ -44,10 +47,12 @@ export function ObservationLocationMap({ latitude, longitude }: ObservationLocat
                 attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             }).addTo(map);
 
-            markerRef.current = L.marker([latitude, longitude])
+            const marker = L.marker([latitude, longitude])
               .bindTooltip('Beobachtungsstandort')
               .addTo(map)
               .openTooltip();
+            
+            markerRef.current = marker;
         }
 
         // Cleanup function for when the component unmounts
@@ -65,7 +70,7 @@ export function ObservationLocationMap({ latitude, longitude }: ObservationLocat
     useEffect(() => {
         if (mapInstanceRef.current && markerRef.current) {
             const newLatLng = L.latLng(latitude, longitude);
-            mapInstanceRef.current.setView(newLatLng);
+            mapInstanceRef.current.setView(newLatLng, 13);
             markerRef.current.setLatLng(newLatLng);
         }
     }, [latitude, longitude]);
