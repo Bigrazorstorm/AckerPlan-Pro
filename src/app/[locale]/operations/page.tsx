@@ -1,7 +1,8 @@
 import { OperationsClientContent } from "@/components/operations/operations-client-content";
-import { getTranslations } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 
-export default async function OperationsPage() {
+export default async function OperationsPage({params: {locale}}: {params: {locale: string}}) {
+  setRequestLocale(locale);
   const t = await getTranslations('OperationsPage');
 
   return (

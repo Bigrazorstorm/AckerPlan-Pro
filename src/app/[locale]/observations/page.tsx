@@ -1,8 +1,9 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Siren } from 'lucide-react';
-import { getTranslations } from 'next-intl/server';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 
-export default async function ObservationsPage() {
+export default async function ObservationsPage({params: {locale}}: {params: {locale: string}}) {
+  setRequestLocale(locale);
   const t = await getTranslations('ObservationsPage');
   return (
     <Card>
