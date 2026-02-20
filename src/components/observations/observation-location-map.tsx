@@ -1,14 +1,13 @@
 'use client';
 
-import { MapContainer, TileLayer, Marker, Tooltip } from 'react-leaflet';
-import * as L from 'leaflet';
-import { useMemo, useEffect, useState } from 'react';
+import L from 'leaflet';
+import { useMemo, useEffect, useRef } from 'react';
 
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
 import markerIcon from 'leaflet/dist/images/marker-icon.png';
 import markerShadow from 'leaflet/dist/images/marker-shadow.png';
 
-// Fix for default marker icon
+// Fix for default marker icon, run only once
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconUrl: markerIcon.src,
@@ -22,31 +21,40 @@ interface ObservationLocationMapProps {
 }
 
 export function ObservationLocationMap({ latitude, longitude }: ObservationLocationMapProps) {
-    const [isMounted, setIsMounted] = useState(false);
+    const mapContainerRef = useRef<HTMLDivElement>(null);
+    const mapInstanceRef = useRef<L.Map | null>(null);
 
-    useEffect(() => {
-      setIsMounted(true);
-    }, []);
-
-    const position: L.LatLngExpression = [latitude, longitude];
-    
     const mapStyle = useMemo(() => ({ height: '100%', width: '100%', borderRadius: 'inherit', zIndex: 0 }), []);
     
-    if (!isMounted) {
-      return null;
-    }
+    useEffect(() => {
+        if (mapContainerRef.current && !mapInstanceRef.current) {
+            const map = L.map(mapContainerRef.current, {
+                center: [latitude, longitude],
+                zoom: 13,
+                zoomControl: false,
+                scrollWheelZoom: false,
+                dragging: false,
+            });
+            mapInstanceRef.current = map;
 
-    return (
-        <MapContainer center={position} zoom={13} style={mapStyle} zoomControl={false} scrollWheelZoom={false} dragging={false}>
-            <TileLayer
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            />
-            <Marker position={position}>
-                <Tooltip>
-                    Beobachtungsstandort
-                </Tooltip>
-            </Marker>
-        </MapContainer>
-    );
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; &lt;a href="https://www.openstreetmap.org/copyright"&gt;OpenStreetMap&lt;/a&gt; contributors'
+            }).addTo(map);
+
+            L.marker([latitude, longitude])
+              .bindTooltip('Beobachtungsstandort')
+              .addTo(map)
+              .openTooltip();
+        }
+
+        // Cleanup function for React StrictMode
+        return () => {
+            if (mapInstanceRef.current) {
+                mapInstanceRef.current.remove();
+                mapInstanceRef.current = null;
+            }
+        };
+    }, [latitude, longitude]); // Re-run if coordinates change
+
+    return &lt;div ref={mapContainerRef} style={mapStyle} /&gt;;
 }

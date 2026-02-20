@@ -1,18 +1,15 @@
 'use client';
 
-import { MapContainer, TileLayer, Polygon, Tooltip, FeatureGroup, LayersControl, Marker, useMap } from 'react-leaflet';
 import { Field, Observation } from '@/services/types';
 import L, { LatLngExpression, latLng, latLngBounds } from 'leaflet';
-import { useMemo, useEffect, useState } from 'react';
+import { useMemo, useEffect, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
 import markerIcon from 'leaflet/dist/images/marker-icon.png';
 import markerShadow from 'leaflet/dist/images/marker-shadow.png';
 
-const DEFAULT_CENTER: L.LatLngTuple = [52.505, 13.37];
-
-// Fix for default marker icon
+// This setup is moved outside the component to run only once.
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconUrl: markerIcon.src,
@@ -21,16 +18,6 @@ L.Icon.Default.mergeOptions({
 });
 
 
-function ChangeView({ bounds }: { bounds: L.LatLngBounds | null }) {
-    const map = useMap();
-    useEffect(() => {
-        if (bounds) {
-            map.fitBounds(bounds);
-        }
-    }, [bounds, map]);
-    return null;
-}
-
 interface FieldsMapProps {
     fields: Field[];
     observations: Observation[];
@@ -38,70 +25,78 @@ interface FieldsMapProps {
 
 export function FieldsMap({ fields, observations }: FieldsMapProps) {
     const t = useTranslations('FieldsPage');
-    const [isMounted, setIsMounted] = useState(false);
-
-    useEffect(() => {
-      setIsMounted(true);
-    }, []);
+    const mapContainerRef = useRef<HTMLDivElement>(null);
+    const mapInstanceRef = useRef<L.Map | null>(null);
 
     const mapStyle = useMemo(() => ({ height: '100%', width: '100%', borderRadius: 'inherit', zIndex: 0 }), []);
 
     const fieldsWithGeometry = useMemo(() => fields.filter(f => f.geometry && f.geometry.length > 0), [fields]);
     const observationsWithLocation = useMemo(() => observations.filter(o => o.latitude && o.longitude), [observations]);
 
-    const hasData = fieldsWithGeometry.length > 0 || observationsWithLocation.length > 0;
+    useEffect(() => {
+        // This effect hook handles the entire lifecycle of the Leaflet map.
+        if (mapContainerRef.current && !mapInstanceRef.current) {
+            // 1. Initialize the map ONLY if it hasn't been created yet.
+            const map = L.map(mapContainerRef.current, {
+                center: [52.505, 13.37],
+                zoom: 10,
+                scrollWheelZoom: true,
+            });
+            mapInstanceRef.current = map;
 
-    const bounds = useMemo(() => {
-        if (!hasData) return null;
-        
-        const fieldPoints = fieldsWithGeometry.flatMap(f => f.geometry!.map(p => latLng(p[0], p[1])));
-        const observationPoints = observationsWithLocation.map(o => latLng(o.latitude!, o.longitude!));
-        const allPoints = [...fieldPoints, ...observationPoints];
-        
-        return allPoints.length > 0 ? latLngBounds(allPoints).pad(0.1) : null;
-    }, [hasData, fieldsWithGeometry, observationsWithLocation]);
-
-    if (!isMounted) {
-        return null;
-    }
-
-    return (
-        <MapContainer center={DEFAULT_CENTER} zoom={10} scrollWheelZoom={true} style={mapStyle}>
-            <ChangeView bounds={bounds} />
-            <TileLayer
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            />
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
             
-            <LayersControl position="topright">
-                <LayersControl.Overlay checked name={t('fieldsLayer')}>
-                    <FeatureGroup>
-                        {fieldsWithGeometry.map((field) => {
-                            const geometry = field.geometry as LatLngExpression[];
-                            return (
-                                <Polygon key={field.id} positions={geometry} pathOptions={{ color: 'hsl(var(--primary))' }}>
-                                    <Tooltip>
-                                        <strong>{field.name}</strong><br/>
-                                        {field.crop} - {field.area} ha
-                                    </Tooltip>
-                                </Polygon>
-                            );
-                        })}
-                    </FeatureGroup>
-                </LayersControl.Overlay>
-                <LayersControl.Overlay checked name={t('observationsLayer')}>
-                     <FeatureGroup>
-                        {observationsWithLocation.map((obs) => (
-                           <Marker key={obs.id} position={[obs.latitude!, obs.longitude!]}>
-                               <Tooltip>
-                                   <strong>{obs.title}</strong><br/>
-                                   {obs.field} - {new Date(obs.date).toLocaleDateString()}
-                               </Tooltip>
-                           </Marker>
-                        ))}
-                     </FeatureGroup>
-                </LayersControl.Overlay>
-            </LayersControl>
-        </MapContainer>
-    );
+            const fieldLayer = L.featureGroup();
+            fieldsWithGeometry.forEach(field => {
+                const geometry = field.geometry as LatLngExpression[];
+                L.polygon(geometry, { color: 'hsl(var(--primary))' })
+                    .bindTooltip(`&lt;strong&gt;${field.name}&lt;/strong&gt;&lt;br/&gt;${field.crop} - ${field.area} ha`)
+                    .addTo(fieldLayer);
+            });
+
+            const observationLayer = L.featureGroup();
+            observationsWithLocation.forEach(obs => {
+                L.marker([obs.latitude!, obs.longitude!])
+                    .bindTooltip(`&lt;strong&gt;${obs.title}&lt;/strong&gt;&lt;br/&gt;${obs.field} - ${new Date(obs.date).toLocaleDateString()}`)
+                    .addTo(observationLayer);
+            });
+
+            const layersControl = L.control.layers(undefined, {
+                [t('fieldsLayer')]: fieldLayer,
+                [t('observationsLayer')]: observationLayer
+            }).addTo(map);
+
+            fieldLayer.addTo(map);
+            observationLayer.addTo(map);
+
+            const bounds = latLngBounds([]);
+            if (fieldsWithGeometry.length > 0) {
+                 fieldsWithGeometry.forEach(f => {
+                    bounds.extend(latLngBounds(f.geometry as LatLngExpression[]));
+                 });
+            }
+             if (observationsWithLocation.length > 0) {
+                observationsWithLocation.forEach(o => {
+                    bounds.extend(latLng(o.latitude!, o.longitude!));
+                });
+            }
+
+            if(bounds.isValid()){
+                map.fitBounds(bounds.pad(0.1));
+            }
+        }
+
+        // 2. The cleanup function is crucial for React 18 Strict Mode.
+        return () => {
+            if (mapInstanceRef.current) {
+                mapInstanceRef.current.remove();
+                mapInstanceRef.current = null;
+            }
+        };
+    }, [fields, observations, t]); // Rerun effect if data changes
+
+    // 3. We render a simple div that Leaflet will take control of.
+    return &lt;div ref={mapContainerRef} style={mapStyle} /&gt;;
 }
