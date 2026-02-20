@@ -26,6 +26,8 @@ export interface Operation {
       name: string;
   };
   fuelConsumed?: number; // in liters
+  yieldAmount?: number; // in tons
+  revenue?: number; // in EUR
 };
 
 // Input type for adding a new operation
@@ -36,6 +38,8 @@ export interface AddOperationInput {
   status: "Completed" | "In Progress";
   laborHours: number;
   machineId: string;
+  yieldAmount?: number;
+  revenue?: number;
 }
 
 // Represents a Maintenance Event for a machine.

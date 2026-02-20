@@ -116,7 +116,7 @@ const machinery: Machinery[] = [
 ];
 
 const operations: Operation[] = [
-  { id: '1', tenantId: 'tenant-123', companyId: 'company-456', type: "Harvesting", field: "Große Wiese", date: "2024-07-22T10:00:00Z", status: "Completed", laborHours: 8.5, machine: { id: 'M002', name: 'Claas Lexion 8900' }, fuelConsumed: 722.5 },
+  { id: '1', tenantId: 'tenant-123', companyId: 'company-456', type: "Harvesting", field: "Große Wiese", date: "2024-07-22T10:00:00Z", status: "Completed", laborHours: 8.5, machine: { id: 'M002', name: 'Claas Lexion 8900' }, fuelConsumed: 722.5, yieldAmount: 176, revenue: 38720 },
   { id: '2', tenantId: 'tenant-123', companyId: 'company-456', type: "Fertilizing", field: "Südhang", date: "2024-07-21T10:00:00Z", status: "Completed", laborHours: 4, machine: { id: 'M003', name: 'Fendt 942 Vario' }, fuelConsumed: 168.0 },
   { id: '3', tenantId: 'tenant-123', companyId: 'company-456', type: "PestControl", field: "Acker-Nord 1", date: "2024-07-20T10:00:00Z", status: "Completed", laborHours: 5.5, machine: { id: 'M001', name: 'John Deere 8R 370' }, fuelConsumed: 195.2 },
   { id: '4', tenantId: 'tenant-123', companyId: 'company-456', type: "Seeding", field: "An der B2", date: "2024-07-17T10:00:00Z", status: "In Progress", laborHours: 12, machine: { id: 'M005', name: 'Horsch Maestro 12.50 SW' }, fuelConsumed: 144.0 },
@@ -302,13 +302,18 @@ export class MockDataService implements DataService {
               name: machine.name
           },
           fuelConsumed: parseFloat(fuelConsumedPerField.toFixed(1)),
+          yieldAmount: operationData.yieldAmount ? parseFloat((operationData.yieldAmount / numFields).toFixed(2)) : undefined,
+          revenue: operationData.revenue ? parseFloat((operationData.revenue / numFields).toFixed(2)) : undefined,
         };
         createdOps.push(newOperation);
     }
     
     operations.unshift(...createdOps);
     const fieldsString = operationData.fields.join(', ');
-    const logDetails = `Maßnahme "${operationData.type}" auf Fläche(n) "${fieldsString}" erstellt (Gesamtarbeitszeit: ${operationData.laborHours}h).`;
+    let logDetails = `Maßnahme "${operationData.type}" auf Fläche(n) "${fieldsString}" erstellt (Gesamtarbeitszeit: ${operationData.laborHours}h).`;
+    if (operationData.type === 'Harvesting' && operationData.yieldAmount) {
+      logDetails += ` Gesamtertrag: ${operationData.yieldAmount}t.`
+    }
     logAuditEvent(tenantId, companyId, 'operation.create', logDetails);
     return Promise.resolve(createdOps);
   }

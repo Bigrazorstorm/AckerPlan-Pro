@@ -15,7 +15,7 @@ import { useParams } from 'next/navigation'
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger, DropdownMenuCheckboxItem } from "@/components/ui/dropdown-menu"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuCheckboxItem } from "@/components/ui/dropdown-menu"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { MoreHorizontal, PlusCircle, Calendar as CalendarIcon, ChevronsUpDown } from "lucide-react"
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
@@ -55,6 +55,7 @@ function AddOperationForm({ closeSheet, tenantId, companyId, fields, machinery }
   const tOperationTypes = useTranslations('OperationTypes');
   const [date, setDate] = useState<Date>()
   const [selectedFields, setSelectedFields] = useState<string[]>([]);
+  const [operationType, setOperationType] = useState<string>('');
   const { locale } = useParams<{ locale: string }>();
 
   useEffect(() => {
@@ -84,7 +85,7 @@ function AddOperationForm({ closeSheet, tenantId, companyId, fields, machinery }
 
       <div className="space-y-2">
         <Label htmlFor="type">{t('typeLabel')}</Label>
-        <Select name="type" required>
+        <Select name="type" required onValueChange={setOperationType}>
           <SelectTrigger>
             <SelectValue placeholder={t('typePlaceholder')} />
           </SelectTrigger>
@@ -147,6 +148,24 @@ function AddOperationForm({ closeSheet, tenantId, companyId, fields, machinery }
             {state.errors?.machineId && <p className="text-sm text-destructive">{state.errors.machineId.join(', ')}</p>}
         </div>
        </div>
+
+      {operationType === 'Harvesting' && (
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="yieldAmount">{t('yieldLabel')}</Label>
+            <Input id="yieldAmount" name="yieldAmount" type="number" step="0.01" placeholder={t('yieldPlaceholder')} />
+            {state.errors?.yieldAmount && <p className="text-sm text-destructive">{state.errors.yieldAmount.join(', ')}</p>}
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="revenue">{t('revenueLabel')}</Label>
+            <div className="relative">
+                <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-muted-foreground text-sm">€</span>
+                <Input id="revenue" name="revenue" type="number" step="0.01" placeholder={t('revenuePlaceholder')} className="pl-7"/>
+            </div>
+            {state.errors?.revenue && <p className="text-sm text-destructive">{state.errors.revenue.join(', ')}</p>}
+          </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
@@ -247,6 +266,7 @@ export function OperationsClientContent() {
                              <TableHead><Skeleton className="h-4 w-24" /></TableHead>
                             <TableHead><Skeleton className="h-4 w-16" /></TableHead>
                             <TableHead><Skeleton className="h-4 w-16" /></TableHead>
+                             <TableHead><Skeleton className="h-4 w-16" /></TableHead>
                             <TableHead><Skeleton className="h-4 w-24" /></TableHead>
                             <TableHead><span className="sr-only">{t('actions')}</span></TableHead>
                         </TableRow>
@@ -258,6 +278,7 @@ export function OperationsClientContent() {
                                 <TableCell><Skeleton className="h-5 w-24" /></TableCell>
                                 <TableCell><Skeleton className="h-5 w-24" /></TableCell>
                                 <TableCell><Skeleton className="h-5 w-20" /></TableCell>
+                                <TableCell><Skeleton className="h-5 w-16" /></TableCell>
                                 <TableCell><Skeleton className="h-5 w-16" /></TableCell>
                                 <TableCell><Skeleton className="h-5 w-16" /></TableCell>
                                 <TableCell><Skeleton className="h-5 w-24" /></TableCell>
@@ -302,6 +323,7 @@ export function OperationsClientContent() {
               <TableHead>{t('tableHeaderDate')}</TableHead>
               <TableHead className="text-right">{t('tableHeaderLaborHours')}</TableHead>
               <TableHead className="text-right">{t('tableHeaderFuel')}</TableHead>
+              <TableHead className="text-right">{t('tableHeaderYield')}</TableHead>
               <TableHead>{t('tableHeaderStatus')}</TableHead>
               <TableHead><span className="sr-only">{t('actions')}</span></TableHead>
             </TableRow>
@@ -315,6 +337,7 @@ export function OperationsClientContent() {
                 <TableCell>{op.date}</TableCell>
                 <TableCell className="text-right">{op.laborHours.toLocaleString(locale)} h</TableCell>
                 <TableCell className="text-right">{op.fuelConsumed?.toLocaleString(locale)} l</TableCell>
+                <TableCell className="text-right">{op.yieldAmount ? `${op.yieldAmount.toLocaleString(locale)} t` : '-'}</TableCell>
                 <TableCell>
                   <Badge variant={op.status === 'Completed' ? 'default' : 'secondary'} className={op.status === 'Completed' ? 'bg-green-100 text-green-800' : ''}>{op.status}</Badge>
                 </TableCell>

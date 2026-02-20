@@ -11,6 +11,14 @@ const AddOperationSchema = z.object({
   date: z.string().min(1, { message: 'Date is required' }),
   laborHours: z.coerce.number().min(0, { message: 'Labor hours must be a positive number' }),
   status: z.enum(['Completed', 'In Progress']),
+  yieldAmount: z.preprocess(
+    (val) => (val === '' ? undefined : val),
+    z.coerce.number().positive({ message: 'Yield must be a positive number' }).optional()
+  ),
+  revenue: z.preprocess(
+    (val) => (val === '' ? undefined : val),
+    z.coerce.number().positive({ message: 'Revenue must be a positive number' }).optional()
+  ),
   tenantId: z.string().min(1, { message: 'Tenant ID is required' }),
   companyId: z.string().min(1, { message: 'Company ID is required' }),
 })
@@ -23,6 +31,8 @@ export async function addOperation(prevState: any, formData: FormData) {
     date: formData.get('date'),
     laborHours: formData.get('laborHours'),
     status: formData.get('status'),
+    yieldAmount: formData.get('yieldAmount'),
+    revenue: formData.get('revenue'),
     tenantId: formData.get('tenantId'),
     companyId: formData.get('companyId'),
   })
