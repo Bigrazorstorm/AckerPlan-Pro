@@ -1,7 +1,7 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { useFormState, useFormStatus } from 'react-dom'
+import { useEffect, useState, useActionState } from 'react'
+import { useFormStatus } from 'react-dom'
 import { useTranslations } from "next-intl"
 import { useToast } from '@/hooks/use-toast'
 import { Machinery } from '@/services/types'
@@ -47,7 +47,7 @@ function SubmitButton() {
 }
 
 function AddMachineForm({ closeSheet, tenantId, companyId }: { closeSheet: () => void; tenantId: string; companyId: string; }) {
-  const [state, formAction] = useFormState(addMachine, initialState)
+  const [state, formAction] = useActionState(addMachine, initialState)
   const { toast } = useToast()
   const t = useTranslations('MachineryPage.addMachineForm');
   const tMachineTypes = useTranslations('MachineryTypes');

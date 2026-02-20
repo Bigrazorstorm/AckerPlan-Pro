@@ -1,7 +1,7 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { useFormState, useFormStatus } from 'react-dom'
+import { useEffect, useState, useActionState } from 'react'
+import { useFormStatus } from 'react-dom'
 import { useTranslations } from "next-intl"
 import { useToast } from '@/hooks/use-toast'
 import { Observation, Field } from '@/services/types'
@@ -50,7 +50,7 @@ function SubmitButton() {
 }
 
 function AddObservationForm({ closeSheet, tenantId, companyId, fields }: { closeSheet: () => void; tenantId: string; companyId: string; fields: Field[] }) {
-  const [state, formAction] = useFormState(addObservation, initialState)
+  const [state, formAction] = useActionState(addObservation, initialState)
   const { toast } = useToast()
   const t = useTranslations('ObservationsPage.addObservationForm');
   const [date, setDate] = useState<Date>()

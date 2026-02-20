@@ -1,7 +1,7 @@
 'use client'
 
-import { useEffect, useState, useMemo } from 'react'
-import { useFormState, useFormStatus } from 'react-dom'
+import { useEffect, useState, useMemo, useActionState } from 'react'
+import { useFormStatus } from 'react-dom'
 import { useTranslations } from "next-intl"
 import { useToast } from '@/hooks/use-toast'
 import { Operation, Field, Machinery } from '@/services/types'
@@ -49,7 +49,7 @@ function SubmitButton() {
 }
 
 function AddOperationForm({ closeSheet, tenantId, companyId, fields, machinery }: { closeSheet: () => void; tenantId: string; companyId: string; fields: Field[], machinery: Machinery[] }) {
-  const [state, formAction] = useFormState(addOperation, initialState)
+  const [state, formAction] = useActionState(addOperation, initialState)
   const { toast } = useToast()
   const t = useTranslations('OperationsPage.addOperationForm');
   const tOperationTypes = useTranslations('OperationTypes');

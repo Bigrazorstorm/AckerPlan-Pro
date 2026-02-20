@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useFormState, useFormStatus } from 'react-dom';
+import { useState, useEffect, useActionState } from 'react';
+import { useFormStatus } from 'react-dom';
 import { useParams } from 'next/navigation';
 import { useSession } from '@/context/session-context';
 import dataService from '@/services';
@@ -53,7 +53,7 @@ function EditMachineForm({
   closeSheet: () => void;
   machine: Machinery;
 }) {
-  const [state, formAction] = useFormState(updateMachine, initialState);
+  const [state, formAction] = useActionState(updateMachine, initialState);
   const { toast } = useToast();
   const t = useTranslations('MachineDetailPage.editMachineForm');
   const tMachineTypes = useTranslations('MachineryTypes');
@@ -135,7 +135,7 @@ function AddMaintenanceForm({
   machineId: string;
   locale: string;
 }) {
-  const [state, formAction] = useFormState(addMaintenanceEvent, initialState);
+  const [state, formAction] = useActionState(addMaintenanceEvent, initialState);
   const { toast } = useToast();
   const t = useTranslations('MachineDetailPage.addMaintenanceForm');
   const [date, setDate] = useState<Date>();
@@ -221,7 +221,7 @@ function AddRepairForm({
   machineId: string;
   locale: string;
 }) {
-  const [state, formAction] = useFormState(addRepairEvent, initialState);
+  const [state, formAction] = useActionState(addRepairEvent, initialState);
   const { toast } = useToast();
   const t = useTranslations('MachineDetailPage.addRepairForm');
   const [date, setDate] = useState<Date>();
