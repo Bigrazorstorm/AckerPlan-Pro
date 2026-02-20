@@ -9,8 +9,8 @@ import { LoginForm } from "@/components/auth/login-form";
 import { getTranslations } from "next-intl/server";
 import { Leaf } from "lucide-react";
 
-export default async function LoginPage() {
-  const t = await getTranslations("LoginPage");
+export default async function LoginPage({params: {locale}}: {params: {locale: string}}) {
+  const t = await getTranslations({locale, namespace: "LoginPage"});
   return (
     <div className="flex items-center justify-center min-h-screen bg-muted/50">
       <div className="w-full max-w-sm">

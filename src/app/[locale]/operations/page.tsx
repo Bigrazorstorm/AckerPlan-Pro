@@ -1,8 +1,8 @@
 import { OperationsClientContent } from "@/components/operations/operations-client-content";
 import { getTranslations } from "next-intl/server";
 
-export default async function OperationsPage() {
-  const t = await getTranslations('OperationsPage');
+export default async function OperationsPage({params: {locale}}: {params: {locale: string}}) {
+  const t = await getTranslations({locale, namespace: 'OperationsPage'});
 
   return (
      <div className="space-y-6">
