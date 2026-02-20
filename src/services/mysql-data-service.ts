@@ -139,6 +139,11 @@ export class MySqlDataService implements DataService {
     return Promise.resolve([]);
   }
 
+  async deleteOperation(tenantId: string, companyId: string, operationId: string): Promise<void> {
+    this.log('deleteOperation', { tenantId, companyId, operationId });
+    return Promise.resolve();
+  }
+
   async getFields(tenantId: string, companyId: string): Promise<Field[]> {
     this.log('getFields', { tenantId, companyId });
     return Promise.resolve([]);

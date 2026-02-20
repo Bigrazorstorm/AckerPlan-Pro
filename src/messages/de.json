@@ -227,6 +227,12 @@
     "actions": "Aktionen",
     "edit": "Bearbeiten",
     "delete": "Löschen",
+    "deleteConfirmationTitle": "Maßnahme wirklich löschen?",
+    "deleteConfirmationDescription": "Diese Aktion kann nicht rückgängig gemacht werden. Dadurch wird die Maßnahme endgültig aus den Aufzeichnungen entfernt.",
+    "deleteConfirmationCancel": "Abbrechen",
+    "deleteConfirmationConfirm": "Löschen",
+    "deleteSuccessToastTitle": "Erfolg",
+    "deleteErrorToastTitle": "Fehler",
     "addOperationForm": {
       "typeLabel": "Maßnahmentyp",
       "typePlaceholder": "Typ auswählen",

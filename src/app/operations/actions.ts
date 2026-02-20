@@ -56,3 +56,17 @@ export async function addOperation(prevState: any, formData: FormData) {
     }
   }
 }
+
+export async function deleteOperation(operationId: string, tenantId: string, companyId: string) {
+  if (!operationId || !tenantId || !companyId) {
+    return { message: 'Failed to delete operation: Missing required IDs.' };
+  }
+  try {
+    await dataService.deleteOperation(tenantId, companyId, operationId);
+    revalidatePath('/operations');
+    return { message: 'Operation deleted successfully.' };
+  } catch (e) {
+    const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
+    return { message: `Failed to delete operation: ${errorMessage}` };
+  }
+}

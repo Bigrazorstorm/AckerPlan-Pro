@@ -347,6 +347,25 @@ export class MockDataService implements DataService {
     return Promise.resolve(createdOps);
   }
   
+  async deleteOperation(tenantId: string, companyId: string, operationId: string): Promise<void> {
+    console.log(`Deleting Operation ${operationId} for tenant ${tenantId} and company ${companyId}.`);
+    const initialLength = operations.length;
+    const operationToDelete = operations.find(o => o.id === operationId && o.tenantId === tenantId && o.companyId === companyId);
+    
+    if (!operationToDelete) {
+        return Promise.reject(new Error('Operation not found or not authorized to delete.'));
+    }
+
+    operations = operations.filter(o => o.id !== operationId);
+    
+    if (operations.length < initialLength) {
+        logAuditEvent(tenantId, companyId, 'operation.delete', `Maßnahme "${operationToDelete.type}" auf Fläche "${operationToDelete.field}" vom ${new Date(operationToDelete.date).toLocaleDateString('de-DE')} wurde gelöscht.`);
+        return Promise.resolve();
+    } else {
+        return Promise.reject(new Error('Deletion failed unexpectedly.'));
+    }
+  }
+
   async addMaintenanceEvent(tenantId: string, companyId: string, eventData: AddMaintenanceEventInput): Promise<MaintenanceEvent> {
     console.log(`Adding Maintenance Event for tenant ${tenantId} and company ${companyId}.`);
     const machine = machinery.find(m => m.id === eventData.machineId);

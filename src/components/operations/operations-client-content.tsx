@@ -5,7 +5,7 @@ import { useFormStatus } from 'react-dom'
 import { useTranslations } from "next-intl"
 import { useToast } from '@/hooks/use-toast'
 import { Operation, Field, Machinery } from '@/services/types'
-import { addOperation } from '@/app/operations/actions'
+import { addOperation, deleteOperation } from '@/app/operations/actions'
 import { useSession } from '@/context/session-context'
 import dataService from '@/services'
 import { format } from "date-fns"
@@ -32,6 +32,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Calendar } from '@/components/ui/calendar'
 import { Skeleton } from '../ui/skeleton'
 import { cn } from '@/lib/utils'
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
 
 const initialState = {
   message: '',
@@ -297,13 +298,17 @@ export function OperationsClientContent() {
   const t = useTranslations('OperationsPage');
   const tOperationTypes = useTranslations('OperationTypes');
   const tOperationStatuses = useTranslations('OperationStatuses');
+  const { toast } = useToast();
   const [isSheetOpen, setSheetOpen] = useState(false);
-  const { activeCompany, loading: sessionLoading } = useSession();
+  const { activeCompany, loading: sessionLoading, activeRole } = useSession();
   const [operations, setOperations] = useState<Operation[]>([]);
   const [fields, setFields] = useState<Field[]>([]);
   const [machinery, setMachinery] = useState<Machinery[]>([]);
   const [loading, setLoading] = useState(true);
   const { locale } = useParams<{ locale: string }>();
+  const [operationToDelete, setOperationToDelete] = useState<Operation | null>(null);
+
+  const canManageOperations = activeRole === 'Firmen Admin' || activeRole === 'Tenant Admin';
 
   useEffect(() => {
     if (activeCompany) {
@@ -323,6 +328,25 @@ export function OperationsClientContent() {
     }
   }, [activeCompany]);
 
+  const handleDelete = async () => {
+    if (operationToDelete && activeCompany) {
+      const result = await deleteOperation(operationToDelete.id, activeCompany.tenantId, activeCompany.id);
+      if (result.message.includes('successfully')) {
+        toast({
+          title: t('deleteSuccessToastTitle'),
+          description: result.message,
+        });
+      } else {
+        toast({
+          variant: 'destructive',
+          title: t('deleteErrorToastTitle'),
+          description: result.message,
+        });
+      }
+      setOperationToDelete(null); // Close dialog
+    }
+  };
+
   const dateFormatter = (dateString: string) => {
     try {
         return format(new Date(dateString), 'PP', { locale: locale === 'de' ? de : enUS });
@@ -336,138 +360,161 @@ export function OperationsClientContent() {
   }
 
   return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between">
-        <div/>
-        <Sheet open={isSheetOpen} onOpenChange={setSheetOpen}>
-          <SheetTrigger asChild>
-            <Button size="sm" className="gap-1">
-              <PlusCircle className="h-4 w-4" />
-              {t('addOperation')}
-            </Button>
-          </SheetTrigger>
-          <SheetContent>
-            <SheetHeader>
-              <SheetTitle>{t('addOperationSheetTitle')}</SheetTitle>
-            </SheetHeader>
-            <div className="py-4">
-              {activeCompany && <AddOperationForm closeSheet={() => setSheetOpen(false)} tenantId={activeCompany.tenantId} companyId={activeCompany.id} fields={fields} machinery={machinery} />}
-            </div>
-          </SheetContent>
-        </Sheet>
-      </CardHeader>
-      <CardContent>
-        {/* Mobile View */}
-        <div className="md:hidden space-y-4">
-           {operations.map((op) => (
-            <Card key={op.id}>
-              <CardHeader>
-                <div className="flex justify-between items-start">
-                  <div>
-                    <CardTitle className="text-lg">{tOperationTypes(op.type)}</CardTitle>
-                    <CardDescription>{op.field}</CardDescription>
-                  </div>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button aria-haspopup="true" size="icon" variant="ghost">
-                        <MoreHorizontal className="h-4 w-4" />
-                        <span className="sr-only">Toggle menu</span>
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuLabel>{t('actions')}</DropdownMenuLabel>
-                      <DropdownMenuItem>{t('edit')}</DropdownMenuItem>
-                      <DropdownMenuItem className="text-destructive">{t('delete')}</DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-3 text-sm pt-0">
-                <div className="flex justify-between items-center">
-                    <span className="text-muted-foreground">{t('tableHeaderStatus')}</span>
-                    <Badge variant={op.status === 'Completed' ? 'default' : 'secondary'} className={op.status === 'Completed' ? 'bg-green-100 text-green-800' : ''}>{tOperationStatuses(op.status)}</Badge>
-                </div>
-                <div className="flex justify-between">
-                    <span className="text-muted-foreground">{t('tableHeaderDate')}</span>
-                    <span>{dateFormatter(op.date)}</span>
-                </div>
-                {op.machine && (
-                  <div className="flex justify-between">
-                      <span className="text-muted-foreground">{t('tableHeaderMachine')}</span>
-                      <span>{op.machine.name}</span>
-                  </div>
-                )}
-                <div className="flex justify-between">
-                    <span className="text-muted-foreground">{t('tableHeaderLaborHours')}</span>
-                    <span className="font-medium">{op.laborHours.toLocaleString(locale)} h</span>
-                </div>
-                {op.fuelConsumed && (
-                  <div className="flex justify-between">
-                      <span className="text-muted-foreground">{t('tableHeaderFuel')}</span>
-                      <span className="font-medium">{op.fuelConsumed.toLocaleString(locale)} l</span>
-                  </div>
-                )}
-                {op.yieldAmount && (
-                  <div className="flex justify-between">
-                      <span className="text-muted-foreground">{t('tableHeaderYield')}</span>
-                      <span className="font-medium">{op.yieldAmount.toLocaleString(locale)} t</span>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-
-        {/* Desktop View */}
-        <div className="hidden md:block">
-            <Table>
-            <TableHeader>
-                <TableRow>
-                <TableHead>{t('tableHeaderType')}</TableHead>
-                <TableHead>{t('tableHeaderField')}</TableHead>
-                <TableHead>{t('tableHeaderMachine')}</TableHead>
-                <TableHead>{t('tableHeaderDate')}</TableHead>
-                <TableHead className="text-right">{t('tableHeaderLaborHours')}</TableHead>
-                <TableHead className="text-right">{t('tableHeaderFuel')}</TableHead>
-                <TableHead className="text-right">{t('tableHeaderYield')}</TableHead>
-                <TableHead>{t('tableHeaderStatus')}</TableHead>
-                <TableHead><span className="sr-only">{t('actions')}</span></TableHead>
-                </TableRow>
-            </TableHeader>
-            <TableBody>
-                {operations.map((op) => (
-                <TableRow key={op.id}>
-                    <TableCell className="font-medium">{tOperationTypes(op.type)}</TableCell>
-                    <TableCell>{op.field}</TableCell>
-                    <TableCell>{op.machine?.name}</TableCell>
-                    <TableCell>{dateFormatter(op.date)}</TableCell>
-                    <TableCell className="text-right">{op.laborHours.toLocaleString(locale)} h</TableCell>
-                    <TableCell className="text-right">{op.fuelConsumed?.toLocaleString(locale)} l</TableCell>
-                    <TableCell className="text-right">{op.yieldAmount ? `${op.yieldAmount.toLocaleString(locale)} t` : '-'}</TableCell>
-                    <TableCell>
-                      <Badge variant={op.status === 'Completed' ? 'default' : 'secondary'} className={op.status === 'Completed' ? 'bg-green-100 text-green-800' : ''}>{tOperationStatuses(op.status)}</Badge>
-                    </TableCell>
-                    <TableCell>
+    <>
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <div/>
+          <Sheet open={isSheetOpen} onOpenChange={setSheetOpen}>
+            <SheetTrigger asChild>
+              <Button size="sm" className="gap-1">
+                <PlusCircle className="h-4 w-4" />
+                {t('addOperation')}
+              </Button>
+            </SheetTrigger>
+            <SheetContent>
+              <SheetHeader>
+                <SheetTitle>{t('addOperationSheetTitle')}</SheetTitle>
+              </SheetHeader>
+              <div className="py-4">
+                {activeCompany && <AddOperationForm closeSheet={() => setSheetOpen(false)} tenantId={activeCompany.tenantId} companyId={activeCompany.id} fields={fields} machinery={machinery} />}
+              </div>
+            </SheetContent>
+          </Sheet>
+        </CardHeader>
+        <CardContent>
+          {/* Mobile View */}
+          <div className="md:hidden space-y-4">
+            {operations.map((op) => (
+              <Card key={op.id}>
+                <CardHeader>
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <CardTitle className="text-lg">{tOperationTypes(op.type)}</CardTitle>
+                      <CardDescription>{op.field}</CardDescription>
+                    </div>
                     <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
+                      <DropdownMenuTrigger asChild>
                         <Button aria-haspopup="true" size="icon" variant="ghost">
-                            <MoreHorizontal className="h-4 w-4" />
-                            <span className="sr-only">Toggle menu</span>
+                          <MoreHorizontal className="h-4 w-4" />
+                          <span className="sr-only">Toggle menu</span>
                         </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
                         <DropdownMenuLabel>{t('actions')}</DropdownMenuLabel>
                         <DropdownMenuItem>{t('edit')}</DropdownMenuItem>
-                        <DropdownMenuItem className="text-destructive">{t('delete')}</DropdownMenuItem>
-                        </DropdownMenuContent>
+                        {canManageOperations && (
+                          <DropdownMenuItem className="text-destructive" onSelect={() => setOperationToDelete(op)}>{t('delete')}</DropdownMenuItem>
+                        )}
+                      </DropdownMenuContent>
                     </DropdownMenu>
-                    </TableCell>
-                </TableRow>
-                ))}
-            </TableBody>
-            </Table>
-        </div>
-      </CardContent>
-    </Card>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-3 text-sm pt-0">
+                  <div className="flex justify-between items-center">
+                      <span className="text-muted-foreground">{t('tableHeaderStatus')}</span>
+                      <Badge variant={op.status === 'Completed' ? 'default' : 'secondary'} className={op.status === 'Completed' ? 'bg-green-100 text-green-800' : ''}>{tOperationStatuses(op.status)}</Badge>
+                  </div>
+                  <div className="flex justify-between">
+                      <span className="text-muted-foreground">{t('tableHeaderDate')}</span>
+                      <span>{dateFormatter(op.date)}</span>
+                  </div>
+                  {op.machine && (
+                    <div className="flex justify-between">
+                        <span className="text-muted-foreground">{t('tableHeaderMachine')}</span>
+                        <span>{op.machine.name}</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between">
+                      <span className="text-muted-foreground">{t('tableHeaderLaborHours')}</span>
+                      <span className="font-medium">{op.laborHours.toLocaleString(locale)} h</span>
+                  </div>
+                  {op.fuelConsumed && (
+                    <div className="flex justify-between">
+                        <span className="text-muted-foreground">{t('tableHeaderFuel')}</span>
+                        <span className="font-medium">{op.fuelConsumed.toLocaleString(locale)} l</span>
+                    </div>
+                  )}
+                  {op.yieldAmount && (
+                    <div className="flex justify-between">
+                        <span className="text-muted-foreground">{t('tableHeaderYield')}</span>
+                        <span className="font-medium">{op.yieldAmount.toLocaleString(locale)} t</span>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          {/* Desktop View */}
+          <div className="hidden md:block">
+              <Table>
+              <TableHeader>
+                  <TableRow>
+                  <TableHead>{t('tableHeaderType')}</TableHead>
+                  <TableHead>{t('tableHeaderField')}</TableHead>
+                  <TableHead>{t('tableHeaderMachine')}</TableHead>
+                  <TableHead>{t('tableHeaderDate')}</TableHead>
+                  <TableHead className="text-right">{t('tableHeaderLaborHours')}</TableHead>
+                  <TableHead className="text-right">{t('tableHeaderFuel')}</TableHead>
+                  <TableHead className="text-right">{t('tableHeaderYield')}</TableHead>
+                  <TableHead>{t('tableHeaderStatus')}</TableHead>
+                  <TableHead><span className="sr-only">{t('actions')}</span></TableHead>
+                  </TableRow>
+              </TableHeader>
+              <TableBody>
+                  {operations.map((op) => (
+                  <TableRow key={op.id}>
+                      <TableCell className="font-medium">{tOperationTypes(op.type)}</TableCell>
+                      <TableCell>{op.field}</TableCell>
+                      <TableCell>{op.machine?.name}</TableCell>
+                      <TableCell>{dateFormatter(op.date)}</TableCell>
+                      <TableCell className="text-right">{op.laborHours.toLocaleString(locale)} h</TableCell>
+                      <TableCell className="text-right">{op.fuelConsumed?.toLocaleString(locale)} l</TableCell>
+                      <TableCell className="text-right">{op.yieldAmount ? `${op.yieldAmount.toLocaleString(locale)} t` : '-'}</TableCell>
+                      <TableCell>
+                        <Badge variant={op.status === 'Completed' ? 'default' : 'secondary'} className={op.status === 'Completed' ? 'bg-green-100 text-green-800' : ''}>{tOperationStatuses(op.status)}</Badge>
+                      </TableCell>
+                      <TableCell>
+                      <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                          <Button aria-haspopup="true" size="icon" variant="ghost">
+                              <MoreHorizontal className="h-4 w-4" />
+                              <span className="sr-only">Toggle menu</span>
+                          </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                          <DropdownMenuLabel>{t('actions')}</DropdownMenuLabel>
+                          <DropdownMenuItem>{t('edit')}</DropdownMenuItem>
+                          {canManageOperations && (
+                            <>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem className="text-destructive" onSelect={() => setOperationToDelete(op)}>{t('delete')}</DropdownMenuItem>
+                            </>
+                          )}
+                          </DropdownMenuContent>
+                      </DropdownMenu>
+                      </TableCell>
+                  </TableRow>
+                  ))}
+              </TableBody>
+              </Table>
+          </div>
+        </CardContent>
+      </Card>
+      <AlertDialog open={!!operationToDelete} onOpenChange={(open) => !open && setOperationToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('deleteConfirmationTitle')}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t('deleteConfirmationDescription')}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t('deleteConfirmationCancel')}</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-destructive hover:bg-destructive/90">{t('deleteConfirmationConfirm')}</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   )
 }

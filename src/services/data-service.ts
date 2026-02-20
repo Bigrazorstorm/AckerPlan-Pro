@@ -113,6 +113,14 @@ export interface DataService {
   addOperation(tenantId: string, companyId: string, operationData: AddOperationInput): Promise<Operation[]>;
 
   /**
+   * Deletes an operation from the data store.
+   * @param tenantId - The ID of the tenant.
+   * @param companyId - The ID of the company.
+   * @param operationId - The ID of the operation to delete.
+   */
+  deleteOperation(tenantId: string, companyId: string, operationId: string): Promise<void>;
+
+  /**
    * Retrieves fields data for a given company and tenant.
    * @param tenantId - The ID of the tenant.
    * @param companyId - The ID of the company.
