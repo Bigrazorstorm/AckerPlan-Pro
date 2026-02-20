@@ -1,5 +1,5 @@
 import { DataService } from './data-service';
-import { Kpi, ChartDataPoint, Operation, Machinery, Session, Field, MaintenanceEvent } from './types';
+import { Kpi, ChartDataPoint, Operation, Machinery, Session, Field, MaintenanceEvent, AddMaintenanceEventInput, AddRepairEventInput, RepairEvent, AuditLogEvent } from './types';
 
 /**
  * A DataService implementation that connects to a Supabase backend.
@@ -42,6 +42,21 @@ export class SupabaseDataService implements DataService {
     throw new Error('Method not implemented.');
   }
 
+  async addMaintenanceEvent(tenantId: string, companyId: string, eventData: AddMaintenanceEventInput): Promise<MaintenanceEvent> {
+    console.log(`Adding Maintenance Event for tenant ${tenantId} and company ${companyId} to Supabase.`);
+    throw new Error('Method not implemented.');
+  }
+
+  async getRepairHistory(tenantId: string, companyId: string, machineId: string): Promise<RepairEvent[]> {
+    console.log(`Fetching Repair History for machine ${machineId} from Supabase.`);
+    throw new Error('Method not implemented.');
+  }
+
+  async addRepairEvent(tenantId: string, companyId: string, eventData: AddRepairEventInput): Promise<RepairEvent> {
+    console.log(`Adding Repair Event for tenant ${tenantId} and company ${companyId} to Supabase.`);
+    throw new Error('Method not implemented.');
+  }
+
   async addMachinery(tenantId: string, companyId: string, machineData: { name: string; type: string; model: string; }): Promise<Machinery> {
     console.log(`Adding Machinery for tenant ${tenantId} and company ${companyId} to Supabase.`);
     throw new Error('Method not implemented.');
@@ -54,6 +69,11 @@ export class SupabaseDataService implements DataService {
 
   async getFields(tenantId: string, companyId: string): Promise<Field[]> {
     console.log(`Fetching Fields for tenant ${tenantId} and company ${companyId} from Supabase.`);
+    throw new Error('Method not implemented.');
+  }
+
+  async getAuditLog(tenantId: string, companyId: string): Promise<AuditLogEvent[]> {
+    console.log(`Fetching AuditLog for tenant ${tenantId} and company ${companyId} from Supabase.`);
     throw new Error('Method not implemented.');
   }
 }

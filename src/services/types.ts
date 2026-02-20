@@ -42,6 +42,28 @@ export interface AddMaintenanceEventInput {
   cost: number;
 }
 
+// Represents a Repair Event for a machine.
+export interface RepairEvent {
+  id: string; // UUID
+  tenantId: string;
+  companyId: string;
+  machineId: string;
+  date: string; // ISO-8601 date string
+  description: string;
+  cost: number;
+  downtimeHours: number; // Downtime in hours
+  createdAt: string; // ISO-8601 date string
+}
+
+// Input type for adding a new repair event
+export interface AddRepairEventInput {
+  machineId: string;
+  date: string;
+  description: string;
+  cost: number;
+  downtimeHours: number;
+}
+
 // Represents the Machinery entity in the database.
 export interface Machinery {
   id: string; // Should be a UUID

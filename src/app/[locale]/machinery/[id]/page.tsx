@@ -5,7 +5,7 @@ import { useFormState, useFormStatus } from 'react-dom';
 import { useParams } from 'next/navigation';
 import { useSession } from '@/context/session-context';
 import dataService from '@/services';
-import { Machinery, MaintenanceEvent } from '@/services/types';
+import { Machinery, MaintenanceEvent, RepairEvent } from '@/services/types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useTranslations } from 'next-intl';
 import { Badge } from '@/components/ui/badge';
@@ -24,7 +24,9 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Calendar } from '@/components/ui/calendar';
 import { useToast } from '@/hooks/use-toast';
 import { addMaintenanceEvent } from '@/app/machinery/maintenance/actions';
+import { addRepairEvent } from '@/app/machinery/repair/actions';
 import { cn } from '@/lib/utils';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 
 const initialState = {
@@ -32,12 +34,12 @@ const initialState = {
   errors: {},
 };
 
-function SubmitButton() {
+function SubmitButton({tKey = 'submit'}: {tKey?: string}) {
   const { pending } = useFormStatus();
-  const t = useTranslations('MachineDetailPage.addMaintenanceForm');
+  const t = useTranslations();
   return (
     <Button type="submit" aria-disabled={pending}>
-      {pending ? t('submitting') : t('submit')}
+      {pending ? t('General.submitting') : t(tKey)}
     </Button>
   );
 }
@@ -123,7 +125,100 @@ function AddMaintenanceForm({
         {state.errors?.cost && <p className="text-sm text-destructive">{state.errors.cost.join(', ')}</p>}
       </div>
       
-      <SubmitButton />
+      <SubmitButton tKey="MachineDetailPage.addMaintenanceForm.submit"/>
+    </form>
+  );
+}
+
+function AddRepairForm({
+  closeSheet,
+  tenantId,
+  companyId,
+  machineId,
+  locale
+}: {
+  closeSheet: () => void;
+  tenantId: string;
+  companyId: string;
+  machineId: string;
+  locale: string;
+}) {
+  const [state, formAction] = useFormState(addRepairEvent, initialState);
+  const { toast } = useToast();
+  const t = useTranslations('MachineDetailPage.addRepairForm');
+  const [date, setDate] = useState<Date>();
+
+  useEffect(() => {
+    if (state.message && Object.keys(state.errors).length === 0) {
+      toast({
+        title: t('successToastTitle'),
+        description: t('successToastDescription'),
+      });
+      closeSheet();
+    } else if (state.message && Object.keys(state.errors).length > 0) {
+      toast({
+        variant: 'destructive',
+        title: t('errorToastTitle'),
+        description: state.message,
+      });
+    }
+  }, [state, toast, closeSheet, t]);
+
+  return (
+    <form action={formAction} className="space-y-4">
+      <input type="hidden" name="tenantId" value={tenantId} />
+      <input type="hidden" name="companyId" value={companyId} />
+      <input type="hidden" name="machineId" value={machineId} />
+      <input type="hidden" name="date" value={date ? format(date, 'yyyy-MM-dd') : ''} />
+
+      <div className="space-y-2">
+        <Label htmlFor="date">{t('dateLabel')}</Label>
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              variant={'outline'}
+              className={cn('w-full justify-start text-left font-normal', !date && 'text-muted-foreground')}
+            >
+              <CalendarIcon className="mr-2 h-4 w-4" />
+              {date ? format(date, 'PPP', { locale: locale === 'de' ? de : enUS }) : <span>{t('datePlaceholder')}</span>}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0">
+            <Calendar
+              mode="single"
+              selected={date}
+              onSelect={setDate}
+              initialFocus
+              disabled={(d) => d > new Date()}
+            />
+          </PopoverContent>
+        </Popover>
+        {state.errors?.date && <p className="text-sm text-destructive">{state.errors.date.join(', ')}</p>}
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="description">{t('descriptionLabel')}</Label>
+        <Textarea id="description" name="description" required placeholder={t('descriptionPlaceholder')} />
+        {state.errors?.description && <p className="text-sm text-destructive">{state.errors.description.join(', ')}</p>}
+      </div>
+
+       <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="cost">{t('costLabel')}</Label>
+            <div className="relative">
+                <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-muted-foreground text-sm">€</span>
+                <Input id="cost" name="cost" type="number" step="0.01" required placeholder="150.00" className="pl-7"/>
+            </div>
+            {state.errors?.cost && <p className="text-sm text-destructive">{state.errors.cost.join(', ')}</p>}
+          </div>
+            <div className="space-y-2">
+                <Label htmlFor="downtimeHours">{t('downtimeLabel')}</Label>
+                <Input id="downtimeHours" name="downtimeHours" type="number" step="0.1" required placeholder={t('downtimePlaceholder')} />
+                {state.errors?.downtimeHours && <p className="text-sm text-destructive">{state.errors.downtimeHours.join(', ')}</p>}
+            </div>
+       </div>
+      
+      <SubmitButton tKey="MachineDetailPage.addRepairForm.submit"/>
     </form>
   );
 }
@@ -141,7 +236,10 @@ function MachineDetailSkeleton() {
                 <Skeleton className="h-9 w-64 mb-2" />
                 <Skeleton className="h-4 w-96" />
                 </div>
-                <Skeleton className="h-9 w-44" />
+                <div className="flex gap-2">
+                    <Skeleton className="h-9 w-44" />
+                    <Skeleton className="h-9 w-44" />
+                </div>
             </div>
 
             <div className="grid gap-6 md:grid-cols-3">
@@ -161,9 +259,9 @@ function MachineDetailSkeleton() {
                 <Card className="md:col-span-2">
                 <CardHeader>
                     <Skeleton className="h-6 w-1/2" />
-                    <Skeleton className="h-4 w-3/4 mt-1" />
                 </CardHeader>
                 <CardContent>
+                    <Skeleton className="h-10 w-48 mb-4" />
                     <div className="space-y-2">
                         {[...Array(5)].map((_, i) => (
                             <Skeleton key={i} className="h-10 w-full" />
@@ -182,8 +280,10 @@ export default function MachineDetailPage() {
   const { activeCompany, loading: sessionLoading } = useSession();
   const [machine, setMachine] = useState<Machinery | null>(null);
   const [maintenanceHistory, setMaintenanceHistory] = useState<MaintenanceEvent[]>([]);
+  const [repairHistory, setRepairHistory] = useState<RepairEvent[]>([]);
   const [loading, setLoading] = useState(true);
-  const [isSheetOpen, setSheetOpen] = useState(false);
+  const [isMaintenanceSheetOpen, setMaintenanceSheetOpen] = useState(false);
+  const [isRepairSheetOpen, setRepairSheetOpen] = useState(false);
 
   const t = useTranslations('MachineDetailPage');
   const tGen = useTranslations('General');
@@ -193,14 +293,16 @@ export default function MachineDetailPage() {
     if (activeCompany) {
       const fetchData = async () => {
         setLoading(true);
-        const [machineData, historyData] = await Promise.all([
+        const [machineData, maintenanceData, repairData] = await Promise.all([
           dataService.getMachineById(activeCompany.tenantId, activeCompany.id, id),
-          dataService.getMaintenanceHistory(activeCompany.tenantId, activeCompany.id, id)
+          dataService.getMaintenanceHistory(activeCompany.tenantId, activeCompany.id, id),
+          dataService.getRepairHistory(activeCompany.tenantId, activeCompany.id, id),
         ]);
         
         setMachine(machineData);
         if (machineData) {
-            setMaintenanceHistory(historyData);
+            setMaintenanceHistory(maintenanceData);
+            setRepairHistory(repairData);
         }
 
         setLoading(false);
@@ -261,22 +363,40 @@ export default function MachineDetailPage() {
                 <h1 className="text-2xl md:text-3xl font-bold tracking-tight">{machine.name}</h1>
                 <p className="text-muted-foreground">{t('description', { model: machine.model, type: tMachineTypes(machine.type) })}</p>
                 </div>
-                 <Sheet open={isSheetOpen} onOpenChange={setSheetOpen}>
-                    <SheetTrigger asChild>
-                        <Button size="sm" className="gap-1">
-                            <PlusCircle className="h-4 w-4" />
-                            {t('logMaintenanceButton')}
-                        </Button>
-                    </SheetTrigger>
-                    <SheetContent>
-                        <SheetHeader>
-                            <SheetTitle>{t('logMaintenanceSheetTitle')}</SheetTitle>
-                        </SheetHeader>
-                        <div className="py-4">
-                            {activeCompany && <AddMaintenanceForm closeSheet={() => setSheetOpen(false)} tenantId={activeCompany.tenantId} companyId={activeCompany.id} machineId={machine.id} locale={locale} />}
-                        </div>
-                    </SheetContent>
-                </Sheet>
+                 <div className="flex gap-2">
+                    <Sheet open={isMaintenanceSheetOpen} onOpenChange={setMaintenanceSheetOpen}>
+                        <SheetTrigger asChild>
+                            <Button size="sm" className="gap-1">
+                                <PlusCircle className="h-4 w-4" />
+                                {t('logMaintenanceButton')}
+                            </Button>
+                        </SheetTrigger>
+                        <SheetContent>
+                            <SheetHeader>
+                                <SheetTitle>{t('logMaintenanceSheetTitle')}</SheetTitle>
+                            </SheetHeader>
+                            <div className="py-4">
+                                {activeCompany && <AddMaintenanceForm closeSheet={() => setMaintenanceSheetOpen(false)} tenantId={activeCompany.tenantId} companyId={activeCompany.id} machineId={machine.id} locale={locale} />}
+                            </div>
+                        </SheetContent>
+                    </Sheet>
+                     <Sheet open={isRepairSheetOpen} onOpenChange={setRepairSheetOpen}>
+                        <SheetTrigger asChild>
+                            <Button size="sm" variant="destructive" className="gap-1">
+                                <Wrench className="h-4 w-4" />
+                                {t('reportRepairButton')}
+                            </Button>
+                        </SheetTrigger>
+                        <SheetContent>
+                            <SheetHeader>
+                                <SheetTitle>{t('logRepairSheetTitle')}</SheetTitle>
+                            </SheetHeader>
+                            <div className="py-4">
+                                {activeCompany && <AddRepairForm closeSheet={() => setRepairSheetOpen(false)} tenantId={activeCompany.tenantId} companyId={activeCompany.id} machineId={machine.id} locale={locale} />}
+                            </div>
+                        </SheetContent>
+                    </Sheet>
+                 </div>
             </div>
 
             <div className="grid gap-6 md:grid-cols-3">
@@ -318,38 +438,77 @@ export default function MachineDetailPage() {
 
                 <Card className="md:col-span-2">
                     <CardHeader>
-                        <CardTitle>{t('maintenanceHistoryTitle')}</CardTitle>
-                        <CardDescription>{t('maintenanceHistoryDescription')}</CardDescription>
+                        <CardTitle>{t('serviceHistoryTitle')}</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        {maintenanceHistory.length > 0 ? (
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead>{t('dateHeader')}</TableHead>
-                                    <TableHead>{t('descriptionHeader')}</TableHead>
-                                    <TableHead className="text-right">{t('costHeader')}</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {maintenanceHistory.map((event) => (
-                                    <TableRow key={event.id}>
-                                        <TableCell>{dateFormatter(event.date)}</TableCell>
-                                        <TableCell className="font-medium">{event.description}</TableCell>
-                                        <TableCell className="text-right">{currencyFormatter.format(event.cost)}</TableCell>
-                                    </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
-                        ) : (
-                            <div className="flex flex-col items-center justify-center text-center gap-4 py-16 border-2 border-dashed rounded-lg">
-                                <Wrench className="w-12 h-12 text-muted-foreground" />
-                                <h3 className="text-lg font-semibold">{t('noMaintenanceTitle')}</h3>
-                                <p className="text-muted-foreground max-w-sm">
-                                    {t('noMaintenanceDescription')}
-                                </p>
-                            </div>
-                        )}
+                        <Tabs defaultValue="maintenance">
+                            <TabsList>
+                                <TabsTrigger value="maintenance">{t('maintenanceHistoryTitle')}</TabsTrigger>
+                                <TabsTrigger value="repairs">{t('repairHistoryTitle')}</TabsTrigger>
+                            </TabsList>
+                            <TabsContent value="maintenance" className="pt-4">
+                                {maintenanceHistory.length > 0 ? (
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow>
+                                            <TableHead>{t('dateHeader')}</TableHead>
+                                            <TableHead>{t('descriptionHeader')}</TableHead>
+                                            <TableHead className="text-right">{t('costHeader')}</TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {maintenanceHistory.map((event) => (
+                                            <TableRow key={event.id}>
+                                                <TableCell>{dateFormatter(event.date)}</TableCell>
+                                                <TableCell className="font-medium">{event.description}</TableCell>
+                                                <TableCell className="text-right">{currencyFormatter.format(event.cost)}</TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                                ) : (
+                                    <div className="flex flex-col items-center justify-center text-center gap-4 py-16 border-2 border-dashed rounded-lg">
+                                        <Wrench className="w-12 h-12 text-muted-foreground" />
+                                        <h3 className="text-lg font-semibold">{t('noMaintenanceTitle')}</h3>
+                                        <p className="text-muted-foreground max-w-sm">
+                                            {t('noMaintenanceDescription')}
+                                        </p>
+                                    </div>
+                                )}
+                            </TabsContent>
+                            <TabsContent value="repairs" className="pt-4">
+                                 {repairHistory.length > 0 ? (
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow>
+                                            <TableHead>{t('dateHeader')}</TableHead>
+                                            <TableHead>{t('descriptionHeader')}</TableHead>
+                                            <TableHead className="text-right">{t('costHeader')}</TableHead>
+                                            <TableHead className="text-right">{t('downtimeHeader')}</TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {repairHistory.map((event) => (
+                                            <TableRow key={event.id}>
+                                                <TableCell>{dateFormatter(event.date)}</TableCell>
+                                                <TableCell className="font-medium">{event.description}</TableCell>
+                                                <TableCell className="text-right">{currencyFormatter.format(event.cost)}</TableCell>
+                                                <TableCell className="text-right">{event.downtimeHours}h</TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                                ) : (
+                                    <div className="flex flex-col items-center justify-center text-center gap-4 py-16 border-2 border-dashed rounded-lg">
+                                        <Wrench className="w-12 h-12 text-muted-foreground" />
+                                        <h3 className="text-lg font-semibold">{t('noRepairsTitle')}</h3>
+                                        <p className="text-muted-foreground max-w-sm">
+                                            {t('noRepairsDescription')}
+                                        </p>
+                                    </div>
+                                )}
+                            </TabsContent>
+                        </Tabs>
                     </CardContent>
                 </Card>
             </div>

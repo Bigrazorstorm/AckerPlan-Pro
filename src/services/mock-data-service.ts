@@ -1,5 +1,5 @@
 import { DataService } from './data-service';
-import { Kpi, ChartDataPoint, Operation, Machinery, Session, Field, MaintenanceEvent, AddMaintenanceEventInput, AuditLogEvent } from './types';
+import { Kpi, ChartDataPoint, Operation, Machinery, Session, Field, MaintenanceEvent, AddMaintenanceEventInput, AuditLogEvent, RepairEvent, AddRepairEventInput } from './types';
 
 const session: Session = {
   user: {
@@ -143,8 +143,12 @@ const maintenanceEvents: MaintenanceEvent[] = [
   { id: 'ME003', tenantId: 'tenant-123', companyId: 'company-456', machineId: 'M002', date: '2023-09-15', description: 'Großer 3000h Service, Austausch Verschleißteile', cost: 2800, createdAt: '2023-09-15T09:00:00Z' },
   { id: 'ME004', tenantId: 'tenant-123', companyId: 'company-456', machineId: 'M003', date: '2024-03-22', description: 'Software-Update und Hydraulik-Check', cost: 150, createdAt: '2024-03-22T16:00:00Z' },
   { id: 'ME005', tenantId: 'tenant-123', companyId: 'company-456', machineId: 'M004', date: '2024-01-10', description: 'Jährliche Inspektion', cost: 200, createdAt: '2024-01-10T09:45:00Z' },
-  { id: 'ME006', tenantId: 'tenant-123', companyId: 'company-456', machineId: 'M005', date: '2024-04-01', description: 'Reparatur nach Schaden (Getriebe)', cost: 4500, createdAt: '2024-04-01T11:00:00Z' },
-  { id: 'ME007', tenantId: 'tenant-123', companyId: 'company-789', machineId: 'M007', date: '2024-06-15', description: '1000h Service', cost: 850, createdAt: '2024-06-15T14:00:00Z' },
+  { id: 'ME006', tenantId: 'tenant-123', companyId: 'company-789', machineId: 'M007', date: '2024-06-15', description: '1000h Service', cost: 850, createdAt: '2024-06-15T14:00:00Z' },
+];
+
+const repairEvents: RepairEvent[] = [
+    { id: 'RE001', tenantId: 'tenant-123', companyId: 'company-456', machineId: 'M005', date: '2024-04-01', description: 'Getriebeschaden nach Überlastung', cost: 4500, downtimeHours: 120, createdAt: '2024-04-01T11:00:00Z' },
+    { id: 'RE002', tenantId: 'tenant-123', companyId: 'company-456', machineId: 'M002', date: '2023-08-20', description: 'Hydraulikschlauch geplatzt', cost: 350, downtimeHours: 8, createdAt: '2023-08-20T15:00:00Z' },
 ];
 
 const auditLogEvents: AuditLogEvent[] = [
@@ -216,6 +220,11 @@ export class MockDataService implements DataService {
     console.log(`Fetching Maintenance History for machine ${machineId}.`);
     return Promise.resolve(maintenanceEvents.filter(e => e.machineId === machineId && e.tenantId === tenantId && e.companyId === companyId).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
   }
+  
+  async getRepairHistory(tenantId: string, companyId: string, machineId: string): Promise<RepairEvent[]> {
+    console.log(`Fetching Repair History for machine ${machineId}.`);
+    return Promise.resolve(repairEvents.filter(e => e.machineId === machineId && e.tenantId === tenantId && e.companyId === companyId).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
+  }
 
   async addMachinery(tenantId: string, companyId: string, machineData: { name: string; type: string; model: string; }): Promise<Machinery> {
     console.log(`Adding Machinery for tenant ${tenantId} and company ${companyId}.`);
@@ -262,6 +271,24 @@ export class MockDataService implements DataService {
 
     const costFormatted = new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(eventData.cost);
     logAuditEvent(tenantId, companyId, 'maintenance.log', `Wartung für "${machine?.name || eventData.machineId}" protokolliert: ${eventData.description} (Kosten: ${costFormatted}).`);
+
+    return Promise.resolve(newEvent);
+  }
+
+  async addRepairEvent(tenantId: string, companyId: string, eventData: AddRepairEventInput): Promise<RepairEvent> {
+    console.log(`Adding Repair Event for tenant ${tenantId} and company ${companyId}.`);
+    const machine = machinery.find(m => m.id === eventData.machineId);
+    const newEvent: RepairEvent = {
+      id: `RE${String(repairEvents.length + 1).padStart(3, '0')}`,
+      tenantId,
+      companyId,
+      createdAt: new Date().toISOString(),
+      ...eventData,
+    };
+    repairEvents.unshift(newEvent);
+
+    const costFormatted = new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(eventData.cost);
+    logAuditEvent(tenantId, companyId, 'repair.log', `Reparatur für "${machine?.name || eventData.machineId}" protokolliert: ${eventData.description} (Kosten: ${costFormatted}, Ausfall: ${eventData.downtimeHours}h).`);
 
     return Promise.resolve(newEvent);
   }
