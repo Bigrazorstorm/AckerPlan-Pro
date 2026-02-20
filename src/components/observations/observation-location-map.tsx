@@ -3,7 +3,7 @@
 import { MapContainer, TileLayer, Marker, Tooltip } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import * as L from 'leaflet';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 
 // Fix for default marker icon with webpack
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
@@ -24,6 +24,8 @@ interface ObservationLocationMapProps {
 export function ObservationLocationMap({ latitude, longitude }: ObservationLocationMapProps) {
     const position: L.LatLngExpression = [latitude, longitude];
     const [isMounted, setIsMounted] = useState(false);
+    
+    const mapStyle = useMemo(() => ({ height: '100%', width: '100%', borderRadius: 'inherit', zIndex: 0 }), []);
 
     useEffect(() => {
       setIsMounted(true);
@@ -34,7 +36,7 @@ export function ObservationLocationMap({ latitude, longitude }: ObservationLocat
     }
 
     return (
-        <MapContainer center={position} zoom={13} style={{ height: '100%', width: '100%', borderRadius: 'inherit', zIndex: 0 }} zoomControl={false} scrollWheelZoom={false} dragging={false}>
+        <MapContainer key={`${latitude}-${longitude}`} center={position} zoom={13} style={mapStyle} zoomControl={false} scrollWheelZoom={false} dragging={false}>
             <TileLayer
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

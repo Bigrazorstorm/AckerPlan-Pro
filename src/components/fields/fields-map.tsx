@@ -53,6 +53,8 @@ export function FieldsMap({ fields, observations }: FieldsMapProps) {
     }, [hasData, fieldsWithGeometry, observationsWithLocation]);
 
     const center: LatLngTuple = [52.505, 13.37];
+    
+    const mapStyle = useMemo(() => ({ height: '100%', width: '100%', borderRadius: 'inherit', zIndex: 0 }), []);
 
     useEffect(() => {
         setIsMounted(true);
@@ -63,7 +65,7 @@ export function FieldsMap({ fields, observations }: FieldsMapProps) {
     }
 
     return (
-        <MapContainer center={center} zoom={10} scrollWheelZoom={true} style={{ height: '100%', width: '100%', borderRadius: 'inherit', zIndex: 0 }}>
+        <MapContainer center={center} zoom={10} scrollWheelZoom={true} style={mapStyle}>
             <ChangeView bounds={bounds} />
             <TileLayer
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
