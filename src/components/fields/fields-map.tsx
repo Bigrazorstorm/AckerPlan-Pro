@@ -1,29 +1,25 @@
 'use client';
 
 import { MapContainer, TileLayer, Polygon, Tooltip, FeatureGroup, LayersControl, Marker, useMap } from 'react-leaflet';
-import 'leaflet/dist/leaflet.css';
 import { Field, Observation } from '@/services/types';
 import L, { LatLngExpression, latLng, latLngBounds } from 'leaflet';
 import { useMemo, useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 
-// Fix for default marker icon with webpack
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
 import markerIcon from 'leaflet/dist/images/marker-icon.png';
 import markerShadow from 'leaflet/dist/images/marker-shadow.png';
 
 const DEFAULT_CENTER: L.LatLngTuple = [52.505, 13.37];
 
+// Fix for default marker icon
+delete (L.Icon.Default.prototype as any)._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconUrl: markerIcon.src,
   iconRetinaUrl: markerIcon2x.src,
   shadowUrl: markerShadow.src,
 });
 
-interface FieldsMapProps {
-    fields: Field[];
-    observations: Observation[];
-}
 
 function ChangeView({ bounds }: { bounds: L.LatLngBounds | null }) {
     const map = useMap();
@@ -35,6 +31,11 @@ function ChangeView({ bounds }: { bounds: L.LatLngBounds | null }) {
     return null;
 }
 
+interface FieldsMapProps {
+    fields: Field[];
+    observations: Observation[];
+}
+
 export function FieldsMap({ fields, observations }: FieldsMapProps) {
     const t = useTranslations('FieldsPage');
     const [isMounted, setIsMounted] = useState(false);
@@ -42,7 +43,7 @@ export function FieldsMap({ fields, observations }: FieldsMapProps) {
     useEffect(() => {
       setIsMounted(true);
     }, []);
-    
+
     const mapStyle = useMemo(() => ({ height: '100%', width: '100%', borderRadius: 'inherit', zIndex: 0 }), []);
 
     const fieldsWithGeometry = useMemo(() => fields.filter(f => f.geometry && f.geometry.length > 0), [fields]);
