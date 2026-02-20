@@ -116,14 +116,14 @@ const machinery: Machinery[] = [
 ];
 
 const operations: Operation[] = [
-  { id: '1', tenantId: 'tenant-123', companyId: 'company-456', type: "Harvesting", field: "Field A-12", date: "2024-07-22T10:00:00Z", status: "Completed", laborHours: 8.5, machine: { id: 'M002', name: 'Claas Lexion 8900' }, fuelConsumed: 722.5 },
-  { id: '2', tenantId: 'tenant-123', companyId: 'company-456', type: "Fertilizing", field: "Field C-04", date: "2024-07-21T10:00:00Z", status: "Completed", laborHours: 4, machine: { id: 'M003', name: 'Fendt 942 Vario' }, fuelConsumed: 168.0 },
-  { id: '3', tenantId: 'tenant-123', companyId: 'company-456', type: "PestControl", field: "Field B-08", date: "2024-07-20T10:00:00Z", status: "Completed", laborHours: 5.5, machine: { id: 'M001', name: 'John Deere 8R 370' }, fuelConsumed: 195.2 },
-  { id: '4', tenantId: 'tenant-123', companyId: 'company-456', type: "Seeding", field: "Field D-01", date: "2024-07-17T10:00:00Z", status: "In Progress", laborHours: 12, machine: { id: 'M005', name: 'Horsch Maestro 12.50 SW' }, fuelConsumed: 144.0 },
-  { id: '5', tenantId: 'tenant-123', companyId: 'company-456', type: "Tillage", field: "Field F-21", date: "2024-07-10T10:00:00Z", status: "Completed", laborHours: 6, machine: { id: 'M004', name: 'Amazone Catros XL' }, fuelConsumed: 90.0 },
+  { id: '1', tenantId: 'tenant-123', companyId: 'company-456', type: "Harvesting", field: "Große Wiese", date: "2024-07-22T10:00:00Z", status: "Completed", laborHours: 8.5, machine: { id: 'M002', name: 'Claas Lexion 8900' }, fuelConsumed: 722.5 },
+  { id: '2', tenantId: 'tenant-123', companyId: 'company-456', type: "Fertilizing", field: "Südhang", date: "2024-07-21T10:00:00Z", status: "Completed", laborHours: 4, machine: { id: 'M003', name: 'Fendt 942 Vario' }, fuelConsumed: 168.0 },
+  { id: '3', tenantId: 'tenant-123', companyId: 'company-456', type: "PestControl", field: "Acker-Nord 1", date: "2024-07-20T10:00:00Z", status: "Completed", laborHours: 5.5, machine: { id: 'M001', name: 'John Deere 8R 370' }, fuelConsumed: 195.2 },
+  { id: '4', tenantId: 'tenant-123', companyId: 'company-456', type: "Seeding", field: "An der B2", date: "2024-07-17T10:00:00Z", status: "In Progress", laborHours: 12, machine: { id: 'M005', name: 'Horsch Maestro 12.50 SW' }, fuelConsumed: 144.0 },
+  { id: '5', tenantId: 'tenant-123', companyId: 'company-456', type: "Tillage", field: "Acker-Nord 1", date: "2024-07-10T10:00:00Z", status: "Completed", laborHours: 6, machine: { id: 'M004', name: 'Amazone Catros XL' }, fuelConsumed: 90.0 },
   // Data for another company to test multi-tenancy
-  { id: '6', tenantId: 'tenant-123', companyId: 'company-789', type: "Mowing", field: "Miller's Acre", date: "2024-07-19T10:00:00Z", status: "Completed", laborHours: 7, machine: { id: 'M007', name: 'Case IH Magnum 380' }, fuelConsumed: 266.0 },
-  { id: '7', tenantId: 'tenant-123', companyId: 'company-789', type: "Baling", field: "South Pasture", date: "2024-07-17T11:00:00Z", status: "Completed", laborHours: 9 }, // No machine assigned yet
+  { id: '6', tenantId: 'tenant-123', companyId: 'company-789', type: "Mowing", field: "Weide am Bach", date: "2024-07-19T10:00:00Z", status: "Completed", laborHours: 7, machine: { id: 'M007', name: 'Case IH Magnum 380' }, fuelConsumed: 266.0 },
+  { id: '7', tenantId: 'tenant-123', companyId: 'company-789', type: "Baling", field: "Grünland-West", date: "2024-07-17T11:00:00Z", status: "Completed", laborHours: 9 }, // No machine assigned yet
 ];
 
 
@@ -208,6 +208,17 @@ export class MockDataService implements DataService {
   async getFields(tenantId: string, companyId: string): Promise<Field[]> {
     console.log(`Fetching Fields for tenant ${tenantId} and company ${companyId}.`);
     return Promise.resolve(fields.filter(f => f.tenantId === tenantId && f.companyId === companyId));
+  }
+
+  async getFieldById(tenantId: string, companyId: string, fieldId: string): Promise<Field | null> {
+    console.log(`Fetching Field ${fieldId} for tenant ${tenantId} and company ${companyId}.`);
+    const field = fields.find(f => f.id === fieldId && f.tenantId === tenantId && f.companyId === companyId);
+    return Promise.resolve(field || null);
+  }
+
+  async getOperationsForField(tenantId: string, companyId: string, fieldName: string): Promise<Operation[]> {
+    console.log(`Fetching Operations for field ${fieldName}.`);
+    return Promise.resolve(operations.filter(o => o.tenantId === tenantId && o.companyId === companyId && o.field === fieldName).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
   }
 
   async getMachineById(tenantId: string, companyId: string, machineId: string): Promise<Machinery | null> {

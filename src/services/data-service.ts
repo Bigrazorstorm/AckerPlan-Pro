@@ -103,6 +103,22 @@ export interface DataService {
   getFields(tenantId: string, companyId: string): Promise<Field[]>;
 
   /**
+   * Retrieves a single field by its ID.
+   * @param tenantId - The ID of the tenant.
+   * @param companyId - The ID of the company.
+   * @param fieldId - The ID of the field to retrieve.
+   */
+  getFieldById(tenantId: string, companyId: string, fieldId: string): Promise<Field | null>;
+
+  /**
+   * Retrieves operations for a specific field.
+   * @param tenantId - The ID of the tenant.
+   * @param companyId - The ID of the company.
+   * @param fieldName - The name of the field.
+   */
+  getOperationsForField(tenantId: string, companyId: string, fieldName: string): Promise<Operation[]>;
+
+  /**
    * Retrieves the audit log for a given company and tenant.
    * @param tenantId - The ID of the tenant.
    * @param companyId - The ID of the company.

@@ -71,6 +71,24 @@
     "listHeaderCrop": "Crop",
     "listHeaderArea": "Area"
   },
+  "FieldDetailPage": {
+    "backToList": "Back to Fields List",
+    "description": "Crop: {crop} | Area: {area} ha",
+    "detailsTitle": "Field Details",
+    "areaLabel": "Area (ha)",
+    "cropLabel": "Current Crop",
+    "idLabel": "Internal ID",
+    "recentOperationsTitle": "Recent Operations",
+    "recentOperationsDescription": "A list of the latest operations performed on this field.",
+    "tableHeaderType": "Operation",
+    "tableHeaderDate": "Date",
+    "tableHeaderMachine": "Machine",
+    "tableHeaderStatus": "Status",
+    "noOperationsTitle": "No Operations Recorded",
+    "noOperationsDescription": "No operations have been logged for this field yet.",
+    "notFoundTitle": "Field Not Found",
+    "notFoundDescription": "The requested field could not be found."
+  },
   "MachineryPage": {
     "title": "Machinery",
     "description": "Manage your fleet of tractors, harvesters, and other equipment.",

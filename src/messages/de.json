@@ -71,6 +71,24 @@
     "listHeaderCrop": "Kultur",
     "listHeaderArea": "Fläche"
   },
+  "FieldDetailPage": {
+    "backToList": "Zurück zur Flächenübersicht",
+    "description": "Kultur: {crop} | Fläche: {area} ha",
+    "detailsTitle": "Schlagdetails",
+    "areaLabel": "Fläche (ha)",
+    "cropLabel": "Aktuelle Kultur",
+    "idLabel": "Interne ID",
+    "recentOperationsTitle": "Letzte Maßnahmen",
+    "recentOperationsDescription": "Eine Liste der zuletzt auf dieser Fläche durchgeführten Maßnahmen.",
+    "tableHeaderType": "Maßnahme",
+    "tableHeaderDate": "Datum",
+    "tableHeaderMachine": "Maschine",
+    "tableHeaderStatus": "Status",
+    "noOperationsTitle": "Keine Maßnahmen erfasst",
+    "noOperationsDescription": "Für diese Fläche wurden noch keine Maßnahmen protokolliert.",
+    "notFoundTitle": "Fläche nicht gefunden",
+    "notFoundDescription": "Die angeforderte Fläche konnte nicht gefunden werden."
+  },
   "MachineryPage": {
     "title": "Maschinen",
     "description": "Verwalten Sie Ihre Flotte von Traktoren, Erntemaschinen und anderen Geräten.",

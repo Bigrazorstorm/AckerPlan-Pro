@@ -128,6 +128,16 @@ export class MySqlDataService implements DataService {
     return Promise.resolve([]);
   }
 
+  async getFieldById(tenantId: string, companyId: string, fieldId: string): Promise<Field | null> {
+    this.log('getFieldById', { tenantId, companyId, fieldId });
+    return Promise.resolve(null);
+  }
+
+  async getOperationsForField(tenantId: string, companyId: string, fieldName: string): Promise<Operation[]> {
+    this.log('getOperationsForField', { tenantId, companyId, fieldName });
+    return Promise.resolve([]);
+  }
+
   async getAuditLog(tenantId: string, companyId: string): Promise<AuditLogEvent[]> {
     this.log('getAuditLog', { tenantId, companyId });
     return Promise.resolve([]);

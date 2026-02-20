@@ -11,6 +11,8 @@ import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { PlusCircle } from 'lucide-react';
+import Link from 'next/link';
+import { useParams } from 'next/navigation';
 
 function FieldsSkeleton() {
   return (
@@ -59,6 +61,7 @@ export function FieldsClientContent() {
   const [fields, setFields] = useState<Field[]>([]);
   const [loading, setLoading] = useState(true);
   const t = useTranslations('FieldsPage');
+  const { locale } = useParams<{ locale: string }>();
 
   useEffect(() => {
     if (activeCompany) {
@@ -115,7 +118,11 @@ export function FieldsClientContent() {
             <TableBody>
               {fields.map((field) => (
                 <TableRow key={field.id}>
-                  <TableCell className="font-medium">{field.name}</TableCell>
+                  <TableCell className="font-medium">
+                    <Link href={`/${locale}/fields/${field.id}`} className="hover:underline">
+                      {field.name}
+                    </Link>
+                  </TableCell>
                   <TableCell>{field.crop}</TableCell>
                   <TableCell className="text-right">{field.area.toLocaleString('de-DE')} ha</TableCell>
                 </TableRow>
