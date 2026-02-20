@@ -8,7 +8,6 @@ import {NextIntlClientProvider} from 'next-intl';
 import {getMessages, getTranslations} from 'next-intl/server';
 import { SessionProvider } from '@/context/session-context';
 import { getSession } from '@/app/auth/actions';
-import { FirebaseClientProvider } from '@/firebase/client-provider';
 
 export async function generateMetadata({params: {locale}}: {params: {locale: string}}): Promise<Metadata> {
   const t = await getTranslations({locale, namespace: 'Metadata'});
@@ -48,7 +47,6 @@ export default async function RootLayout({
       <body className="font-body antialiased">
         <NextIntlClientProvider locale={locale} messages={messages}>
           <SessionProvider session={session}>
-            <FirebaseClientProvider>
               {session ? (
                 <SidebarProvider>
                     <Sidebar>
@@ -65,7 +63,6 @@ export default async function RootLayout({
                 <main>{children}</main>
               )}
               <Toaster />
-            </FirebaseClientProvider>
           </SessionProvider>
         </NextIntlClientProvider>
       </body>
