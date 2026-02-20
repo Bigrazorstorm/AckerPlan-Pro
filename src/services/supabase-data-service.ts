@@ -1,5 +1,5 @@
 import { DataService } from './data-service';
-import { Kpi, ChartDataPoint, Operation, Machinery, Session, Field, MaintenanceEvent, AddMaintenanceEventInput, AddRepairEventInput, RepairEvent, AuditLogEvent, AddOperationInput } from './types';
+import { Kpi, ChartDataPoint, Operation, Machinery, Session, Field, MaintenanceEvent, AddMaintenanceEventInput, AddRepairEventInput, RepairEvent, AuditLogEvent, AddOperationInput, LaborHoursByCropReportData } from './types';
 
 // Hardcoded session for demonstration purposes, as this is a placeholder service.
 const session: Session = {
@@ -133,6 +133,11 @@ export class SupabaseDataService implements DataService {
 
   async getAuditLog(tenantId: string, companyId: string): Promise<AuditLogEvent[]> {
     this.log('getAuditLog', { tenantId, companyId });
+    return Promise.resolve([]);
+  }
+
+  async getLaborHoursByCropReport(tenantId: string, companyId: string): Promise<LaborHoursByCropReportData[]> {
+    this.log('getLaborHoursByCropReport', { tenantId, companyId });
     return Promise.resolve([]);
   }
 }

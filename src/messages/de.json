@@ -249,8 +249,11 @@
   "ReportsPage": {
     "title": "Auswertungen",
     "description": "Analysieren Sie Kosten, Deckungsbeiträge und die Gesamtleistung.",
-    "comingSoonTitle": "Analysen & Berichte in Kürze verfügbar",
-    "comingSoonDescription": "Dashboards und Berichte für transparente Einblicke in Vollkosten, Deckungsbeiträge, Arbeitsstunden und Maschinenkosten werden hier verfügbar sein."
+    "laborHoursByCropTitle": "Arbeitsstunden nach Kultur",
+    "laborHoursByCropDescription": "Gesamte protokollierte Arbeitszeit, aufgeteilt nach den angebauten Kulturen.",
+    "laborHoursChartLabel": "Stunden",
+    "moreReportsComingSoonTitle": "Weitere Berichte folgen",
+    "moreReportsComingSoonDescription": "Analysen zu Dieselverbrauch, Maschinenkosten und Deckungsbeiträgen werden in Kürze hier verfügbar sein."
   },
   "SettingsPage": {
     "title": "Einstellungen",

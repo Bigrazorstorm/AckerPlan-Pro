@@ -249,8 +249,11 @@
   "ReportsPage": {
     "title": "Reports",
     "description": "Analyze costs, contribution margins, and overall performance.",
-    "comingSoonTitle": "Analytics & Reports Coming Soon",
-    "comingSoonDescription": "Dashboards and reports for transparent insights into full costs, contribution margins, labor hours, and machinery costs will be available here."
+    "laborHoursByCropTitle": "Labor Hours by Crop",
+    "laborHoursByCropDescription": "Total logged labor hours, broken down by the crops grown.",
+    "laborHoursChartLabel": "Hours",
+    "moreReportsComingSoonTitle": "More Reports Coming Soon",
+    "moreReportsComingSoonDescription": "Analyses of diesel consumption, machinery costs, and contribution margins will be available here shortly."
   },
   "SettingsPage": {
     "title": "Settings",

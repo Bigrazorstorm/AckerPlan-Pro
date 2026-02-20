@@ -145,3 +145,9 @@ export interface AuditLogEvent {
   action: string; // e.g., 'machine.create', 'maintenance.log'
   details: string; // e.g., 'Created machine "Fendt 942 Vario"'
 }
+
+// Represents data for the labor hours by crop report.
+export interface LaborHoursByCropReportData {
+  crop: string;
+  hours: number;
+}

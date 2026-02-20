@@ -1,5 +1,5 @@
 import { DataService } from './data-service';
-import { Kpi, ChartDataPoint, Operation, Machinery, Session, Field, MaintenanceEvent, AddMaintenanceEventInput, AuditLogEvent, RepairEvent, AddRepairEventInput, AddOperationInput } from './types';
+import { Kpi, ChartDataPoint, Operation, Machinery, Session, Field, MaintenanceEvent, AddMaintenanceEventInput, AuditLogEvent, RepairEvent, AddRepairEventInput, AddOperationInput, LaborHoursByCropReportData } from './types';
 
 const session: Session = {
   user: {
@@ -355,5 +355,30 @@ export class MockDataService implements DataService {
   async getAuditLog(tenantId: string, companyId: string): Promise<AuditLogEvent[]> {
     console.log(`Fetching AuditLog for tenant ${tenantId} and company ${companyId}.`);
     return Promise.resolve(auditLogEvents.filter(e => e.tenantId === tenantId && e.companyId === companyId).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
+  }
+
+  async getLaborHoursByCropReport(tenantId: string, companyId: string): Promise<LaborHoursByCropReportData[]> {
+    console.log(`Fetching Labor Hours by Crop Report for tenant ${tenantId} and company ${companyId}.`);
+    const companyOps = operations.filter(op => op.tenantId === tenantId && op.companyId === companyId);
+    const companyFields = fields.filter(f => f.tenantId === tenantId && f.companyId === companyId);
+
+    const hoursByCrop: { [crop: string]: number } = {};
+
+    for (const op of companyOps) {
+        const field = companyFields.find(f => f.name === op.field);
+        if (field) {
+            if (!hoursByCrop[field.crop]) {
+                hoursByCrop[field.crop] = 0;
+            }
+            hoursByCrop[field.crop] += op.laborHours;
+        }
+    }
+
+    const reportData: LaborHoursByCropReportData[] = Object.entries(hoursByCrop).map(([crop, hours]) => ({
+        crop,
+        hours: parseFloat(hours.toFixed(1)),
+    }));
+
+    return Promise.resolve(reportData);
   }
 }
