@@ -3,7 +3,7 @@ import { SettingsClientContent } from '@/components/settings/settings-client-con
 
 export default async function SettingsPage({params: {locale}}: {params: {locale: string}}) {
   setRequestLocale(locale);
-  const t = await getTranslations('SettingsPage');
+  const t = await getTranslations({locale, namespace: 'SettingsPage'});
   
   return (
     <div className="space-y-6">

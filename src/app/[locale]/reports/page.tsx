@@ -3,7 +3,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 export default async function ReportsPage({params: {locale}}: {params: {locale: string}}) {
   setRequestLocale(locale);
-  const t = await getTranslations('ReportsPage');
+  const t = await getTranslations({locale, namespace: 'ReportsPage'});
   
   return (
     <div className="space-y-6">

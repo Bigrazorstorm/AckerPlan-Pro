@@ -6,10 +6,11 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { LoginForm } from "@/components/auth/login-form";
-import { getTranslations } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Leaf } from "lucide-react";
 
 export default async function LoginPage({params: {locale}}: {params: {locale: string}}) {
+  setRequestLocale(locale);
   const t = await getTranslations({locale, namespace: "LoginPage"});
   return (
     <div className="flex items-center justify-center min-h-screen bg-muted/50">

@@ -5,11 +5,12 @@ import { SidebarProvider, Sidebar } from '@/components/ui/sidebar';
 import { Header } from '@/components/layout/header';
 import { SidebarNav } from '@/components/layout/sidebar-nav';
 import {NextIntlClientProvider} from 'next-intl';
-import {getMessages, getTranslations} from 'next-intl/server';
+import {getMessages, getTranslations, setRequestLocale} from 'next-intl/server';
 import { SessionProvider } from '@/context/session-context';
 import { getSession } from '@/app/auth/actions';
 
 export async function generateMetadata({params: {locale}}: {params: {locale: string}}): Promise<Metadata> {
+  setRequestLocale(locale);
   const t = await getTranslations({locale, namespace: 'Metadata'});
  
   return {
@@ -31,6 +32,7 @@ export default async function RootLayout({
   children: React.ReactNode;
   params: {locale: string};
 }>) {
+  setRequestLocale(locale);
   const messages = await getMessages({locale});
   const session = await getSession();
 
