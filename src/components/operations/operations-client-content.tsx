@@ -5,10 +5,10 @@ import { useFormStatus } from 'react-dom'
 import { useTranslations } from "next-intl"
 import { useToast } from '@/hooks/use-toast'
 import { Operation, Field, Machinery } from '@/services/types'
-import { addOperation, deleteOperation } from '@/app/operations/actions'
+import { addOperation, deleteOperation, updateOperation } from '@/app/operations/actions'
 import { useSession } from '@/context/session-context'
 import dataService from '@/services'
-import { format } from "date-fns"
+import { format, parseISO } from "date-fns"
 import { de, enUS } from 'date-fns/locale'
 import { useParams } from 'next/navigation'
 
@@ -17,7 +17,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuCheckboxItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { MoreHorizontal, PlusCircle, Calendar as CalendarIcon, ChevronsUpDown } from "lucide-react"
+import { MoreHorizontal, PlusCircle, Calendar as CalendarIcon, ChevronsUpDown, Pencil } from "lucide-react"
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -39,13 +39,154 @@ const initialState = {
   errors: {},
 }
 
-function SubmitButton() {
+function SubmitButton({tKey, isEdit}: {tKey: string, isEdit?: boolean}) {
   const { pending } = useFormStatus()
   const t = useTranslations('OperationsPage.addOperationForm');
+  const tEdit = useTranslations('OperationsPage.editOperationForm');
   return (
     <Button type="submit" aria-disabled={pending}>
-      {pending ? t('submitting') : t('submit')}
+      {pending ? t('submitting') : (isEdit ? tEdit(tKey) : t(tKey))}
     </Button>
+  )
+}
+
+function EditOperationForm({ closeSheet, tenantId, companyId, fields, machinery, operation }: { closeSheet: () => void; tenantId: string; companyId: string; fields: Field[], machinery: Machinery[], operation: Operation }) {
+  const [state, formAction] = useActionState(updateOperation, initialState)
+  const { toast } = useToast()
+  const t = useTranslations('OperationsPage.editOperationForm');
+  const tOperationTypes = useTranslations('OperationTypes');
+  const [date, setDate] = useState<Date | undefined>(operation ? parseISO(operation.date) : undefined);
+  const [operationType, setOperationType] = useState<string>(operation.type);
+  const { locale } = useParams<{ locale: string }>();
+
+  useEffect(() => {
+    if (state.message && Object.keys(state.errors).length === 0) {
+      toast({
+        title: t('successToastTitle'),
+        description: state.message,
+      })
+      closeSheet();
+    } else if (state.message && Object.keys(state.errors).length > 0) {
+      toast({
+        variant: 'destructive',
+        title: t('errorToastTitle'),
+        description: state.message,
+      })
+    }
+  }, [state, toast, closeSheet, t]);
+  
+  const operationTypes = ["Tillage", "Seeding", "Fertilizing", "PestControl", "Harvesting", "Baling", "Mowing"];
+
+  return (
+    <form action={formAction} className="space-y-4">
+      <input type="hidden" name="tenantId" value={tenantId} />
+      <input type="hidden" name="companyId" value={companyId} />
+      <input type="hidden" name="id" value={operation.id} />
+      <input type="hidden" name="date" value={date ? format(date, "yyyy-MM-dd") : ""} />
+      
+      <div className="space-y-2">
+        <Label htmlFor="field">{t('fieldLabel')}</Label>
+        <Input id="field" name="field" readOnly disabled value={operation.field} />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="type">{t('typeLabel')}</Label>
+        <Select name="type" required onValueChange={setOperationType} defaultValue={operation.type}>
+          <SelectTrigger>
+            <SelectValue placeholder={t('typePlaceholder')} />
+          </SelectTrigger>
+          <SelectContent>
+            {operationTypes.map((type) => (
+                <SelectItem key={type} value={type}>{tOperationTypes(type)}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        {state.errors?.type && <p className="text-sm text-destructive">{state.errors.type.join(', ')}</p>}
+      </div>
+
+       <div className="space-y-2">
+          <Label htmlFor="machineId">{t('machineLabel')}</Label>
+          <Select name="machineId" required defaultValue={operation.machine?.id}>
+            <SelectTrigger>
+              <SelectValue placeholder={t('machinePlaceholder')} />
+            </SelectTrigger>
+            <SelectContent>
+              {machinery.map((machine) => (
+                  <SelectItem key={machine.id} value={machine.id}>{machine.name}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          {state.errors?.machineId && <p className="text-sm text-destructive">{state.errors.machineId.join(', ')}</p>}
+      </div>
+       
+      {operationType === 'Harvesting' && (
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="yieldAmount">{t('yieldLabel')}</Label>
+            <Input id="yieldAmount" name="yieldAmount" type="number" step="0.01" placeholder={t('yieldPlaceholder')} defaultValue={operation.yieldAmount} />
+            {state.errors?.yieldAmount && <p className="text-sm text-destructive">{state.errors.yieldAmount.join(', ')}</p>}
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="revenue">{t('revenueLabel')}</Label>
+            <div className="relative">
+                <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-muted-foreground text-sm">€</span>
+                <Input id="revenue" name="revenue" type="number" step="0.01" placeholder={t('revenuePlaceholder')} className="pl-7" defaultValue={operation.revenue} />
+            </div>
+            {state.errors?.revenue && <p className="text-sm text-destructive">{state.errors.revenue.join(', ')}</p>}
+          </div>
+        </div>
+      )}
+
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
+            <Label htmlFor="date">{t('dateLabel')}</Label>
+            <Popover>
+                <PopoverTrigger asChild>
+                <Button
+                    variant={"outline"}
+                    className={cn(
+                    "w-full justify-start text-left font-normal",
+                    !date && "text-muted-foreground"
+                    )}
+                >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {date ? format(date, "PPP", { locale: locale === 'de' ? de : enUS }) : <span>{t('datePlaceholder')}</span>}
+                </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0">
+                <Calendar
+                    mode="single"
+                    selected={date}
+                    onSelect={setDate}
+                    initialFocus
+                />
+                </PopoverContent>
+            </Popover>
+            {state.errors?.date && <p className="text-sm text-destructive">{state.errors.date.join(', ')}</p>}
+        </div>
+        <div className="space-y-2">
+            <Label htmlFor="laborHours">{t('laborHoursLabel')}</Label>
+            <Input id="laborHours" name="laborHours" type="number" step="0.1" required placeholder={t('laborHoursPlaceholder')} defaultValue={operation.laborHours}/>
+            {state.errors?.laborHours && <p className="text-sm text-destructive">{state.errors.laborHours.join(', ')}</p>}
+        </div>
+      </div>
+
+       <div className="space-y-2">
+        <Label htmlFor="status">{t('statusLabel')}</Label>
+        <Select name="status" required defaultValue={operation.status}>
+          <SelectTrigger>
+            <SelectValue placeholder={t('statusPlaceholder')} />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="Completed">{t('statusCompleted')}</SelectItem>
+            <SelectItem value="In Progress">{t('statusInProgress')}</SelectItem>
+          </SelectContent>
+        </Select>
+        {state.errors?.status && <p className="text-sm text-destructive">{state.errors.status.join(', ')}</p>}
+      </div>
+
+      <SubmitButton tKey="submit" isEdit={true} />
+    </form>
   )
 }
 
@@ -216,7 +357,7 @@ function AddOperationForm({ closeSheet, tenantId, companyId, fields, machinery }
         {state.errors?.status && <p className="text-sm text-destructive">{state.errors.status.join(', ')}</p>}
       </div>
 
-      <SubmitButton />
+      <SubmitButton tKey="submit" />
     </form>
   )
 }
@@ -299,7 +440,8 @@ export function OperationsClientContent() {
   const tOperationTypes = useTranslations('OperationTypes');
   const tOperationStatuses = useTranslations('OperationStatuses');
   const { toast } = useToast();
-  const [isSheetOpen, setSheetOpen] = useState(false);
+  const [isAddSheetOpen, setAddSheetOpen] = useState(false);
+  const [isEditSheetOpen, setEditSheetOpen] = useState(false);
   const { activeCompany, loading: sessionLoading, activeRole } = useSession();
   const [operations, setOperations] = useState<Operation[]>([]);
   const [fields, setFields] = useState<Field[]>([]);
@@ -307,6 +449,7 @@ export function OperationsClientContent() {
   const [loading, setLoading] = useState(true);
   const { locale } = useParams<{ locale: string }>();
   const [operationToDelete, setOperationToDelete] = useState<Operation | null>(null);
+  const [operationToEdit, setOperationToEdit] = useState<Operation | null>(null);
 
   const canManageOperations = activeRole === 'Firmen Admin' || activeRole === 'Tenant Admin';
 
@@ -326,7 +469,7 @@ export function OperationsClientContent() {
       }
       fetchData();
     }
-  }, [activeCompany]);
+  }, [activeCompany, isAddSheetOpen, isEditSheetOpen]);
 
   const handleDelete = async () => {
     if (operationToDelete && activeCompany) {
@@ -347,9 +490,14 @@ export function OperationsClientContent() {
     }
   };
 
+  const handleEdit = (operation: Operation) => {
+    setOperationToEdit(operation);
+    setEditSheetOpen(true);
+  };
+
   const dateFormatter = (dateString: string) => {
     try {
-        return format(new Date(dateString), 'PP', { locale: locale === 'de' ? de : enUS });
+        return format(parseISO(dateString), 'PP', { locale: locale === 'de' ? de : enUS });
     } catch (e) {
         return dateString;
     }
@@ -364,7 +512,7 @@ export function OperationsClientContent() {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <div/>
-          <Sheet open={isSheetOpen} onOpenChange={setSheetOpen}>
+          <Sheet open={isAddSheetOpen} onOpenChange={setAddSheetOpen}>
             <SheetTrigger asChild>
               <Button size="sm" className="gap-1">
                 <PlusCircle className="h-4 w-4" />
@@ -376,7 +524,7 @@ export function OperationsClientContent() {
                 <SheetTitle>{t('addOperationSheetTitle')}</SheetTitle>
               </SheetHeader>
               <div className="py-4">
-                {activeCompany && <AddOperationForm closeSheet={() => setSheetOpen(false)} tenantId={activeCompany.tenantId} companyId={activeCompany.id} fields={fields} machinery={machinery} />}
+                {activeCompany && <AddOperationForm closeSheet={() => setAddSheetOpen(false)} tenantId={activeCompany.tenantId} companyId={activeCompany.id} fields={fields} machinery={machinery} />}
               </div>
             </SheetContent>
           </Sheet>
@@ -401,7 +549,7 @@ export function OperationsClientContent() {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuLabel>{t('actions')}</DropdownMenuLabel>
-                        <DropdownMenuItem>{t('edit')}</DropdownMenuItem>
+                        <DropdownMenuItem onSelect={() => handleEdit(op)}>{t('edit')}</DropdownMenuItem>
                         {canManageOperations && (
                           <DropdownMenuItem className="text-destructive" onSelect={() => setOperationToDelete(op)}>{t('delete')}</DropdownMenuItem>
                         )}
@@ -484,7 +632,7 @@ export function OperationsClientContent() {
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
                           <DropdownMenuLabel>{t('actions')}</DropdownMenuLabel>
-                          <DropdownMenuItem>{t('edit')}</DropdownMenuItem>
+                          <DropdownMenuItem onSelect={() => handleEdit(op)}>{t('edit')}</DropdownMenuItem>
                           {canManageOperations && (
                             <>
                               <DropdownMenuSeparator />
@@ -515,6 +663,16 @@ export function OperationsClientContent() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      <Sheet open={isEditSheetOpen} onOpenChange={setEditSheetOpen}>
+        <SheetContent>
+          <SheetHeader>
+            <SheetTitle>{t('editOperationSheetTitle')}</SheetTitle>
+          </SheetHeader>
+          <div className="py-4">
+            {activeCompany && operationToEdit && <EditOperationForm closeSheet={() => setEditSheetOpen(false)} tenantId={activeCompany.tenantId} companyId={activeCompany.id} fields={fields} machinery={machinery} operation={operationToEdit} />}
+          </div>
+        </SheetContent>
+      </Sheet>
     </>
   )
 }

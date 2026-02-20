@@ -1,5 +1,5 @@
 import { DataService } from './data-service';
-import { Kpi, ChartDataPoint, Operation, Machinery, Session, Field, MaintenanceEvent, AddMaintenanceEventInput, AddRepairEventInput, RepairEvent, AuditLogEvent, AddOperationInput, LaborHoursByCropReportData, Observation, AddObservationInput, ProfitabilityByCropReportData, UpdateMachineInput, FieldEconomics, User, AddUserInput } from './types';
+import { Kpi, ChartDataPoint, Operation, Machinery, Session, Field, MaintenanceEvent, AddMaintenanceEventInput, AddRepairEventInput, RepairEvent, AuditLogEvent, AddOperationInput, LaborHoursByCropReportData, Observation, AddObservationInput, ProfitabilityByCropReportData, UpdateMachineInput, FieldEconomics, User, AddUserInput, UpdateOperationInput } from './types';
 
 // Hardcoded session for demonstration purposes, as this is a placeholder service.
 const session: Session = {
@@ -137,6 +137,18 @@ export class SupabaseDataService implements DataService {
   async addOperation(tenantId: string, companyId: string, operationData: AddOperationInput): Promise<Operation[]> {
     this.log('addOperation', { tenantId, companyId, operationData });
     return Promise.resolve([]);
+  }
+
+  async updateOperation(tenantId: string, companyId: string, operationId: string, operationData: UpdateOperationInput): Promise<Operation> {
+    this.log('updateOperation', { tenantId, companyId, operationId, operationData });
+    const updatedOperation: Operation = {
+        id: operationId,
+        tenantId,
+        companyId,
+        field: 'Placeholder Field',
+        ...operationData,
+    };
+    return Promise.resolve(updatedOperation);
   }
 
   async deleteOperation(tenantId: string, companyId: string, operationId: string): Promise<void> {

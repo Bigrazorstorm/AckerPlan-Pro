@@ -22,6 +22,11 @@ const AddOperationSchema = z.object({
   tenantId: z.string().min(1, { message: 'Tenant ID is required' }),
   companyId: z.string().min(1, { message: 'Company ID is required' }),
 })
+
+const UpdateOperationSchema = AddOperationSchema.extend({
+  id: z.string().min(1, { message: 'Operation ID is required' }),
+  fields: z.array(z.string()).optional(), // Field is not updatable this way
+})
  
 export async function addOperation(prevState: any, formData: FormData) {
   const validatedFields = AddOperationSchema.safeParse({
@@ -48,13 +53,50 @@ export async function addOperation(prevState: any, formData: FormData) {
     const { tenantId, companyId, ...operationData } = validatedFields.data;
     await dataService.addOperation(tenantId, companyId, operationData)
     revalidatePath('/operations')
-    return { message: 'Operation added successfully.' }
+    return { message: 'Operation added successfully.', errors: {} }
   } catch (e) {
     return {
       message: 'Failed to add operation.',
       errors: { _form: ['Failed to add operation.'] },
     }
   }
+}
+
+export async function updateOperation(prevState: any, formData: FormData) {
+    const validatedFields = UpdateOperationSchema.safeParse({
+        id: formData.get('id'),
+        type: formData.get('type'),
+        machineId: formData.get('machineId'),
+        date: formData.get('date'),
+        laborHours: formData.get('laborHours'),
+        status: formData.get('status'),
+        yieldAmount: formData.get('yieldAmount'),
+        revenue: formData.get('revenue'),
+        tenantId: formData.get('tenantId'),
+        companyId: formData.get('companyId'),
+    });
+
+    if (!validatedFields.success) {
+        return {
+            errors: validatedFields.error.flatten().fieldErrors,
+            message: 'Validation failed. Please check the fields.',
+        }
+    }
+
+    try {
+        const { tenantId, companyId, id, ...operationData } = validatedFields.data;
+        // The 'fields' array is not passed to updateOperation, as we're editing a single operation record.
+        const { fields, ...updateData } = operationData;
+        await dataService.updateOperation(tenantId, companyId, id, updateData);
+        revalidatePath('/operations');
+        return { message: 'Operation updated successfully.', errors: {} };
+    } catch (e) {
+        const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
+        return {
+            message: `Failed to update operation: ${errorMessage}`,
+            errors: {},
+        }
+    }
 }
 
 export async function deleteOperation(operationId: string, tenantId: string, companyId: string) {

@@ -1,5 +1,5 @@
 import { DataService } from './data-service';
-import { Kpi, ChartDataPoint, Operation, Machinery, Session, Field, MaintenanceEvent, AddMaintenanceEventInput, AuditLogEvent, RepairEvent, AddRepairEventInput, AddOperationInput, LaborHoursByCropReportData, Observation, AddObservationInput, ProfitabilityByCropReportData, UpdateMachineInput, FieldEconomics, User, AddUserInput, Role } from './types';
+import { Kpi, ChartDataPoint, Operation, Machinery, Session, Field, MaintenanceEvent, AddMaintenanceEventInput, AuditLogEvent, RepairEvent, AddRepairEventInput, AddOperationInput, LaborHoursByCropReportData, Observation, AddObservationInput, ProfitabilityByCropReportData, UpdateMachineInput, FieldEconomics, User, AddUserInput, Role, UpdateOperationInput } from './types';
 
 let users: User[] = [
     {
@@ -386,6 +386,44 @@ export class MockDataService implements DataService {
     }
     logAuditEvent(tenantId, companyId, 'operation.create', logDetails);
     return Promise.resolve(createdOps);
+  }
+
+  async updateOperation(tenantId: string, companyId: string, operationId: string, operationData: UpdateOperationInput): Promise<Operation> {
+    console.log(`Updating Operation ${operationId} for tenant ${tenantId}, company ${companyId}.`);
+    const opIndex = operations.findIndex(o => o.id === operationId && o.tenantId === tenantId && o.companyId === companyId);
+    if (opIndex === -1) {
+        throw new Error("Operation not found or not authorized to update.");
+    }
+
+    const oldOperation = operations[opIndex];
+    
+    // Adjust machine operating hours
+    const oldMachine = machinery.find(m => m.id === oldOperation.machine?.id);
+    if (oldMachine) {
+        oldMachine.totalOperatingHours -= oldOperation.laborHours;
+    }
+
+    const newMachine = machinery.find(m => m.id === operationData.machineId);
+    if (!newMachine) {
+        throw new Error("New machine not found.");
+    }
+    newMachine.totalOperatingHours += operationData.laborHours;
+    
+    // Recalculate fuel consumption
+    const fuelConsumed = newMachine.standardFuelConsumption * operationData.laborHours;
+
+    const updatedOperation: Operation = {
+        ...oldOperation,
+        ...operationData,
+        machine: { id: newMachine.id, name: newMachine.name },
+        fuelConsumed: parseFloat(fuelConsumed.toFixed(1)),
+    };
+
+    operations[opIndex] = updatedOperation;
+
+    logAuditEvent(tenantId, companyId, 'operation.update', `Maßnahme "${updatedOperation.type}" auf Fläche "${updatedOperation.field}" wurde aktualisiert.`);
+    
+    return Promise.resolve(updatedOperation);
   }
   
   async deleteOperation(tenantId: string, companyId: string, operationId: string): Promise<void> {

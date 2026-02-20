@@ -42,6 +42,18 @@ export interface AddOperationInput {
   revenue?: number;
 }
 
+// Input type for updating an existing operation
+export interface UpdateOperationInput {
+  type: string;
+  date: string;
+  status: "Completed" | "In Progress";
+  laborHours: number;
+  machineId: string;
+  yieldAmount?: number;
+  revenue?: number;
+}
+
+
 // Represents a Maintenance Event for a machine.
 export interface MaintenanceEvent {
   id: string; // UUID
