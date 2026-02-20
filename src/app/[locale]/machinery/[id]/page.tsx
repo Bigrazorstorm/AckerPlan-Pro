@@ -15,7 +15,7 @@ import { PlusCircle, Wrench, ArrowLeft, Calendar as CalendarIcon, Info, Pencil }
 import { format } from 'date-fns';
 import { de, enUS } from 'date-fns/locale';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Link } from 'next-intl/navigation';
+import Link from 'next/link';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -436,7 +436,7 @@ export default function MachineDetailPage() {
             <CardContent>
                 <p>{t('notFoundDescription')}</p>
                 <Button asChild variant="link" className="pl-0 mt-4">
-                    <Link href="/machinery">
+                    <Link href={`/${locale}/machinery`}>
                         <ArrowLeft className="mr-2 h-4 w-4" />
                         {t('backToList')}
                     </Link>
@@ -453,7 +453,7 @@ export default function MachineDetailPage() {
     <div className="space-y-4">
         <div>
             <Button variant="ghost" asChild>
-                <Link href="/machinery">
+                <Link href={`/${locale}/machinery`}>
                 <ArrowLeft className="mr-2 h-4 w-4" />
                 {t('backToList')}
                 </Link>
