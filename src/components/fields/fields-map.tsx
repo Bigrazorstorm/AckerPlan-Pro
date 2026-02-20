@@ -3,8 +3,8 @@
 import { MapContainer, TileLayer, Polygon, Tooltip, FeatureGroup, LayersControl, Marker, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import { Field, Observation } from '@/services/types';
-import L, { LatLngExpression, LatLngTuple, latLng, latLngBounds } from 'leaflet';
-import { useMemo, useEffect } from 'react';
+import L, { LatLngExpression, latLng, latLngBounds } from 'leaflet';
+import { useMemo, useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 
 // Fix for default marker icon with webpack
@@ -12,8 +12,7 @@ import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
 import markerIcon from 'leaflet/dist/images/marker-icon.png';
 import markerShadow from 'leaflet/dist/images/marker-shadow.png';
 
-// Define the center as a constant outside the component to prevent re-creation on render.
-const DEFAULT_CENTER: LatLngTuple = [52.505, 13.37];
+const DEFAULT_CENTER: L.LatLngTuple = [52.505, 13.37];
 
 L.Icon.Default.mergeOptions({
   iconUrl: markerIcon.src,
@@ -38,8 +37,12 @@ function ChangeView({ bounds }: { bounds: L.LatLngBounds | null }) {
 
 export function FieldsMap({ fields, observations }: FieldsMapProps) {
     const t = useTranslations('FieldsPage');
+    const [isMounted, setIsMounted] = useState(false);
+
+    useEffect(() => {
+      setIsMounted(true);
+    }, []);
     
-    // Memoize the style object to ensure it's stable across renders.
     const mapStyle = useMemo(() => ({ height: '100%', width: '100%', borderRadius: 'inherit', zIndex: 0 }), []);
 
     const fieldsWithGeometry = useMemo(() => fields.filter(f => f.geometry && f.geometry.length > 0), [fields]);
@@ -56,6 +59,10 @@ export function FieldsMap({ fields, observations }: FieldsMapProps) {
         
         return allPoints.length > 0 ? latLngBounds(allPoints).pad(0.1) : null;
     }, [hasData, fieldsWithGeometry, observationsWithLocation]);
+
+    if (!isMounted) {
+        return null;
+    }
 
     return (
         <MapContainer center={DEFAULT_CENTER} zoom={10} scrollWheelZoom={true} style={mapStyle}>
