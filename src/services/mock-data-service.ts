@@ -1,5 +1,5 @@
 import { DataService } from './data-service';
-import { Kpi, ChartDataPoint, Operation, Machinery, Session, Field, MaintenanceEvent, AddMaintenanceEventInput, AuditLogEvent, RepairEvent, AddRepairEventInput, AddOperationInput, LaborHoursByCropReportData, Observation, AddObservationInput } from './types';
+import { Kpi, ChartDataPoint, Operation, Machinery, Session, Field, MaintenanceEvent, AddMaintenanceEventInput, AuditLogEvent, RepairEvent, AddRepairEventInput, AddOperationInput, LaborHoursByCropReportData, Observation, AddObservationInput, ProfitabilityByCropReportData } from './types';
 
 const session: Session = {
   user: {
@@ -409,5 +409,50 @@ export class MockDataService implements DataService {
     }));
 
     return Promise.resolve(reportData);
+  }
+
+  async getProfitabilityByCropReport(tenantId: string, companyId: string): Promise<ProfitabilityByCropReportData[]> {
+    console.log(`Fetching Profitability by Crop Report for tenant ${tenantId} and company ${companyId}.`);
+    
+    const DIESEL_PRICE_PER_LITER = 1.50;
+    const LABOR_COST_PER_HOUR = 25.00;
+
+    const companyOps = operations.filter(op => op.tenantId === tenantId && op.companyId === companyId);
+    const companyFields = fields.filter(f => f.tenantId === tenantId && f.companyId === companyId);
+
+    const report: { [crop: string]: { revenue: number, laborCost: number, fuelCost: number } } = {};
+
+    // Initialize report object with all crops for the company
+    for (const field of companyFields) {
+        if (!report[field.crop]) {
+            report[field.crop] = { revenue: 0, laborCost: 0, fuelCost: 0 };
+        }
+    }
+
+    for (const op of companyOps) {
+        const field = companyFields.find(f => f.name === op.field);
+        if (field) {
+            const cropReport = report[field.crop];
+            if(cropReport) { // check if crop exists in report
+              cropReport.laborCost += op.laborHours * LABOR_COST_PER_HOUR;
+              if (op.fuelConsumed) {
+                  cropReport.fuelCost += op.fuelConsumed * DIESEL_PRICE_PER_LITER;
+              }
+              if (op.revenue) {
+                  cropReport.revenue += op.revenue;
+              }
+            }
+        }
+    }
+    
+    const reportData: ProfitabilityByCropReportData[] = Object.entries(report).map(([crop, data]) => ({
+        crop,
+        revenue: data.revenue,
+        laborCost: data.laborCost,
+        fuelCost: data.fuelCost,
+        contributionMargin: data.revenue - data.laborCost - data.fuelCost,
+    }));
+    
+    return Promise.resolve(reportData.sort((a,b) => b.contributionMargin - a.contributionMargin));
   }
 }

@@ -175,3 +175,12 @@ export interface LaborHoursByCropReportData {
   crop: string;
   hours: number;
 }
+
+// Represents data for the profitability by crop report.
+export interface ProfitabilityByCropReportData {
+  crop: string;
+  revenue: number;
+  laborCost: number;
+  fuelCost: number;
+  contributionMargin: number;
+}
