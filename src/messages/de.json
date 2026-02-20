@@ -87,7 +87,11 @@
     "noOperationsTitle": "Keine Maßnahmen erfasst",
     "noOperationsDescription": "Für diese Fläche wurden noch keine Maßnahmen protokolliert.",
     "notFoundTitle": "Fläche nicht gefunden",
-    "notFoundDescription": "Die angeforderte Fläche konnte nicht gefunden werden."
+    "notFoundDescription": "Die angeforderte Fläche konnte nicht gefunden werden.",
+    "economicsTitle": "Wirtschaftlichkeit (kumuliert)",
+    "revenueLabel": "Gesamterlös",
+    "costsLabel": "Gesamtkosten",
+    "marginLabel": "Deckungsbeitrag"
   },
   "MachineryPage": {
     "title": "Maschinen",

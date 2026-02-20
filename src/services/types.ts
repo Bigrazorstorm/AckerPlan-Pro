@@ -125,6 +125,13 @@ export interface Field {
   crop: string;
 };
 
+// Represents economic data for a specific entity (like a field).
+export interface FieldEconomics {
+  revenue: number;
+  costs: number;
+  contributionMargin: number;
+}
+
 // Represents a field observation or damage report.
 export interface Observation {
   id: string; // UUID

@@ -1,5 +1,5 @@
 import { DataService } from './data-service';
-import { Kpi, ChartDataPoint, Operation, Machinery, Session, Field, MaintenanceEvent, AddMaintenanceEventInput, AuditLogEvent, RepairEvent, AddRepairEventInput, AddOperationInput, LaborHoursByCropReportData, Observation, AddObservationInput, ProfitabilityByCropReportData, UpdateMachineInput } from './types';
+import { Kpi, ChartDataPoint, Operation, Machinery, Session, Field, MaintenanceEvent, AddMaintenanceEventInput, AuditLogEvent, RepairEvent, AddRepairEventInput, AddOperationInput, LaborHoursByCropReportData, Observation, AddObservationInput, ProfitabilityByCropReportData, UpdateMachineInput, FieldEconomics } from './types';
 
 const session: Session = {
   user: {
@@ -502,5 +502,37 @@ export class MockDataService implements DataService {
     }));
     
     return Promise.resolve(reportData.sort((a,b) => b.contributionMargin - a.contributionMargin));
+  }
+
+  async getFieldEconomics(tenantId: string, companyId: string, fieldId: string): Promise<FieldEconomics> {
+    console.log(`Fetching Field Economics for field ${fieldId}.`);
+    const DIESEL_PRICE_PER_LITER = 1.50;
+    const LABOR_COST_PER_HOUR = 25.00;
+
+    const field = fields.find(f => f.id === fieldId && f.tenantId === tenantId && f.companyId === companyId);
+    if (!field) {
+        return Promise.resolve({ revenue: 0, costs: 0, contributionMargin: 0 });
+    }
+
+    const fieldOps = operations.filter(op => op.tenantId === tenantId && op.companyId === companyId && op.field === field.name);
+
+    let totalRevenue = 0;
+    let totalCosts = 0;
+
+    for (const op of fieldOps) {
+        if (op.revenue) {
+            totalRevenue += op.revenue;
+        }
+        totalCosts += op.laborHours * LABOR_COST_PER_HOUR;
+        if (op.fuelConsumed) {
+            totalCosts += op.fuelConsumed * DIESEL_PRICE_PER_LITER;
+        }
+    }
+    
+    return Promise.resolve({
+        revenue: totalRevenue,
+        costs: totalCosts,
+        contributionMargin: totalRevenue - totalCosts,
+    });
   }
 }

@@ -87,7 +87,11 @@
     "noOperationsTitle": "No Operations Recorded",
     "noOperationsDescription": "No operations have been logged for this field yet.",
     "notFoundTitle": "Field Not Found",
-    "notFoundDescription": "The requested field could not be found."
+    "notFoundDescription": "The requested field could not be found.",
+    "economicsTitle": "Economics (Cumulative)",
+    "revenueLabel": "Total Revenue",
+    "costsLabel": "Total Costs",
+    "marginLabel": "Contribution Margin"
   },
   "MachineryPage": {
     "title": "Machinery",
