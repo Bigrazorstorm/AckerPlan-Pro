@@ -55,7 +55,7 @@ export function FieldsMap({ fields, observations }: FieldsMapProps) {
     const center: LatLngTuple = [52.505, 13.37];
 
     return (
-        <MapContainer center={center} zoom={10} scrollWheelZoom={hasData} style={{ height: '100%', width: '100%', borderRadius: 'inherit', zIndex: 0 }}>
+        <MapContainer center={center} zoom={10} scrollWheelZoom={true} style={{ height: '100%', width: '100%', borderRadius: 'inherit', zIndex: 0 }}>
             <ChangeView bounds={bounds} />
             <TileLayer
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
