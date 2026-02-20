@@ -47,7 +47,8 @@
   },
   "General": {
     "comingSoonTitle": "Coming Soon",
-    "comingSoonDescription": "This feature is under development and will be available shortly."
+    "comingSoonDescription": "This feature is under development and will be available shortly.",
+    "submitting": "Saving..."
   },
   "FieldsPage": {
     "title": "Fields",
@@ -67,6 +68,7 @@
     "type": "Type",
     "status": "Status",
     "operatingHours": "Operating Hours",
+    "operatingHoursUnit": "h",
     "actions": "Actions",
     "edit": "Edit",
     "viewMaintenance": "View Maintenance",
@@ -107,6 +109,8 @@
     "descriptionHeader": "Description",
     "costHeader": "Cost",
     "downtimeHeader": "Downtime (h)",
+    "downtimeUnit": "h",
+    "operatingHoursUnit": "h",
     "noMaintenanceTitle": "No Maintenance Records",
     "noMaintenanceDescription": "No maintenance has been logged for this machine yet.",
     "noRepairsTitle": "No Repair Records",
@@ -122,7 +126,6 @@
       "descriptionPlaceholder": "Describe the work performed (e.g., oil change, filter replacement)...",
       "costLabel": "Cost",
       "submit": "Save Event",
-      "submitting": "Saving...",
       "successToastTitle": "Success",
       "successToastDescription": "The maintenance event was saved successfully.",
       "errorToastTitle": "Error"
@@ -137,14 +140,14 @@
       "downtimeLabel": "Downtime (hours)",
       "downtimePlaceholder": "8",
       "submit": "Save Event",
-      "submitting": "Saving...",
       "successToastTitle": "Success",
       "successToastDescription": "The repair event was saved successfully.",
       "errorToastTitle": "Error"
     },
     "serviceDue": "Service Due",
     "serviceInHours": "In {hours}h",
-    "statusInWorkshop": "In Workshop"
+    "statusInWorkshop": "In Workshop",
+    "serviceNotApplicable": "N/A"
   },
   "MachineryTypes": {
     "Tractor": "Tractor",
@@ -152,6 +155,11 @@
     "Tillage": "Tillage",
     "Seeding": "Seeding",
     "Baler": "Baler"
+  },
+  "MachineryStatuses": {
+    "Operational": "Operational",
+    "Maintenance Due": "Maintenance Due",
+    "In Workshop": "In Workshop"
   },
   "OperationsPage": {
     "title": "Operations",
@@ -197,6 +205,10 @@
     "Harvesting": "Harvesting",
     "Baling": "Baling",
     "Mowing": "Mowing"
+  },
+  "OperationStatuses": {
+    "Completed": "Completed",
+    "In Progress": "In Progress"
   },
   "ObservationsPage": {
     "title": "Observations",

@@ -47,7 +47,8 @@
   },
   "General": {
     "comingSoonTitle": "Bald verfügbar",
-    "comingSoonDescription": "Diese Funktion befindet sich in der Entwicklung und wird in Kürze verfügbar sein."
+    "comingSoonDescription": "Diese Funktion befindet sich in der Entwicklung und wird in Kürze verfügbar sein.",
+    "submitting": "Wird gespeichert..."
   },
   "FieldsPage": {
     "title": "Flächen",
@@ -67,6 +68,7 @@
     "type": "Typ",
     "status": "Status",
     "operatingHours": "Betriebsstunden",
+    "operatingHoursUnit": "h",
     "actions": "Aktionen",
     "edit": "Bearbeiten",
     "viewMaintenance": "Wartung anzeigen",
@@ -107,6 +109,8 @@
     "descriptionHeader": "Beschreibung",
     "costHeader": "Kosten",
     "downtimeHeader": "Ausfall (h)",
+    "downtimeUnit": "h",
+    "operatingHoursUnit": "h",
     "noMaintenanceTitle": "Keine Wartungseinträge",
     "noMaintenanceDescription": "Für diese Maschine wurden noch keine Wartungsarbeiten protokolliert.",
     "noRepairsTitle": "Keine Reparaturen erfasst",
@@ -122,7 +126,6 @@
       "descriptionPlaceholder": "Beschreiben Sie die durchgeführten Arbeiten (z.B. Ölwechsel, Filtertausch)...",
       "costLabel": "Kosten",
       "submit": "Ereignis speichern",
-      "submitting": "Wird gespeichert...",
       "successToastTitle": "Erfolg",
       "successToastDescription": "Das Wartungsereignis wurde erfolgreich gespeichert.",
       "errorToastTitle": "Fehler"
@@ -137,14 +140,14 @@
       "downtimeLabel": "Ausfallzeit (Stunden)",
       "downtimePlaceholder": "8",
       "submit": "Ereignis speichern",
-      "submitting": "Wird gespeichert...",
       "successToastTitle": "Erfolg",
       "successToastDescription": "Das Reparaturereignis wurde erfolgreich gespeichert.",
       "errorToastTitle": "Fehler"
     },
     "serviceDue": "Service fällig",
     "serviceInHours": "In {hours}h",
-    "statusInWorkshop": "In Werkstatt"
+    "statusInWorkshop": "In Werkstatt",
+    "serviceNotApplicable": "Nicht zutreffend"
   },
   "MachineryTypes": {
     "Tractor": "Traktor",
@@ -152,6 +155,11 @@
     "Tillage": "Bodenbearbeitung",
     "Seeding": "Sämaschine",
     "Baler": "Ballenpresse"
+  },
+  "MachineryStatuses": {
+    "Operational": "Betriebsbereit",
+    "Maintenance Due": "Wartung fällig",
+    "In Workshop": "In Werkstatt"
   },
   "OperationsPage": {
     "title": "Maßnahmen",
@@ -197,6 +205,10 @@
     "Harvesting": "Ernte",
     "Baling": "Ballenpressen",
     "Mowing": "Mähen"
+  },
+  "OperationStatuses": {
+    "Completed": "Abgeschlossen",
+    "In Progress": "In Bearbeitung"
   },
   "ObservationsPage": {
     "title": "Beobachtungen",

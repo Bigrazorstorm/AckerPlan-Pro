@@ -116,6 +116,7 @@ function AddMachineForm({ closeSheet, tenantId, companyId }: { closeSheet: () =>
 export function MachineryClientContent() {
   const t = useTranslations('MachineryPage');
   const tMachineTypes = useTranslations('MachineryTypes');
+  const tMachineStatuses = useTranslations('MachineryStatuses');
   const [isSheetOpen, setSheetOpen] = useState(false);
   const { activeCompany, loading: sessionLoading } = useSession();
   const [machinery, setMachinery] = useState<Machinery[]>([]);
@@ -230,10 +231,10 @@ export function MachineryClientContent() {
                     : machine.status === 'In Workshop' ? 'bg-red-100 text-red-800'
                     : ''
                   }>
-                    {machine.status}
+                    {tMachineStatuses(machine.status)}
                   </Badge>
                 </TableCell>
-                <TableCell className="text-right">{machine.totalOperatingHours.toLocaleString(locale)} h</TableCell>
+                <TableCell className="text-right">{machine.totalOperatingHours.toLocaleString(locale)} {t('operatingHoursUnit')}</TableCell>
                 <TableCell>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>

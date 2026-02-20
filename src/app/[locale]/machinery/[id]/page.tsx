@@ -286,8 +286,8 @@ export default function MachineDetailPage() {
   const [isRepairSheetOpen, setRepairSheetOpen] = useState(false);
 
   const t = useTranslations('MachineDetailPage');
-  const tGen = useTranslations('General');
   const tMachineTypes = useTranslations('MachineryTypes');
+  const tMachineStatuses = useTranslations('MachineryStatuses');
 
   useEffect(() => {
     if (activeCompany) {
@@ -326,10 +326,10 @@ export default function MachineDetailPage() {
 
   const getNextServiceInfo = (m: Machinery) => {
     if (m.status === 'In Workshop') {
-      return { text: t('statusInWorkshop'), isDue: true };
+      return { text: tMachineStatuses('In Workshop'), isDue: true };
     }
     if (!m.maintenanceIntervalHours) {
-      return { text: 'N/A', isDue: false };
+      return { text: t('serviceNotApplicable'), isDue: false };
     }
     const nextServiceHours = m.lastMaintenanceHours + m.maintenanceIntervalHours;
     const hoursRemaining = nextServiceHours - m.totalOperatingHours;
@@ -437,12 +437,12 @@ export default function MachineDetailPage() {
                             : machine.status === 'In Workshop' ? 'bg-red-100 text-red-800'
                             : ''
                         }>
-                            {machine.status}
+                            {tMachineStatuses(machine.status)}
                         </Badge>
                     </div>
                     <div className="flex justify-between">
                         <span className="text-muted-foreground">{t('totalOperatingHoursLabel')}</span>
-                        <span className="font-medium">{machine.totalOperatingHours.toLocaleString(locale)} h</span>
+                        <span className="font-medium">{machine.totalOperatingHours.toLocaleString(locale)} {t('operatingHoursUnit')}</span>
                     </div>
                     <div className="flex justify-between">
                     <span className="text-muted-foreground">{t('nextServiceLabel')}</span>
@@ -516,7 +516,7 @@ export default function MachineDetailPage() {
                                                 <TableCell>{dateFormatter(event.date)}</TableCell>
                                                 <TableCell className="font-medium">{event.description}</TableCell>
                                                 <TableCell className="text-right">{currencyFormatter.format(event.cost)}</TableCell>
-                                                <TableCell className="text-right">{event.downtimeHours}h</TableCell>
+                                                <TableCell className="text-right">{event.downtimeHours}{t('downtimeUnit')}</TableCell>
                                             </TableRow>
                                         ))}
                                     </TableBody>

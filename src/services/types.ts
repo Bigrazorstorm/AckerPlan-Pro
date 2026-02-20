@@ -89,7 +89,6 @@ export interface Machinery {
   type: string;
   model: string;
   status: "Operational" | "Maintenance Due" | "In Workshop";
-  nextService: string; // Legacy display string, will be calculated
   lastMaintenance: string;
   standardFuelConsumption: number; // in liters per hour
   

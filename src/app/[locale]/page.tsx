@@ -7,10 +7,12 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import dataService from "@/services";
 import { DashboardChart } from "@/components/dashboard-chart";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { AreaChart, Bell, Eye, Tractor } from "lucide-react";
 import { Kpi, Operation, ChartDataPoint } from '@/services/types';
 import { Skeleton } from '@/components/ui/skeleton';
+import { format } from 'date-fns';
+import { de, enUS } from 'date-fns/locale';
 
 function DashboardSkeleton() {
     return (
@@ -72,7 +74,9 @@ export default function Home() {
   const t = useTranslations('Dashboard');
   const tKpi = useTranslations('Kpis');
   const tOperationTypes = useTranslations('OperationTypes');
+  const tOperationStatuses = useTranslations('OperationStatuses');
   const { activeCompany, loading: sessionLoading } = useSession();
+  const locale = useLocale();
 
   const [kpis, setKpis] = useState<Kpi[]>([]);
   const [recentOperations, setRecentOperations] = useState<Operation[]>([]);
@@ -103,6 +107,15 @@ export default function Home() {
     OpenObservations: Eye,
     MaintenanceDue: Bell,
   };
+  
+  const dateFormatter = (dateString: string) => {
+    try {
+        return format(new Date(dateString), 'PP', { locale: locale === 'de' ? de : enUS });
+    } catch (e) {
+        return dateString;
+    }
+  }
+
 
   if (sessionLoading || (loading && !kpis.length)) {
     return <DashboardSkeleton />
@@ -173,11 +186,11 @@ export default function Home() {
                   <TableRow key={activity.id}>
                     <TableCell>
                       <div className="font-medium">{tOperationTypes(activity.type)}</div>
-                      <div className="text-sm text-muted-foreground">{activity.date}</div>
+                      <div className="text-sm text-muted-foreground">{dateFormatter(activity.date)}</div>
                     </TableCell>
                     <TableCell>{activity.field}</TableCell>
                     <TableCell>
-                      <Badge variant={activity.status === 'Completed' ? 'default' : 'secondary'} className={activity.status === 'Completed' ? 'bg-green-100 text-green-800' : ''}>{activity.status}</Badge>
+                      <Badge variant={activity.status === 'Completed' ? 'default' : 'secondary'} className={activity.status === 'Completed' ? 'bg-green-100 text-green-800' : ''}>{tOperationStatuses(activity.status)}</Badge>
                     </TableCell>
                   </TableRow>
                 ))}
