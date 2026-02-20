@@ -1,8 +1,21 @@
-"use client"
+'use client';
 
-import { Link, usePathname } from "next-intl/navigation";
-import { Leaf, LayoutDashboard, Map, Tractor, Combine, Siren, BarChart3, Settings, LogOut, ChevronDown, History } from "lucide-react"
-import { cn } from "@/lib/utils"
+import { Link } from 'next-intl/navigation';
+import { usePathname, useParams } from 'next/navigation';
+import {
+  Leaf,
+  LayoutDashboard,
+  Map,
+  Tractor,
+  Combine,
+  Siren,
+  BarChart3,
+  Settings,
+  LogOut,
+  ChevronDown,
+  History,
+} from 'lucide-react';
+import { cn } from '@/lib/utils';
 import {
   SidebarHeader,
   SidebarContent,
@@ -11,33 +24,45 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarSeparator,
-} from "@/components/ui/sidebar"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { PlaceHolderImages } from "@/lib/placeholder-images"
-import { Button } from "@/components/ui/button"
+} from '@/components/ui/sidebar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { PlaceHolderImages } from '@/lib/placeholder-images';
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { useTranslations } from "next-intl"
+} from '@/components/ui/dropdown-menu';
+import { useTranslations } from 'next-intl';
+import { useEffect, useState } from 'react';
 
 const navItems = [
-  { href: "/", icon: LayoutDashboard, labelKey: "dashboard" },
-  { href: "/fields", icon: Map, labelKey: "fields" },
-  { href: "/operations", icon: Combine, labelKey: "operations" },
-  { href: "/observations", icon: Siren, labelKey: "observations" },
-  { href: "/machinery", icon: Tractor, labelKey: "machinery" },
-  { href: "/reports", icon: BarChart3, labelKey: "reports" },
-  { href: "/audit-log", icon: History, labelKey: "auditLog" },
+  { href: '/', icon: LayoutDashboard, labelKey: 'dashboard' },
+  { href: '/fields', icon: Map, labelKey: 'fields' },
+  { href: '/operations', icon: Combine, labelKey: 'operations' },
+  { href: '/observations', icon: Siren, labelKey: 'observations' },
+  { href: '/machinery', icon: Tractor, labelKey: 'machinery' },
+  { href: '/reports', icon: BarChart3, labelKey: 'reports' },
+  { href: '/audit-log', icon: History, labelKey: 'auditLog' },
 ];
 
 export function SidebarNav() {
   const pathname = usePathname();
-    
-  const userAvatar = PlaceHolderImages.find(p => p.id === 'user-avatar');
+  const params = useParams();
+  const [basePath, setBasePath] = useState('');
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    // This effect runs only on the client, after hydration.
+    // It safely calculates the base path without causing a server-client mismatch.
+    const locale = params && typeof params.locale === 'string' ? params.locale : '';
+    setBasePath(locale ? pathname.replace(`/${locale}`, '') || '/' : pathname);
+    setIsClient(true);
+  }, [pathname, params]);
+
+  const userAvatar = PlaceHolderImages.find((p) => p.id === 'user-avatar');
   const t = useTranslations('Sidebar');
 
   return (
@@ -51,21 +76,22 @@ export function SidebarNav() {
       <SidebarContent>
         <SidebarMenu>
           {navItems.map((item) => {
-            const isActive = (item.href === "/" && pathname === item.href) || (item.href !== "/" && pathname.startsWith(item.href));
+            // Active state is only calculated on the client side to prevent hydration errors.
+            const isActive =
+              isClient &&
+              ((item.href === '/' && basePath === item.href) ||
+                (item.href !== '/' && basePath.startsWith(item.href)));
             return (
-            <SidebarMenuItem key={item.href}>
-              <SidebarMenuButton
-                asChild
-                isActive={isActive}
-                className="justify-start"
-              >
-                <Link href={item.href}>
-                  <item.icon className="h-4 w-4" />
-                  <span>{t(item.labelKey)}</span>
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          )})}
+              <SidebarMenuItem key={item.href}>
+                <SidebarMenuButton asChild isActive={isActive} className="justify-start">
+                  <Link href={item.href}>
+                    <item.icon className="h-4 w-4" />
+                    <span>{t(item.labelKey)}</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            );
+          })}
         </SidebarMenu>
       </SidebarContent>
       <SidebarSeparator />
@@ -102,5 +128,5 @@ export function SidebarNav() {
         </DropdownMenu>
       </SidebarFooter>
     </>
-  )
+  );
 }
