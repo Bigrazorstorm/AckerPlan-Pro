@@ -93,7 +93,7 @@ export interface DataService {
    * @param companyId - The ID of the company.
    * @param operationData - The data for the new operation.
    */
-  addOperation(tenantId: string, companyId: string, operationData: AddOperationInput): Promise<Operation>;
+  addOperation(tenantId: string, companyId: string, operationData: AddOperationInput): Promise<Operation[]>;
 
   /**
    * Retrieves fields data for a given company and tenant.

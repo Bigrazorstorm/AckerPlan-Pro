@@ -15,9 +15,9 @@ import { useParams } from 'next/navigation'
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger, DropdownMenuCheckboxItem } from "@/components/ui/dropdown-menu"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { MoreHorizontal, PlusCircle, Calendar as CalendarIcon } from "lucide-react"
+import { MoreHorizontal, PlusCircle, Calendar as CalendarIcon, ChevronsUpDown } from "lucide-react"
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -54,6 +54,7 @@ function AddOperationForm({ closeSheet, tenantId, companyId, fields, machinery }
   const t = useTranslations('OperationsPage.addOperationForm');
   const tOperationTypes = useTranslations('OperationTypes');
   const [date, setDate] = useState<Date>()
+  const [selectedFields, setSelectedFields] = useState<string[]>([]);
   const { locale } = useParams<{ locale: string }>();
 
   useEffect(() => {
@@ -79,7 +80,8 @@ function AddOperationForm({ closeSheet, tenantId, companyId, fields, machinery }
       <input type="hidden" name="tenantId" value={tenantId} />
       <input type="hidden" name="companyId" value={companyId} />
       <input type="hidden" name="date" value={date ? format(date, "yyyy-MM-dd") : ""} />
-      
+      {selectedFields.map(field => <input key={field} type="hidden" name="fields" value={field} />)}
+
       <div className="space-y-2">
         <Label htmlFor="type">{t('typeLabel')}</Label>
         <Select name="type" required>
@@ -97,18 +99,38 @@ function AddOperationForm({ closeSheet, tenantId, companyId, fields, machinery }
 
        <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label htmlFor="field">{t('fieldLabel')}</Label>
-            <Select name="field" required>
-              <SelectTrigger>
-                <SelectValue placeholder={t('fieldPlaceholder')} />
-              </SelectTrigger>
-              <SelectContent>
+            <Label>{t('fieldLabel')}</Label>
+             <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="w-full justify-between font-normal">
+                  <span className="truncate pr-1">
+                    {selectedFields.length > 0
+                      ? selectedFields.length === 1
+                        ? selectedFields[0]
+                        : t('multipleFieldsSelected', { count: selectedFields.length })
+                      : t('fieldPlaceholder')}
+                  </span>
+                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-[--radix-dropdown-menu-trigger-width]">
                 {fields.map((field) => (
-                    <SelectItem key={field.id} value={field.name}>{field.name}</SelectItem>
+                  <DropdownMenuCheckboxItem
+                    key={field.id}
+                    checked={selectedFields.includes(field.name)}
+                    onSelect={(e) => e.preventDefault()}
+                    onCheckedChange={(checked) => {
+                      return checked
+                        ? setSelectedFields((prev) => [...prev, field.name])
+                        : setSelectedFields((prev) => prev.filter((f) => f !== field.name));
+                    }}
+                  >
+                    {field.name}
+                  </DropdownMenuCheckboxItem>
                 ))}
-              </SelectContent>
-            </Select>
-            {state.errors?.field && <p className="text-sm text-destructive">{state.errors.field.join(', ')}</p>}
+              </DropdownMenuContent>
+            </DropdownMenu>
+            {state.errors?.fields && <p className="text-sm text-destructive">{state.errors.fields.join(', ')}</p>}
         </div>
         <div className="space-y-2">
             <Label htmlFor="machineId">{t('machineLabel')}</Label>

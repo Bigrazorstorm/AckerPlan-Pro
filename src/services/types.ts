@@ -31,7 +31,7 @@ export interface Operation {
 // Input type for adding a new operation
 export interface AddOperationInput {
   type: string;
-  field: string;
+  fields: string[];
   date: string;
   status: "Completed" | "In Progress";
   laborHours: number;

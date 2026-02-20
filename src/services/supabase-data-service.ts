@@ -111,16 +111,9 @@ export class SupabaseDataService implements DataService {
     return Promise.resolve(newMachine);
   }
 
-  async addOperation(tenantId: string, companyId: string, operationData: AddOperationInput): Promise<Operation> {
+  async addOperation(tenantId: string, companyId: string, operationData: AddOperationInput): Promise<Operation[]> {
     this.log('addOperation', { tenantId, companyId, operationData });
-     const newOperation: Operation = {
-      id: `supabase-op-${Date.now()}`,
-      tenantId,
-      companyId,
-      fuelConsumed: 0,
-      ...operationData,
-    };
-    return Promise.resolve(newOperation);
+    return Promise.resolve([]);
   }
 
   async getFields(tenantId: string, companyId: string): Promise<Field[]> {

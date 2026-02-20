@@ -256,43 +256,55 @@ export class MockDataService implements DataService {
     return Promise.resolve(newMachine);
   }
 
-  async addOperation(tenantId: string, companyId: string, operationData: AddOperationInput): Promise<Operation> {
+  async addOperation(tenantId: string, companyId: string, operationData: AddOperationInput): Promise<Operation[]> {
     console.log(`Adding Operation for tenant ${tenantId} and company ${companyId}.`);
     const machine = machinery.find(m => m.id === operationData.machineId && m.tenantId === tenantId && m.companyId === companyId);
     if (!machine) {
         throw new Error('Machine not found');
     }
 
-    // Update machine operating hours and check for maintenance
-    machine.totalOperatingHours += operationData.laborHours;
+    const createdOps: Operation[] = [];
+    const numFields = operationData.fields.length;
+    if (numFields === 0) {
+        return Promise.resolve([]);
+    }
+
+    // Distribute hours and consumption across fields
+    const laborHoursPerField = operationData.laborHours / numFields;
+    machine.totalOperatingHours += operationData.laborHours; // Add total hours to machine
     machine.updatedAt = new Date().toISOString();
     if (machine.maintenanceIntervalHours && machine.totalOperatingHours >= machine.lastMaintenanceHours + machine.maintenanceIntervalHours) {
         if (machine.status !== 'In Workshop') {
             machine.status = 'Maintenance Due';
         }
     }
+    const fuelConsumedPerField = (machine.standardFuelConsumption * operationData.laborHours) / numFields;
 
 
-    const fuelConsumed = machine.standardFuelConsumption * operationData.laborHours;
-
-    const newOperation: Operation = {
-      id: `OP${String(operations.length + 1).padStart(3, '0')}`,
-      tenantId: tenantId,
-      companyId: companyId,
-      type: operationData.type,
-      field: operationData.field,
-      date: operationData.date,
-      status: operationData.status,
-      laborHours: operationData.laborHours,
-      machine: {
-          id: machine.id,
-          name: machine.name
-      },
-      fuelConsumed: parseFloat(fuelConsumed.toFixed(1)),
-    };
-    operations.unshift(newOperation);
-    logAuditEvent(tenantId, companyId, 'operation.create', `Maßnahme "${operationData.type}" auf Fläche "${operationData.field}" erstellt (Arbeitszeit: ${operationData.laborHours}h, Diesel: ${newOperation.fuelConsumed}l).`);
-    return Promise.resolve(newOperation);
+    for (const fieldName of operationData.fields) {
+        const newOperation: Operation = {
+          id: `OP${String(operations.length + 1 + createdOps.length).padStart(3, '0')}`,
+          tenantId: tenantId,
+          companyId: companyId,
+          type: operationData.type,
+          field: fieldName,
+          date: operationData.date,
+          status: operationData.status,
+          laborHours: parseFloat(laborHoursPerField.toFixed(2)),
+          machine: {
+              id: machine.id,
+              name: machine.name
+          },
+          fuelConsumed: parseFloat(fuelConsumedPerField.toFixed(1)),
+        };
+        createdOps.push(newOperation);
+    }
+    
+    operations.unshift(...createdOps);
+    const fieldsString = operationData.fields.join(', ');
+    const logDetails = `Maßnahme "${operationData.type}" auf Fläche(n) "${fieldsString}" erstellt (Gesamtarbeitszeit: ${operationData.laborHours}h).`;
+    logAuditEvent(tenantId, companyId, 'operation.create', logDetails);
+    return Promise.resolve(createdOps);
   }
   
   async addMaintenanceEvent(tenantId: string, companyId: string, eventData: AddMaintenanceEventInput): Promise<MaintenanceEvent> {
