@@ -1,5 +1,5 @@
 import { DataService } from './data-service';
-import { Kpi, ChartDataPoint, Operation, Machinery, Session, Field, MaintenanceEvent, AddMaintenanceEventInput, AuditLogEvent, RepairEvent, AddRepairEventInput, AddOperationInput, LaborHoursByCropReportData, Observation, AddObservationInput, ProfitabilityByCropReportData, UpdateMachineInput, FieldEconomics, User } from './types';
+import { Kpi, ChartDataPoint, Operation, Machinery, Session, Field, MaintenanceEvent, AddMaintenanceEventInput, AuditLogEvent, RepairEvent, AddRepairEventInput, AddOperationInput, LaborHoursByCropReportData, Observation, AddObservationInput, ProfitabilityByCropReportData, UpdateMachineInput, FieldEconomics, User, AddUserInput, Role } from './types';
 
 let users: User[] = [
     {
@@ -603,5 +603,36 @@ export class MockDataService implements DataService {
         u.companyRoles.some(cr => cr.companyId === companyId)
     );
     return Promise.resolve(companyUsers);
+  }
+
+  async addUser(tenantId: string, companyId: string, userData: AddUserInput): Promise<User> {
+    console.log(`Adding user to tenant ${tenantId} and company ${companyId}.`);
+    
+    // Check if user already exists in the system by email
+    let user = users.find(u => u.email === userData.email);
+
+    if (user) {
+        // User exists, check if they are already in the company
+        const alreadyInCompany = user.companyRoles.some(cr => cr.companyId === companyId);
+        if (alreadyInCompany) {
+            throw new Error('User is already a member of this company.');
+        }
+        // Add role for this company to existing user
+        user.companyRoles.push({ companyId, role: userData.role });
+    } else {
+        // User does not exist, create a new user
+        user = {
+            id: `user-${users.length + 1}`,
+            name: userData.name,
+            email: userData.email,
+            tenantId: tenantId,
+            companyRoles: [{ companyId, role: userData.role }],
+        };
+        users.push(user);
+    }
+    
+    logAuditEvent(tenantId, companyId, 'user.add', `User "${userData.name}" (${userData.email}) was added to the company with role "${userData.role}".`);
+    
+    return Promise.resolve(user);
   }
 }

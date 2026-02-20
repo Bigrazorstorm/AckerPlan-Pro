@@ -1,5 +1,5 @@
 import { DataService } from './data-service';
-import { Kpi, ChartDataPoint, Operation, Machinery, Session, Field, MaintenanceEvent, AddMaintenanceEventInput, AddRepairEventInput, RepairEvent, AuditLogEvent, AddOperationInput, LaborHoursByCropReportData, Observation, AddObservationInput, ProfitabilityByCropReportData, UpdateMachineInput, FieldEconomics, User } from './types';
+import { Kpi, ChartDataPoint, Operation, Machinery, Session, Field, MaintenanceEvent, AddMaintenanceEventInput, AddRepairEventInput, RepairEvent, AuditLogEvent, AddOperationInput, LaborHoursByCropReportData, Observation, AddObservationInput, ProfitabilityByCropReportData, UpdateMachineInput, FieldEconomics, User, AddUserInput } from './types';
 
 // Hardcoded session for demonstration purposes, as this is a placeholder service.
 const session: Session = {
@@ -203,5 +203,17 @@ export class SupabaseDataService implements DataService {
   async getUsersForCompany(tenantId: string, companyId: string): Promise<User[]> {
     this.log('getUsersForCompany', { tenantId, companyId });
     return Promise.resolve([]);
+  }
+
+  async addUser(tenantId: string, companyId: string, userData: AddUserInput): Promise<User> {
+    this.log('addUser', { tenantId, companyId, userData });
+    const newUser: User = {
+      id: `supabase-user-${Date.now()}`,
+      tenantId: tenantId,
+      name: userData.name,
+      email: userData.email,
+      companyRoles: [{ companyId, role: userData.role }],
+    };
+    return Promise.resolve(newUser);
   }
 }

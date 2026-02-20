@@ -366,7 +366,20 @@
       "editRole": "Edit Role",
       "removeUser": "Remove User",
       "accessDeniedTitle": "Access Denied",
-      "accessDeniedDescription": "You do not have the required permissions to manage users for this company."
+      "accessDeniedDescription": "You do not have the required permissions to manage users for this company.",
+      "addUserSheetTitle": "Add New User",
+      "addUserForm": {
+        "nameLabel": "Full Name",
+        "namePlaceholder": "e.g. Jane Doe",
+        "emailLabel": "Email Address",
+        "emailPlaceholder": "jane.doe@example.com",
+        "roleLabel": "Role",
+        "rolePlaceholder": "Select a role",
+        "submit": "Add User",
+        "submitting": "Adding User...",
+        "successToastTitle": "User Added",
+        "errorToastTitle": "Error Adding User"
+      }
     }
   },
   "AuditLogPage": {

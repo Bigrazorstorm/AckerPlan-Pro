@@ -1,4 +1,4 @@
-import { Kpi, ChartDataPoint, Operation, Machinery, Session, Field, MaintenanceEvent, AddMaintenanceEventInput, AuditLogEvent, RepairEvent, AddRepairEventInput, AddOperationInput, LaborHoursByCropReportData, Observation, AddObservationInput, ProfitabilityByCropReportData, UpdateMachineInput, FieldEconomics, User } from './types';
+import { Kpi, ChartDataPoint, Operation, Machinery, Session, Field, MaintenanceEvent, AddMaintenanceEventInput, AuditLogEvent, RepairEvent, AddRepairEventInput, AddOperationInput, LaborHoursByCropReportData, Observation, AddObservationInput, ProfitabilityByCropReportData, UpdateMachineInput, FieldEconomics, User, AddUserInput } from './types';
 
 /**
  * Defines the contract for data access in the application.
@@ -201,4 +201,12 @@ export interface DataService {
    * @param companyId The ID of the company.
    */
   getUsersForCompany(tenantId: string, companyId: string): Promise<User[]>;
+
+  /**
+   * Adds a new user to a company within a tenant.
+   * @param tenantId The ID of the tenant.
+   * @param companyId The ID of the company.
+   * @param userData The data for the new user.
+   */
+  addUser(tenantId: string, companyId: string, userData: AddUserInput): Promise<User>;
 }

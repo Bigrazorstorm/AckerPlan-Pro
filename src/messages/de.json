@@ -366,7 +366,20 @@
       "editRole": "Rolle bearbeiten",
       "removeUser": "Benutzer entfernen",
       "accessDeniedTitle": "Keine Berechtigung",
-      "accessDeniedDescription": "Sie haben nicht die erforderlichen Berechtigungen, um Benutzer für diese Firma zu verwalten."
+      "accessDeniedDescription": "Sie haben nicht die erforderlichen Berechtigungen, um Benutzer für diese Firma zu verwalten.",
+      "addUserSheetTitle": "Neuen Benutzer hinzufügen",
+      "addUserForm": {
+        "nameLabel": "Vollständiger Name",
+        "namePlaceholder": "z.B. Erika Mustermann",
+        "emailLabel": "E-Mail-Adresse",
+        "emailPlaceholder": "erika.mustermann@example.com",
+        "roleLabel": "Rolle",
+        "rolePlaceholder": "Rolle auswählen",
+        "submit": "Benutzer hinzufügen",
+        "submitting": "Benutzer wird hinzugefügt...",
+        "successToastTitle": "Benutzer hinzugefügt",
+        "errorToastTitle": "Fehler beim Hinzufügen"
+      }
     }
   },
   "AuditLogPage": {

@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useActionState } from 'react';
+import { useFormStatus } from 'react-dom';
 import { useSession } from '@/context/session-context';
 import dataService from '@/services';
-import { User } from '@/services/types';
+import { User, Role } from '@/services/types';
 import { useTranslations } from 'next-intl';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -11,6 +12,95 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { MoreHorizontal, PlusCircle, Users } from 'lucide-react';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useToast } from '@/hooks/use-toast';
+import { addUser } from '@/app/settings/actions';
+
+
+const addUserInitialState = {
+  message: '',
+  errors: {},
+};
+
+function AddUserSubmitButton() {
+  const { pending } = useFormStatus();
+  const t = useTranslations('SettingsPage.userManagement.addUserForm');
+  return (
+    <Button type="submit" aria-disabled={pending}>
+      {pending ? t('submitting') : t('submit')}
+    </Button>
+  );
+}
+
+function AddUserForm({ closeSheet, tenantId, companyId }: { closeSheet: () => void; tenantId: string; companyId: string; }) {
+  const [state, formAction] = useActionState(addUser, addUserInitialState);
+  const { toast } = useToast();
+  const t = useTranslations('SettingsPage.userManagement.addUserForm');
+  const tRoles = useTranslations('Roles');
+  
+  const roles: Role[] = ["Firmen Admin", "Betriebsleitung", "Mitarbeiter", "Werkstatt", "Leser"];
+
+  useEffect(() => {
+    if (state.message && Object.keys(state.errors).length === 0) {
+      toast({
+        title: t('successToastTitle'),
+        description: state.message,
+      });
+      closeSheet();
+    } else if (state.message && state.message.startsWith('Failed to add user:')) {
+      toast({
+        variant: 'destructive',
+        title: t('errorToastTitle'),
+        description: state.message,
+      });
+    } else if (state.message && Object.keys(state.errors).length > 0) {
+       toast({
+        variant: 'destructive',
+        title: t('errorToastTitle'),
+        description: state.message,
+      });
+    }
+  }, [state, toast, closeSheet, t]);
+
+  return (
+    <form action={formAction} className="space-y-4">
+      <input type="hidden" name="tenantId" value={tenantId} />
+      <input type="hidden" name="companyId" value={companyId} />
+      
+      <div className="space-y-2">
+        <Label htmlFor="name">{t('nameLabel')}</Label>
+        <Input id="name" name="name" required placeholder={t('namePlaceholder')} />
+        {state.errors?.name && <p className="text-sm text-destructive">{state.errors.name.join(', ')}</p>}
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="email">{t('emailLabel')}</Label>
+        <Input id="email" name="email" type="email" required placeholder={t('emailPlaceholder')} />
+        {state.errors?.email && <p className="text-sm text-destructive">{state.errors.email.join(', ')}</p>}
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="role">{t('roleLabel')}</Label>
+        <Select name="role" required>
+          <SelectTrigger>
+            <SelectValue placeholder={t('rolePlaceholder')} />
+          </SelectTrigger>
+          <SelectContent>
+            {roles.map((role) => (
+              <SelectItem key={role} value={role}>{tRoles(role)}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        {state.errors?.role && <p className="text-sm text-destructive">{state.errors.role.join(', ')}</p>}
+      </div>
+
+      <AddUserSubmitButton />
+    </form>
+  );
+}
 
 function UserTableSkeleton() {
     return (
@@ -41,6 +131,7 @@ export function UserManagementContent() {
     const { activeCompany, loading: sessionLoading, activeRole } = useSession();
     const [users, setUsers] = useState<User[]>([]);
     const [loading, setLoading] = useState(true);
+    const [isAddSheetOpen, setAddSheetOpen] = useState(false);
     const t = useTranslations('SettingsPage.userManagement');
     const tRoles = useTranslations('Roles');
 
@@ -58,7 +149,7 @@ export function UserManagementContent() {
         } else if (!sessionLoading) {
             setLoading(false);
         }
-    }, [activeCompany, canManageUsers, sessionLoading]);
+    }, [activeCompany, canManageUsers, sessionLoading, isAddSheetOpen]); // Re-fetch when sheet closes
     
     if (sessionLoading || loading) {
         return (
@@ -103,10 +194,22 @@ export function UserManagementContent() {
                     <CardTitle>{t('title')}</CardTitle>
                     <CardDescription>{t('description')}</CardDescription>
                 </div>
-                 <Button size="sm" className="gap-1">
-                    <PlusCircle className="h-4 w-4" />
-                    {t('addUserButton')}
-                </Button>
+                 <Sheet open={isAddSheetOpen} onOpenChange={setAddSheetOpen}>
+                    <SheetTrigger asChild>
+                        <Button size="sm" className="gap-1">
+                            <PlusCircle className="h-4 w-4" />
+                            {t('addUserButton')}
+                        </Button>
+                    </SheetTrigger>
+                    <SheetContent>
+                        <SheetHeader>
+                            <SheetTitle>{t('addUserSheetTitle')}</SheetTitle>
+                        </SheetHeader>
+                        <div className="py-4">
+                            {activeCompany && <AddUserForm closeSheet={() => setAddSheetOpen(false)} tenantId={activeCompany.tenantId} companyId={activeCompany.id} />}
+                        </div>
+                    </SheetContent>
+                </Sheet>
             </CardHeader>
             <CardContent>
                 <Table>

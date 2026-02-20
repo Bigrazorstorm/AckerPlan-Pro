@@ -170,6 +170,12 @@ export interface User {
   companyRoles: { companyId: string, role: Role }[];
 }
 
+export interface AddUserInput {
+  name: string;
+  email: string;
+  role: Role;
+}
+
 export interface Session {
   user: User;
   companies: Company[];
