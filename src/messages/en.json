@@ -314,7 +314,9 @@
     "laborHoursByCropDescription": "Total logged labor hours, broken down by the crops grown.",
     "laborHoursChartLabel": "Hours",
     "moreReportsComingSoonTitle": "More Reports Coming Soon",
-    "moreReportsComingSoonDescription": "More detailed analyses on machinery costs and contribution margins will be available here shortly."
+    "moreReportsComingSoonDescription": "More detailed analyses on machinery costs and contribution margins will be available here shortly.",
+    "exportButton": "Export (CSV)",
+    "exportErrorTitle": "Export Failed"
   },
   "SettingsPage": {
     "title": "Settings",

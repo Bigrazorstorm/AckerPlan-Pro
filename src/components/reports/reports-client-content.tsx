@@ -11,6 +11,10 @@ import { Bar, BarChart, CartesianGrid, XAxis, YAxis, ResponsiveContainer } from 
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useParams } from 'next/navigation';
+import { Button } from '../ui/button';
+import { Download } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import { exportProfitabilityReport } from '@/app/reports/actions';
 
 
 function ReportChartSkeleton() {
@@ -59,8 +63,10 @@ export function ReportsClientContent() {
   const [laborReportData, setLaborReportData] = useState<LaborHoursByCropReportData[]>([]);
   const [profitabilityReportData, setProfitabilityReportData] = useState<ProfitabilityByCropReportData[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isExporting, setIsExporting] = useState(false);
   const t = useTranslations('ReportsPage');
   const { locale } = useParams<{ locale: string }>();
+  const { toast } = useToast();
 
   useEffect(() => {
     if (activeCompany) {
@@ -90,6 +96,42 @@ export function ReportsClientContent() {
     currency: 'EUR',
   });
 
+  const handleProfitabilityExport = async () => {
+    if (!activeCompany) return;
+    setIsExporting(true);
+
+    const headers = {
+        crop: t('tableHeaderCrop'),
+        revenue: t('tableHeaderRevenue'),
+        laborCost: t('tableHeaderLaborCosts'),
+        fuelCost: t('tableHeaderFuelCosts'),
+        contributionMargin: t('tableHeaderContributionMargin'),
+    };
+
+    const result = await exportProfitabilityReport(activeCompany.tenantId, activeCompany.id, headers);
+
+    if (result.error) {
+        toast({
+            variant: 'destructive',
+            title: t('exportErrorTitle'),
+            description: result.error,
+        });
+    } else if (result.csv) {
+        const blob = new Blob([result.csv], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        link.setAttribute('href', url);
+        link.setAttribute('download', `profitability_report_${activeCompany.id}.csv`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+    }
+    setIsExporting(false);
+  };
+
+
   if (sessionLoading || loading) {
     return (
         <div className="grid gap-6">
@@ -103,8 +145,16 @@ export function ReportsClientContent() {
     <div className="grid gap-6">
       <Card>
         <CardHeader>
-          <CardTitle>{t('profitabilityByCropTitle')}</CardTitle>
-          <CardDescription>{t('profitabilityByCropDescription')}</CardDescription>
+           <div className="flex justify-between items-start">
+            <div>
+              <CardTitle>{t('profitabilityByCropTitle')}</CardTitle>
+              <CardDescription>{t('profitabilityByCropDescription')}</CardDescription>
+            </div>
+             <Button variant="outline" size="sm" onClick={handleProfitabilityExport} disabled={isExporting} className="gap-1 ml-4 whitespace-nowrap">
+                <Download className="h-4 w-4" />
+                {isExporting ? t('General.submitting') : t('exportButton')}
+            </Button>
+          </div>
         </CardHeader>
         <CardContent>
           <Table>

@@ -314,7 +314,9 @@
     "laborHoursByCropDescription": "Gesamte protokollierte Arbeitszeit, aufgeteilt nach den angebauten Kulturen.",
     "laborHoursChartLabel": "Stunden",
     "moreReportsComingSoonTitle": "Weitere Berichte folgen",
-    "moreReportsComingSoonDescription": "Detailliertere Analysen zu Maschinenkosten und Deckungsbeiträgen werden in Kürze hier verfügbar sein."
+    "moreReportsComingSoonDescription": "Detailliertere Analysen zu Maschinenkosten und Deckungsbeiträgen werden in Kürze hier verfügbar sein.",
+    "exportButton": "Exportieren (CSV)",
+    "exportErrorTitle": "Export fehlgeschlagen"
   },
   "SettingsPage": {
     "title": "Einstellungen",
