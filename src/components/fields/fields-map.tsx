@@ -41,8 +41,8 @@ export function FieldsMap({ fields, observations }: FieldsMapProps) {
             });
 
             const dop20Layer = L.tileLayer.wms("https://www.geoproxy.geoportal-th.de/geoproxy/services/DOP20", {
-                layers: 'dop20-th',
-                format: 'image/jpeg',
+                layers: 'DOP20',
+                format: 'image/png',
                 transparent: false,
                 version: '1.3.0',
                 attribution: "DOP &copy; TLBG"
@@ -52,6 +52,7 @@ export function FieldsMap({ fields, observations }: FieldsMapProps) {
                 layers: 'Gemarkung,Flur,Flurstueck,Gebaeude,Hausnummer',
                 format: 'image/png',
                 transparent: true,
+                version: '1.3.0',
                 attribution: "ALKIS &copy; TLBG"
             });
             
