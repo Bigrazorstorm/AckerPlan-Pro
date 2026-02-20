@@ -50,6 +50,17 @@
     "comingSoonDescription": "This feature is under development and will be available shortly.",
     "submitting": "Saving..."
   },
+  "LoginPage": {
+    "title": "Sign In",
+    "description": "Enter your credentials to access your account.",
+    "emailLabel": "Email",
+    "passwordLabel": "Password",
+    "submit": "Sign In",
+    "submitting": "Signing in...",
+    "errorToastTitle": "Sign In Failed",
+    "Invalid email or password.": "Invalid email or password.",
+    "An error occurred during authentication.": "An error occurred during authentication."
+  },
   "FieldsPage": {
     "title": "Fields",
     "description": "Manage your field boundaries and view GIS data.",

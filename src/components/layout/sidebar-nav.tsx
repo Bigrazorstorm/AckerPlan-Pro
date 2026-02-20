@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { usePathname, useParams } from 'next/navigation';
 import Link from 'next/link';
 import {
@@ -37,6 +37,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useTranslations } from 'next-intl';
+import { logout } from '@/app/auth/actions';
 
 const navItems = [
   { href: '/', icon: LayoutDashboard, labelKey: 'dashboard' },
@@ -53,6 +54,8 @@ export function SidebarNav() {
   const params = useParams();
   const [activePath, setActivePath] = useState('');
   const [locale, setLocale] = useState('de');
+
+  const logoutFormRef = React.useRef<HTMLFormElement>(null);
   
   useEffect(() => {
     // This effect runs only on the client, preventing hydration errors.
@@ -69,6 +72,7 @@ export function SidebarNav() {
 
   return (
     <>
+      <form action={logout} ref={logoutFormRef} className="hidden" />
       <SidebarHeader>
         <Link href={`/${locale}/`} className="flex items-center gap-2 font-bold text-lg">
           <Leaf className="h-6 w-6 text-primary" />
@@ -120,7 +124,7 @@ export function SidebarNav() {
               </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem onSelect={() => logoutFormRef.current?.requestSubmit()}>
               <LogOut className="mr-2 h-4 w-4" />
               <span>{t('logout')}</span>
             </DropdownMenuItem>

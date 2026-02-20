@@ -50,6 +50,17 @@
     "comingSoonDescription": "Diese Funktion befindet sich in der Entwicklung und wird in Kürze verfügbar sein.",
     "submitting": "Wird gespeichert..."
   },
+  "LoginPage": {
+    "title": "Anmelden",
+    "description": "Geben Sie Ihre Anmeldedaten ein, um auf Ihr Konto zuzugreifen.",
+    "emailLabel": "E-Mail",
+    "passwordLabel": "Passwort",
+    "submit": "Anmelden",
+    "submitting": "Anmeldung läuft...",
+    "errorToastTitle": "Anmeldung fehlgeschlagen",
+    "Invalid email or password.": "Ungültige E-Mail-Adresse oder falsches Passwort.",
+    "An error occurred during authentication.": "Bei der Authentifizierung ist ein Fehler aufgetreten."
+  },
   "FieldsPage": {
     "title": "Flächen",
     "description": "Verwalten Sie Ihre Feldgrenzen und sehen Sie GIS-Daten ein.",

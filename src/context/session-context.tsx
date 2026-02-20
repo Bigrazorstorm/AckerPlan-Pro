@@ -2,7 +2,6 @@
 
 import { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { Company, Session } from '@/services/types';
-import dataService from '@/services';
 
 interface SessionContextType {
   session: Session | null;
@@ -13,36 +12,26 @@ interface SessionContextType {
 
 const SessionContext = createContext<SessionContextType | undefined>(undefined);
 
-export function SessionProvider({ children }: { children: ReactNode }) {
-  const [session, setSession] = useState<Session | null>(null);
-  const [loading, setLoading] = useState(true);
+export function SessionProvider({ children, session: initialSession }: { children: ReactNode; session: Session | null }) {
+  const [session] = useState(initialSession);
+  const [loading] = useState(false); // Session is now loaded on the server, so no client loading state
   const [activeCompany, setActiveCompany] = useState<Company | null>(null);
 
   useEffect(() => {
-    const fetchSession = async () => {
-      try {
-        const sessionData = await dataService.getSession();
-        setSession(sessionData);
-        // Set the first company as active by default
-        if (sessionData.companies.length > 0) {
-          // You could enhance this to use localStorage to remember the last selected company
-          setActiveCompany(sessionData.companies[0]);
-        }
-      } catch (error) {
-        console.error("Failed to fetch session:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchSession();
-  }, []);
+    if (session && session.companies.length > 0) {
+      const lastCompanyId = typeof window !== 'undefined' ? localStorage.getItem('activeCompanyId') : null;
+      const companyToSetActive = 
+        session.companies.find(c => c.id === lastCompanyId) || session.companies[0];
+      
+      setActiveCompany(companyToSetActive);
+    }
+  }, [session]);
 
   const switchCompany = (companyId: string) => {
     const company = session?.companies.find(c => c.id === companyId);
     if (company) {
       setActiveCompany(company);
-      // You could also save this preference to localStorage here
+      localStorage.setItem('activeCompanyId', company.id);
     }
   };
 
