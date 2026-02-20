@@ -85,7 +85,7 @@ export interface DataService {
    * @param companyId - The ID of the company.
    * @param machineData - The data for the new machine.
    */
-  addMachinery(tenantId: string, companyId: string, machineData: { name: string; type: string; model: string; }): Promise<Machinery>;
+  addMachinery(tenantId: string, companyId: string, machineData: { name: string; type: string; model: string; standardFuelConsumption: number; }): Promise<Machinery>;
 
   /**
    * Adds a new operation to the data store.

@@ -57,7 +57,7 @@ export class MySqlDataService implements DataService {
     throw new Error('Method not implemented.');
   }
 
-  async addMachinery(tenantId: string, companyId: string, machineData: { name: string; type: string; model: string; }): Promise<Machinery> {
+  async addMachinery(tenantId: string, companyId: string, machineData: { name: string; type: string; model: string; standardFuelConsumption: number; }): Promise<Machinery> {
     console.log(`Adding Machinery for tenant ${tenantId} and company ${companyId} to MySQL.`);
     throw new Error('Method not implemented.');
   }

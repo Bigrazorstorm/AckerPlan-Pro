@@ -4,7 +4,7 @@ import { useEffect, useState, useMemo } from 'react'
 import { useFormState, useFormStatus } from 'react-dom'
 import { useTranslations } from "next-intl"
 import { useToast } from '@/hooks/use-toast'
-import { Operation, Field } from '@/services/types'
+import { Operation, Field, Machinery } from '@/services/types'
 import { addOperation } from '@/app/operations/actions'
 import { useSession } from '@/context/session-context'
 import dataService from '@/services'
@@ -48,7 +48,7 @@ function SubmitButton() {
   )
 }
 
-function AddOperationForm({ closeSheet, tenantId, companyId, fields }: { closeSheet: () => void; tenantId: string; companyId: string; fields: Field[] }) {
+function AddOperationForm({ closeSheet, tenantId, companyId, fields, machinery }: { closeSheet: () => void; tenantId: string; companyId: string; fields: Field[], machinery: Machinery[] }) {
   const [state, formAction] = useFormState(addOperation, initialState)
   const { toast } = useToast()
   const t = useTranslations('OperationsPage.addOperationForm');
@@ -95,20 +95,36 @@ function AddOperationForm({ closeSheet, tenantId, companyId, fields }: { closeSh
         {state.errors?.type && <p className="text-sm text-destructive">{state.errors.type.join(', ')}</p>}
       </div>
 
-       <div className="space-y-2">
-        <Label htmlFor="field">{t('fieldLabel')}</Label>
-        <Select name="field" required>
-          <SelectTrigger>
-            <SelectValue placeholder={t('fieldPlaceholder')} />
-          </SelectTrigger>
-          <SelectContent>
-            {fields.map((field) => (
-                <SelectItem key={field.id} value={field.name}>{field.name}</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        {state.errors?.field && <p className="text-sm text-destructive">{state.errors.field.join(', ')}</p>}
-      </div>
+       <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="field">{t('fieldLabel')}</Label>
+            <Select name="field" required>
+              <SelectTrigger>
+                <SelectValue placeholder={t('fieldPlaceholder')} />
+              </SelectTrigger>
+              <SelectContent>
+                {fields.map((field) => (
+                    <SelectItem key={field.id} value={field.name}>{field.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {state.errors?.field && <p className="text-sm text-destructive">{state.errors.field.join(', ')}</p>}
+        </div>
+        <div className="space-y-2">
+            <Label htmlFor="machineId">{t('machineLabel')}</Label>
+            <Select name="machineId" required>
+              <SelectTrigger>
+                <SelectValue placeholder={t('machinePlaceholder')} />
+              </SelectTrigger>
+              <SelectContent>
+                {machinery.map((machine) => (
+                    <SelectItem key={machine.id} value={machine.id}>{machine.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {state.errors?.machineId && <p className="text-sm text-destructive">{state.errors.machineId.join(', ')}</p>}
+        </div>
+       </div>
 
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
@@ -170,6 +186,7 @@ export function OperationsClientContent() {
   const { activeCompany, loading: sessionLoading } = useSession();
   const [operations, setOperations] = useState<Operation[]>([]);
   const [fields, setFields] = useState<Field[]>([]);
+  const [machinery, setMachinery] = useState<Machinery[]>([]);
   const [loading, setLoading] = useState(true);
   const { locale } = useParams<{ locale: string }>();
 
@@ -177,12 +194,14 @@ export function OperationsClientContent() {
     if (activeCompany) {
       const fetchData = async () => {
         setLoading(true);
-        const [operationsData, fieldsData] = await Promise.all([
+        const [operationsData, fieldsData, machineryData] = await Promise.all([
             dataService.getOperations(activeCompany.tenantId, activeCompany.id),
-            dataService.getFields(activeCompany.tenantId, activeCompany.id)
+            dataService.getFields(activeCompany.tenantId, activeCompany.id),
+            dataService.getMachinery(activeCompany.tenantId, activeCompany.id)
         ]);
         setOperations(operationsData);
         setFields(fieldsData);
+        setMachinery(machineryData);
         setLoading(false);
       }
       fetchData();
@@ -203,6 +222,8 @@ export function OperationsClientContent() {
                             <TableHead><Skeleton className="h-4 w-24" /></TableHead>
                             <TableHead><Skeleton className="h-4 w-24" /></TableHead>
                             <TableHead><Skeleton className="h-4 w-24" /></TableHead>
+                             <TableHead><Skeleton className="h-4 w-24" /></TableHead>
+                            <TableHead><Skeleton className="h-4 w-16" /></TableHead>
                             <TableHead><Skeleton className="h-4 w-16" /></TableHead>
                             <TableHead><Skeleton className="h-4 w-24" /></TableHead>
                             <TableHead><span className="sr-only">{t('actions')}</span></TableHead>
@@ -213,7 +234,9 @@ export function OperationsClientContent() {
                              <TableRow key={i}>
                                 <TableCell><Skeleton className="h-5 w-32" /></TableCell>
                                 <TableCell><Skeleton className="h-5 w-24" /></TableCell>
+                                <TableCell><Skeleton className="h-5 w-24" /></TableCell>
                                 <TableCell><Skeleton className="h-5 w-20" /></TableCell>
+                                <TableCell><Skeleton className="h-5 w-16" /></TableCell>
                                 <TableCell><Skeleton className="h-5 w-16" /></TableCell>
                                 <TableCell><Skeleton className="h-5 w-24" /></TableCell>
                                 <TableCell><Skeleton className="h-8 w-8" /></TableCell>
@@ -242,7 +265,7 @@ export function OperationsClientContent() {
               <SheetTitle>{t('addOperationSheetTitle')}</SheetTitle>
             </SheetHeader>
             <div className="py-4">
-              {activeCompany && <AddOperationForm closeSheet={() => setSheetOpen(false)} tenantId={activeCompany.tenantId} companyId={activeCompany.id} fields={fields} />}
+              {activeCompany && <AddOperationForm closeSheet={() => setSheetOpen(false)} tenantId={activeCompany.tenantId} companyId={activeCompany.id} fields={fields} machinery={machinery} />}
             </div>
           </SheetContent>
         </Sheet>
@@ -253,8 +276,10 @@ export function OperationsClientContent() {
             <TableRow>
               <TableHead>{t('tableHeaderType')}</TableHead>
               <TableHead>{t('tableHeaderField')}</TableHead>
+              <TableHead>{t('tableHeaderMachine')}</TableHead>
               <TableHead>{t('tableHeaderDate')}</TableHead>
               <TableHead className="text-right">{t('tableHeaderLaborHours')}</TableHead>
+              <TableHead className="text-right">{t('tableHeaderFuel')}</TableHead>
               <TableHead>{t('tableHeaderStatus')}</TableHead>
               <TableHead><span className="sr-only">{t('actions')}</span></TableHead>
             </TableRow>
@@ -264,8 +289,10 @@ export function OperationsClientContent() {
               <TableRow key={op.id}>
                 <TableCell className="font-medium">{tOperationTypes(op.type)}</TableCell>
                 <TableCell>{op.field}</TableCell>
+                <TableCell>{op.machine?.name}</TableCell>
                 <TableCell>{op.date}</TableCell>
                 <TableCell className="text-right">{op.laborHours.toLocaleString(locale)} h</TableCell>
+                <TableCell className="text-right">{op.fuelConsumed?.toLocaleString(locale)} l</TableCell>
                 <TableCell>
                   <Badge variant={op.status === 'Completed' ? 'default' : 'secondary'} className={op.status === 'Completed' ? 'bg-green-100 text-green-800' : ''}>{op.status}</Badge>
                 </TableCell>

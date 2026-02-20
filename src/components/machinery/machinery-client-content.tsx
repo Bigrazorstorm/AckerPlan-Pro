@@ -90,10 +90,17 @@ function AddMachineForm({ closeSheet, tenantId, companyId }: { closeSheet: () =>
         </Select>
         {state.errors?.type && <p className="text-sm text-destructive">{state.errors.type.join(', ')}</p>}
       </div>
-      <div className="space-y-2">
-        <Label htmlFor="model">{t('modelLabel')}</Label>
-        <Input id="model" name="model" required />
-        {state.errors?.model && <p className="text-sm text-destructive">{state.errors.model.join(', ')}</p>}
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
+            <Label htmlFor="model">{t('modelLabel')}</Label>
+            <Input id="model" name="model" required />
+            {state.errors?.model && <p className="text-sm text-destructive">{state.errors.model.join(', ')}</p>}
+        </div>
+        <div className="space-y-2">
+            <Label htmlFor="standardFuelConsumption">{t('fuelConsumptionLabel')}</Label>
+            <Input id="standardFuelConsumption" name="standardFuelConsumption" type="number" step="0.1" required placeholder="35.5" />
+            {state.errors?.standardFuelConsumption && <p className="text-sm text-destructive">{state.errors.standardFuelConsumption.join(', ')}</p>}
+        </div>
       </div>
       <SubmitButton />
     </form>

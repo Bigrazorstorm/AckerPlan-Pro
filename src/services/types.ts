@@ -21,6 +21,11 @@ export interface Operation {
   date: string;
   status: "Completed" | "In Progress";
   laborHours: number;
+  machine?: {
+      id: string;
+      name: string;
+  };
+  fuelConsumed?: number; // in liters
 };
 
 // Input type for adding a new operation
@@ -30,6 +35,7 @@ export interface AddOperationInput {
   date: string;
   status: "Completed" | "In Progress";
   laborHours: number;
+  machineId: string;
 }
 
 // Represents a Maintenance Event for a machine.
@@ -85,6 +91,7 @@ export interface Machinery {
   status: "Operational" | "Maintenance Due" | "In Workshop";
   nextService: string;
   lastMaintenance: string;
+  standardFuelConsumption: number; // in liters per hour
   createdAt: string; // ISO-8601 date string
   updatedAt: string; // ISO-8601 date string
 };

@@ -104,28 +104,29 @@ const chartDataCompany789: ChartDataPoint[] = [
     { month: "December", revenue: 300, cost: 100 },
 ];
 
-const operations: Operation[] = [
-  { id: '1', tenantId: 'tenant-123', companyId: 'company-456', type: "Harvesting", field: "Field A-12", date: "2 days ago", status: "Completed", laborHours: 8.5 },
-  { id: '2', tenantId: 'tenant-123', companyId: 'company-456', type: "Fertilizing", field: "Field C-04", date: "3 days ago", status: "Completed", laborHours: 4 },
-  { id: '3', tenantId: 'tenant-123', companyId: 'company-456', type: "PestControl", field: "Field B-08", date: "4 days ago", status: "Completed", laborHours: 5.5 },
-  { id: '4', tenantId: 'tenant-123', companyId: 'company-456', type: "Seeding", field: "Field D-01", date: "1 week ago", status: "In Progress", laborHours: 12 },
-  { id: '5', tenantId: 'tenant-123', companyId: 'company-456', type: "Tillage", field: "Field F-21", date: "2 weeks ago", status: "Completed", laborHours: 6 },
+const machinery: Machinery[] = [
+  { id: 'M001', tenantId: 'tenant-123', companyId: 'company-456', name: "John Deere 8R 370", type: "Tractor", model: "8R 370", status: "Operational", nextService: "In 250h", lastMaintenance: "2024-05-10", standardFuelConsumption: 35.5, createdAt: "2023-01-15T10:00:00Z", updatedAt: "2024-05-10T14:30:00Z" },
+  { id: 'M002', tenantId: 'tenant-123', companyId: 'company-456', name: "Claas Lexion 8900", type: "CombineHarvester", model: "Lexion 8900", status: "Maintenance Due", nextService: "Now (3000h)", lastMaintenance: "2023-09-15", standardFuelConsumption: 85.0, createdAt: "2022-08-20T11:00:00Z", updatedAt: "2023-09-15T09:00:00Z" },
+  { id: 'M003', tenantId: 'tenant-123', companyId: 'company-456', name: "Fendt 942 Vario", type: "Tractor", model: "942 Vario", status: "Operational", nextService: "In 450h", lastMaintenance: "2024-03-22", standardFuelConsumption: 42.0, createdAt: "2023-05-10T12:00:00Z", updatedAt: "2024-03-22T16:00:00Z" },
+  { id: 'M004', tenantId: 'tenant-123', companyId: 'company-456', name: "Amazone Catros XL", type: "Tillage", model: "Catros 6003-2TXL", status: "Operational", nextService: "2025-01-10", lastMaintenance: "2024-01-10", standardFuelConsumption: 15.0, createdAt: "2023-02-01T08:30:00Z", updatedAt: "2024-01-10T09:45:00Z" },
+  { id: 'M005', tenantId: 'tenant-123', companyId: 'company-456', name: "Horsch Maestro 12.50 SW", type: "Seeding", model: "Maestro 12.50 SW", status: "In Workshop", nextService: "After Repair", lastMaintenance: "2024-04-01", standardFuelConsumption: 12.0, createdAt: "2023-03-18T13:20:00Z", updatedAt: "2024-04-01T11:00:00Z" },
+  { id: 'M006', tenantId: 'tenant-123', companyId: 'company-456', name: "Krone Big Pack 1290", type: "Baler", model: "Big Pack 1290", status: "Operational", nextService: "In 120h", lastMaintenance: "2024-06-01", standardFuelConsumption: 25.0, createdAt: "2023-07-25T18:00:00Z", updatedAt: "2024-06-01T10:00:00Z" },
   // Data for another company to test multi-tenancy
-  { id: '6', tenantId: 'tenant-123', companyId: 'company-789', type: "Mowing", field: "Miller's Acre", date: "5 days ago", status: "Completed", laborHours: 7 },
-  { id: '7', tenantId: 'tenant-123', companyId: 'company-789', type: "Baling", field: "South Pasture", date: "1 week ago", status: "Completed", laborHours: 9 },
+  { id: 'M007', tenantId: 'tenant-123', companyId: 'company-789', name: "Case IH Magnum 380", type: "Tractor", model: "Magnum 380", status: "Operational", nextService: "In 300h", lastMaintenance: "2024-06-15", standardFuelConsumption: 38.0, createdAt: "2023-08-01T09:00:00Z", updatedAt: "2024-06-15T14:00:00Z" },
+  { id: 'M008', tenantId: 'tenant-123', companyId: 'company-789', name: "New Holland CR9.90", type: "CombineHarvester", model: "CR9.90", status: "Operational", nextService: "In 150h", lastMaintenance: "2024-07-01", standardFuelConsumption: 75.0, createdAt: "2023-09-01T09:00:00Z", updatedAt: "2024-07-01T14:00:00Z" },
 ];
 
-const machinery: Machinery[] = [
-  { id: 'M001', tenantId: 'tenant-123', companyId: 'company-456', name: "John Deere 8R 370", type: "Tractor", model: "8R 370", status: "Operational", nextService: "In 250h", lastMaintenance: "2024-05-10", createdAt: "2023-01-15T10:00:00Z", updatedAt: "2024-05-10T14:30:00Z" },
-  { id: 'M002', tenantId: 'tenant-123', companyId: 'company-456', name: "Claas Lexion 8900", type: "CombineHarvester", model: "Lexion 8900", status: "Maintenance Due", nextService: "Now (3000h)", lastMaintenance: "2023-09-15", createdAt: "2022-08-20T11:00:00Z", updatedAt: "2023-09-15T09:00:00Z" },
-  { id: 'M003', tenantId: 'tenant-123', companyId: 'company-456', name: "Fendt 942 Vario", type: "Tractor", model: "942 Vario", status: "Operational", nextService: "In 450h", lastMaintenance: "2024-03-22", createdAt: "2023-05-10T12:00:00Z", updatedAt: "2024-03-22T16:00:00Z" },
-  { id: 'M004', tenantId: 'tenant-123', companyId: 'company-456', name: "Amazone Catros XL", type: "Tillage", model: "Catros 6003-2TXL", status: "Operational", nextService: "2025-01-10", lastMaintenance: "2024-01-10", createdAt: "2023-02-01T08:30:00Z", updatedAt: "2024-01-10T09:45:00Z" },
-  { id: 'M005', tenantId: 'tenant-123', companyId: 'company-456', name: "Horsch Maestro 12.50 SW", type: "Seeding", model: "Maestro 12.50 SW", status: "In Workshop", nextService: "After Repair", lastMaintenance: "2024-04-01", createdAt: "2023-03-18T13:20:00Z", updatedAt: "2024-04-01T11:00:00Z" },
-  { id: 'M006', tenantId: 'tenant-123', companyId: 'company-456', name: "Krone Big Pack 1290", type: "Baler", model: "Big Pack 1290", status: "Operational", nextService: "In 120h", lastMaintenance: "2024-06-01", createdAt: "2023-07-25T18:00:00Z", updatedAt: "2024-06-01T10:00:00Z" },
+const operations: Operation[] = [
+  { id: '1', tenantId: 'tenant-123', companyId: 'company-456', type: "Harvesting", field: "Field A-12", date: "2 days ago", status: "Completed", laborHours: 8.5, machine: { id: 'M002', name: 'Claas Lexion 8900' }, fuelConsumed: 722.5 },
+  { id: '2', tenantId: 'tenant-123', companyId: 'company-456', type: "Fertilizing", field: "Field C-04", date: "3 days ago", status: "Completed", laborHours: 4, machine: { id: 'M003', name: 'Fendt 942 Vario' }, fuelConsumed: 168.0 },
+  { id: '3', tenantId: 'tenant-123', companyId: 'company-456', type: "PestControl", field: "Field B-08", date: "4 days ago", status: "Completed", laborHours: 5.5, machine: { id: 'M001', name: 'John Deere 8R 370' }, fuelConsumed: 195.2 },
+  { id: '4', tenantId: 'tenant-123', companyId: 'company-456', type: "Seeding", field: "Field D-01", date: "1 week ago", status: "In Progress", laborHours: 12, machine: { id: 'M005', name: 'Horsch Maestro 12.50 SW' }, fuelConsumed: 144.0 },
+  { id: '5', tenantId: 'tenant-123', companyId: 'company-456', type: "Tillage", field: "Field F-21", date: "2 weeks ago", status: "Completed", laborHours: 6, machine: { id: 'M004', name: 'Amazone Catros XL' }, fuelConsumed: 90.0 },
   // Data for another company to test multi-tenancy
-  { id: 'M007', tenantId: 'tenant-123', companyId: 'company-789', name: "Case IH Magnum 380", type: "Tractor", model: "Magnum 380", status: "Operational", nextService: "In 300h", lastMaintenance: "2024-06-15", createdAt: "2023-08-01T09:00:00Z", updatedAt: "2024-06-15T14:00:00Z" },
-  { id: 'M008', tenantId: 'tenant-123', companyId: 'company-789', name: "New Holland CR9.90", type: "CombineHarvester", model: "CR9.90", status: "Operational", nextService: "In 150h", lastMaintenance: "2024-07-01", createdAt: "2023-09-01T09:00:00Z", updatedAt: "2024-07-01T14:00:00Z" },
+  { id: '6', tenantId: 'tenant-123', companyId: 'company-789', type: "Mowing", field: "Miller's Acre", date: "5 days ago", status: "Completed", laborHours: 7, machine: { id: 'M007', name: 'Case IH Magnum 380' }, fuelConsumed: 266.0 },
+  { id: '7', tenantId: 'tenant-123', companyId: 'company-789', type: "Baling", field: "South Pasture", date: "1 week ago", status: "Completed", laborHours: 9 }, // No machine assigned yet
 ];
+
 
 const fields: Field[] = [
   { id: 'field-1', tenantId: 'tenant-123', companyId: 'company-456', name: 'Acker-Nord 1', area: 15.2, crop: 'Winterweizen' },
@@ -226,7 +227,7 @@ export class MockDataService implements DataService {
     return Promise.resolve(repairEvents.filter(e => e.machineId === machineId && e.tenantId === tenantId && e.companyId === companyId).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
   }
 
-  async addMachinery(tenantId: string, companyId: string, machineData: { name: string; type: string; model: string; }): Promise<Machinery> {
+  async addMachinery(tenantId: string, companyId: string, machineData: { name: string; type: string; model: string; standardFuelConsumption: number; }): Promise<Machinery> {
     console.log(`Adding Machinery for tenant ${tenantId} and company ${companyId}.`);
     const newMachine: Machinery = {
       id: `M${String(machinery.length + 1).padStart(3, '0')}`,
@@ -246,14 +247,30 @@ export class MockDataService implements DataService {
 
   async addOperation(tenantId: string, companyId: string, operationData: AddOperationInput): Promise<Operation> {
     console.log(`Adding Operation for tenant ${tenantId} and company ${companyId}.`);
+    const machine = machinery.find(m => m.id === operationData.machineId && m.tenantId === tenantId && m.companyId === companyId);
+    if (!machine) {
+        throw new Error('Machine not found');
+    }
+
+    const fuelConsumed = machine.standardFuelConsumption * operationData.laborHours;
+
     const newOperation: Operation = {
       id: `OP${String(operations.length + 1).padStart(3, '0')}`,
       tenantId: tenantId,
       companyId: companyId,
-      ...operationData,
+      type: operationData.type,
+      field: operationData.field,
+      date: operationData.date,
+      status: operationData.status,
+      laborHours: operationData.laborHours,
+      machine: {
+          id: machine.id,
+          name: machine.name
+      },
+      fuelConsumed: parseFloat(fuelConsumed.toFixed(1)),
     };
     operations.unshift(newOperation);
-    logAuditEvent(tenantId, companyId, 'operation.create', `Maßnahme "${operationData.type}" auf Fläche "${operationData.field}" erstellt (Arbeitszeit: ${operationData.laborHours}h).`);
+    logAuditEvent(tenantId, companyId, 'operation.create', `Maßnahme "${operationData.type}" auf Fläche "${operationData.field}" erstellt (Arbeitszeit: ${operationData.laborHours}h, Diesel: ${newOperation.fuelConsumed}l).`);
     return Promise.resolve(newOperation);
   }
   

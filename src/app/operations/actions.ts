@@ -7,6 +7,7 @@ import { z } from 'zod'
 const AddOperationSchema = z.object({
   type: z.string().min(1, { message: 'Type is required' }),
   field: z.string().min(1, { message: 'Field is required' }),
+  machineId: z.string().min(1, { message: 'Machine is required' }),
   date: z.string().min(1, { message: 'Date is required' }),
   laborHours: z.coerce.number().min(0, { message: 'Labor hours must be a positive number' }),
   status: z.enum(['Completed', 'In Progress']),
@@ -18,6 +19,7 @@ export async function addOperation(prevState: any, formData: FormData) {
   const validatedFields = AddOperationSchema.safeParse({
     type: formData.get('type'),
     field: formData.get('field'),
+    machineId: formData.get('machineId'),
     date: formData.get('date'),
     laborHours: formData.get('laborHours'),
     status: formData.get('status'),
