@@ -38,13 +38,20 @@ export function FieldsMap({ fields, observations }: FieldsMapProps) {
 
             const osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            }).addTo(map);
+            });
 
-            const alkisWmsLayer = L.tileLayer.wms("https://geoproxy.landesvermessung.thueringen.de/geoproxy/services/wms_alkis_querformat/MapServer/WMSServer?", {
+            const dop20Layer = L.tileLayer.wms("https://www.geoproxy.geoportal-th.de/geoproxy/services/DOP20", {
+                layers: 'dop20-th',
+                format: 'image/jpeg',
+                transparent: false,
+                attribution: "DOP &copy; TLBG"
+            });
+
+            const alkisWmsLayer = L.tileLayer.wms("https://www.geoproxy.geoportal-th.de/geoproxy/services/ALKISV", {
                 layers: 'Gemarkung,Flur,Flurstueck,Gebaeude,Hausnummer',
                 format: 'image/png',
                 transparent: true,
-                attribution: "Liegenschaftskarte &copy; TLBG"
+                attribution: "ALKIS &copy; TLBG"
             });
             
             // Create layer groups and store them in refs
@@ -54,15 +61,18 @@ export function FieldsMap({ fields, observations }: FieldsMapProps) {
             fieldLayerRef.current = fieldLayer;
             observationLayerRef.current = observationLayer;
 
+            // Add default layers to map
+            osmLayer.addTo(map);
             fieldLayer.addTo(map);
             observationLayer.addTo(map);
             
             const baseLayers = {
-                "OpenStreetMap": osmLayer
+                "OpenStreetMap": osmLayer,
+                "Digitale Orthophotos (DOP20)": dop20Layer
             };
 
             const overlayLayers = {
-                "Liegenschaftskarte": alkisWmsLayer,
+                "Liegenschaftskarte (ALKIS)": alkisWmsLayer,
                 [t('fieldsLayer')]: fieldLayer,
                 [t('observationsLayer')]: observationLayer
             };
