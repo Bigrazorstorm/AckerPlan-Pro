@@ -135,6 +135,7 @@ export interface Field {
   name: string;
   area: number; // in hectares
   crop: string;
+  geometry?: number[][]; // Array of [lat, lng] points for a polygon
 };
 
 // Represents economic data for a specific entity (like a field).

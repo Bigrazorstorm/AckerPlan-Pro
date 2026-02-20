@@ -169,13 +169,13 @@ let operations: Operation[] = [
 
 
 const fields: Field[] = [
-  { id: 'field-1', tenantId: 'tenant-123', companyId: 'company-456', name: 'Acker-Nord 1', area: 15.2, crop: 'Winterweizen' },
-  { id: 'field-2', tenantId: 'tenant-123', companyId: 'company-456', name: 'Südhang', area: 8.5, crop: 'Zuckerrüben' },
-  { id: 'field-3', tenantId: 'tenant-123', companyId: 'company-456', name: 'Große Wiese', area: 22.0, crop: 'Gerste' },
-  { id: 'field-4', tenantId: 'tenant-123', companyId: 'company-456', name: 'An der B2', area: 5.7, crop: 'Raps' },
+  { id: 'field-1', tenantId: 'tenant-123', companyId: 'company-456', name: 'Acker-Nord 1', area: 15.2, crop: 'Winterweizen', geometry: [[52.51, 13.35], [52.52, 13.35], [52.52, 13.37], [52.51, 13.37]] },
+  { id: 'field-2', tenantId: 'tenant-123', companyId: 'company-456', name: 'Südhang', area: 8.5, crop: 'Zuckerrüben', geometry: [[52.50, 13.38], [52.51, 13.38], [52.51, 13.40], [52.50, 13.40]] },
+  { id: 'field-3', tenantId: 'tenant-123', companyId: 'company-456', name: 'Große Wiese', area: 22.0, crop: 'Gerste', geometry: [[52.48, 13.35], [52.49, 13.35], [52.49, 13.37], [52.48, 13.37]] },
+  { id: 'field-4', tenantId: 'tenant-123', companyId: 'company-456', name: 'An der B2', area: 5.7, crop: 'Raps', geometry: [[52.49, 13.32], [52.50, 13.32], [52.50, 13.34], [52.49, 13.34]] },
   // Fields for company-789
-  { id: 'field-5', tenantId: 'tenant-123', companyId: 'company-789', name: 'Grünland-West', area: 12.0, crop: 'Weidegras' },
-  { id: 'field-6', tenantId: 'tenant-123', companyId: 'company-789', name: 'Weide am Bach', area: 7.8, crop: 'Klee-Gras-Mischung' },
+  { id: 'field-5', tenantId: 'tenant-123', companyId: 'company-789', name: 'Grünland-West', area: 12.0, crop: 'Weidegras', geometry: [[52.46, 13.41], [52.47, 13.41], [52.47, 13.43], [52.46, 13.43]] },
+  { id: 'field-6', tenantId: 'tenant-123', companyId: 'company-789', name: 'Weide am Bach', area: 7.8, crop: 'Klee-Gras-Mischung', geometry: [[52.45, 13.38], [52.46, 13.38], [52.46, 13.40], [52.45, 13.40]] },
 ];
 
 let maintenanceEvents: MaintenanceEvent[] = [

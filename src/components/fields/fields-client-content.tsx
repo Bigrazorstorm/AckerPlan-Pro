@@ -7,12 +7,17 @@ import { Field } from '@/services/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Skeleton } from '@/components/ui/skeleton';
-import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { PlusCircle } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
+import dynamic from 'next/dynamic';
+
+const FieldsMap = dynamic(() => import('@/components/fields/fields-map').then(mod => mod.FieldsMap), {
+  ssr: false,
+  loading: () => <Skeleton className="w-full aspect-video rounded-lg" />
+});
 
 function FieldsSkeleton() {
   return (
@@ -91,14 +96,7 @@ export function FieldsClientContent() {
         </CardHeader>
         <CardContent>
             <div className="aspect-video w-full overflow-hidden rounded-md border">
-              <Image 
-                src="https://picsum.photos/seed/fieldsmap/1200/800"
-                alt="Map of fields"
-                width={1200}
-                height={800}
-                className="w-full h-full object-cover"
-                data-ai-hint="map farm fields"
-              />
+              <FieldsMap fields={fields} />
             </div>
         </CardContent>
       </Card>
