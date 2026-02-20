@@ -24,16 +24,36 @@ export function ObservationLocationMap({ latitude, longitude }: ObservationLocat
         if (mapContainerRef.current && !mapInstanceRef.current) {
             const map = L.map(mapContainerRef.current, {
                 center: [latitude, longitude],
-                zoom: 13,
-                zoomControl: false,
-                scrollWheelZoom: false,
-                dragging: false,
+                zoom: 15,
+                zoomControl: true,
+                scrollWheelZoom: true,
+                dragging: true,
             });
             mapInstanceRef.current = map;
 
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            const osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            }).addTo(map);
+            });
+
+            const alkisWmsLayer = L.tileLayer.wms("https://geoproxy.landesvermessung.thueringen.de/geoproxy/services/wms_alkis_querformat/MapServer/WMSServer?", {
+                layers: 'Gemarkung,Flur,Flurstueck,Gebaeude,Hausnummer',
+                format: 'image/png',
+                transparent: true,
+                attribution: "Liegenschaftskarte &copy; TLBG"
+            });
+            
+            alkisWmsLayer.addTo(map);
+
+            const baseLayers = {
+                "OpenStreetMap": osmLayer
+            };
+
+            const overlayLayers = {
+                "Liegenschaftskarte": alkisWmsLayer
+            };
+
+            L.control.layers(baseLayers, overlayLayers).addTo(map);
+            osmLayer.addTo(map); // Default base layer
 
             const marker = L.marker([latitude, longitude])
               .bindTooltip('Beobachtungsstandort')
@@ -58,7 +78,7 @@ export function ObservationLocationMap({ latitude, longitude }: ObservationLocat
     useEffect(() => {
         if (mapInstanceRef.current && markerRef.current) {
             const newLatLng = L.latLng(latitude, longitude);
-            mapInstanceRef.current.setView(newLatLng, 13);
+            mapInstanceRef.current.setView(newLatLng, 15);
             markerRef.current.setLatLng(newLatLng);
         }
     }, [latitude, longitude]);

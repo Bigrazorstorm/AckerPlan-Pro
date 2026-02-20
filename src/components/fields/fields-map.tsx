@@ -14,16 +14,6 @@ interface FieldsMapProps {
     observations: Observation[];
 }
 
-// This is the correct, robust way to solve this.
-// By directly managing the map instance with useEffect, we avoid React's Strict Mode re-rendering issues
-// that plague react-leaflet's <MapContainer>.
-
-// 1. We create a reference for the map instance and the container div.
-// 2. We use two separate useEffect hooks:
-//    - The first one runs ONLY ONCE to initialize the map and its cleanup function.
-//    - The second one runs whenever data changes, to update the layers on the map.
-// This separation of concerns is key to a stable implementation.
-
 export function FieldsMap({ fields, observations }: FieldsMapProps) {
     const t = useTranslations('FieldsPage');
     const mapContainerRef = useRef<HTMLDivElement>(null);
@@ -40,15 +30,22 @@ export function FieldsMap({ fields, observations }: FieldsMapProps) {
     useEffect(() => {
         if (mapContainerRef.current && !mapInstanceRef.current) {
             const map = L.map(mapContainerRef.current, {
-                center: [52.505, 13.37],
-                zoom: 10,
+                center: [50.9778, 11.0289], // Center on Thüringen
+                zoom: 9,
                 scrollWheelZoom: true,
             });
             mapInstanceRef.current = map;
 
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            const osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             }).addTo(map);
+
+            const alkisWmsLayer = L.tileLayer.wms("https://geoproxy.landesvermessung.thueringen.de/geoproxy/services/wms_alkis_querformat/MapServer/WMSServer?", {
+                layers: 'Gemarkung,Flur,Flurstueck,Gebaeude,Hausnummer',
+                format: 'image/png',
+                transparent: true,
+                attribution: "Liegenschaftskarte &copy; TLBG"
+            });
             
             // Create layer groups and store them in refs
             const fieldLayer = L.featureGroup();
@@ -60,10 +57,17 @@ export function FieldsMap({ fields, observations }: FieldsMapProps) {
             fieldLayer.addTo(map);
             observationLayer.addTo(map);
             
-            L.control.layers(undefined, {
+            const baseLayers = {
+                "OpenStreetMap": osmLayer
+            };
+
+            const overlayLayers = {
+                "Liegenschaftskarte": alkisWmsLayer,
                 [t('fieldsLayer')]: fieldLayer,
                 [t('observationsLayer')]: observationLayer
-            }).addTo(map);
+            };
+
+            L.control.layers(baseLayers, overlayLayers).addTo(map);
         }
 
         // Cleanup function for when the component unmounts
