@@ -1,5 +1,5 @@
 import { DataService } from './data-service';
-import { Kpi, ChartDataPoint, Operation, Machinery, Session, Field, MaintenanceEvent, AddMaintenanceEventInput, AuditLogEvent, RepairEvent, AddRepairEventInput, AddOperationInput, LaborHoursByCropReportData } from './types';
+import { Kpi, ChartDataPoint, Operation, Machinery, Session, Field, MaintenanceEvent, AddMaintenanceEventInput, AuditLogEvent, RepairEvent, AddRepairEventInput, AddOperationInput, LaborHoursByCropReportData, Observation, AddObservationInput } from './types';
 
 const session: Session = {
   user: {
@@ -157,6 +157,12 @@ const auditLogEvents: AuditLogEvent[] = [
     { id: 'log-3', tenantId: 'tenant-123', companyId: 'company-456', date: '2024-07-21T14:00:00Z', user: { id: 'user-2', name: 'Max Mustermann' }, action: 'operation.create', details: 'Maßnahme "Ernte" auf Fläche "Acker-Nord 1" erstellt.' },
     { id: 'log-4', tenantId: 'tenant-123', companyId: 'company-456', date: '2024-07-21T11:20:00Z', user: { id: 'user-1', name: 'John Doe' }, action: 'machine.update.status', details: 'Status von "Horsch Maestro 12.50 SW" auf "In Werkstatt" geändert.' },
     { id: 'log-5', tenantId: 'tenant-123', companyId: 'company-789', date: '2024-07-22T08:00:00Z', user: { id: 'user-1', name: 'John Doe' }, action: 'operation.create', details: 'Maßnahme "Mähen" auf Fläche "Miller\'s Acre" erstellt.' },
+];
+
+const observations: Observation[] = [
+    { id: 'obs-1', tenantId: 'tenant-123', companyId: 'company-456', field: 'Südhang', date: '2024-07-18T10:00:00Z', title: 'Verdacht auf Gelbrost', description: 'Im unteren Bereich des Schlags sind deutliche gelbe Pusteln auf den Blättern zu erkennen. Ca. 10-15% der Pflanzen betroffen.', photoUrl: 'https://picsum.photos/seed/rust/600/400' },
+    { id: 'obs-2', tenantId: 'tenant-123', companyId: 'company-456', field: 'Acker-Nord 1', date: '2024-07-15T14:30:00Z', title: 'Wildschweinschaden', description: 'Am Waldrand wurden ca. 50-100qm von Wildschweinen umgebrochen. Schaden hält sich in Grenzen.', photoUrl: 'https://picsum.photos/seed/boar/600/400' },
+    { id: 'obs-3', tenantId: 'tenant-123', companyId: 'company-789', field: 'Weide am Bach', date: '2024-07-20T08:00:00Z', title: 'Guter Klee-Anteil', description: 'Der Klee hat sich gut entwickelt, Bestand sieht sehr gut aus.' },
 ];
 
 function logAuditEvent(tenantId: string, companyId: string, action: string, details: string) {
@@ -355,6 +361,24 @@ export class MockDataService implements DataService {
   async getAuditLog(tenantId: string, companyId: string): Promise<AuditLogEvent[]> {
     console.log(`Fetching AuditLog for tenant ${tenantId} and company ${companyId}.`);
     return Promise.resolve(auditLogEvents.filter(e => e.tenantId === tenantId && e.companyId === companyId).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
+  }
+
+  async getObservations(tenantId: string, companyId: string): Promise<Observation[]> {
+    console.log(`Fetching Observations for tenant ${tenantId} and company ${companyId}.`);
+    return Promise.resolve(observations.filter(o => o.tenantId === tenantId && o.companyId === companyId).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
+  }
+
+  async addObservation(tenantId: string, companyId: string, observationData: AddObservationInput): Promise<Observation> {
+    console.log(`Adding Observation for tenant ${tenantId} and company ${companyId}.`);
+    const newObservation: Observation = {
+      id: `obs-${observations.length + 1}`,
+      tenantId,
+      companyId,
+      ...observationData,
+    };
+    observations.unshift(newObservation);
+    logAuditEvent(tenantId, companyId, 'observation.create', `Beobachtung "${observationData.title}" auf Fläche "${observationData.field}" erstellt.`);
+    return Promise.resolve(newObservation);
   }
 
   async getLaborHoursByCropReport(tenantId: string, companyId: string): Promise<LaborHoursByCropReportData[]> {

@@ -243,8 +243,33 @@
   "ObservationsPage": {
     "title": "Observations",
     "description": "Document crop growth, damages, and other field observations.",
-    "comingSoonTitle": "Observation Logging Coming Soon",
-    "comingSoonDescription": "The tool for geo-referenced documentation of field observations, including attaching photos and notes, will be available here."
+    "addObservation": "Add Observation",
+    "addObservationSheetTitle": "Add New Observation",
+    "tableHeaderTitle": "Title",
+    "tableHeaderField": "Field",
+    "tableHeaderDate": "Date",
+    "tableHeaderPhoto": "Photo",
+    "actions": "Actions",
+    "view": "View",
+    "edit": "Edit",
+    "delete": "Delete",
+    "noObservationsTitle": "No Observations Recorded",
+    "noObservationsDescription": "No observations have been logged for this company yet.",
+    "addObservationForm": {
+      "titleLabel": "Title",
+      "titlePlaceholder": "e.g., Suspected Yellow Rust",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "Describe your observation...",
+      "fieldLabel": "Field",
+      "fieldPlaceholder": "Select a field",
+      "dateLabel": "Date",
+      "datePlaceholder": "Pick a date",
+      "submit": "Save Observation",
+      "submitting": "Saving...",
+      "successToastTitle": "Success",
+      "successToastDescription": "The observation was saved successfully.",
+      "errorToastTitle": "Error"
+    }
   },
   "ReportsPage": {
     "title": "Reports",

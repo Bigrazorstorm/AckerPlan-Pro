@@ -1,4 +1,4 @@
-import { Kpi, ChartDataPoint, Operation, Machinery, Session, Field, MaintenanceEvent, AddMaintenanceEventInput, AuditLogEvent, RepairEvent, AddRepairEventInput, AddOperationInput, LaborHoursByCropReportData } from './types';
+import { Kpi, ChartDataPoint, Operation, Machinery, Session, Field, MaintenanceEvent, AddMaintenanceEventInput, AuditLogEvent, RepairEvent, AddRepairEventInput, AddOperationInput, LaborHoursByCropReportData, Observation, AddObservationInput } from './types';
 
 /**
  * Defines the contract for data access in the application.
@@ -124,6 +124,21 @@ export interface DataService {
    * @param companyId - The ID of the company.
    */
   getAuditLog(tenantId: string, companyId: string): Promise<AuditLogEvent[]>;
+
+  /**
+   * Retrieves observations for a given company and tenant.
+   * @param tenantId - The ID of the tenant.
+   * @param companyId - The ID of the company.
+   */
+  getObservations(tenantId: string, companyId: string): Promise<Observation[]>;
+
+  /**
+   * Adds a new observation to the data store.
+   * @param tenantId - The ID of the tenant.
+   * @param companyId - The ID of the company.
+   * @param observationData - The data for the new observation.
+   */
+  addObservation(tenantId: string, companyId: string, observationData: AddObservationInput): Promise<Observation>;
 
   /**
    * Retrieves data for the labor hours by crop report.

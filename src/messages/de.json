@@ -243,8 +243,33 @@
   "ObservationsPage": {
     "title": "Beobachtungen",
     "description": "Dokumentieren Sie Pflanzenwachstum, Schäden und andere Feldbeobachtungen.",
-    "comingSoonTitle": "Protokollierung von Beobachtungen in Kürze verfügbar",
-    "comingSoonDescription": "Das Werkzeug zur georeferenzierten Dokumentation von Feldbeobachtungen, einschließlich des Anhängens von Fotos und Notizen, wird hier verfügbar sein."
+    "addObservation": "Beobachtung hinzufügen",
+    "addObservationSheetTitle": "Neue Beobachtung hinzufügen",
+    "tableHeaderTitle": "Titel",
+    "tableHeaderField": "Fläche",
+    "tableHeaderDate": "Datum",
+    "tableHeaderPhoto": "Foto",
+    "actions": "Aktionen",
+    "view": "Anzeigen",
+    "edit": "Bearbeiten",
+    "delete": "Löschen",
+    "noObservationsTitle": "Keine Beobachtungen erfasst",
+    "noObservationsDescription": "Für diese Firma wurden noch keine Beobachtungen protokolliert.",
+    "addObservationForm": {
+      "titleLabel": "Titel",
+      "titlePlaceholder": "z.B. Verdacht auf Gelbrost",
+      "descriptionLabel": "Beschreibung",
+      "descriptionPlaceholder": "Beschreiben Sie Ihre Beobachtung...",
+      "fieldLabel": "Fläche",
+      "fieldPlaceholder": "Fläche auswählen",
+      "dateLabel": "Datum",
+      "datePlaceholder": "Datum auswählen",
+      "submit": "Beobachtung speichern",
+      "submitting": "Wird gespeichert...",
+      "successToastTitle": "Erfolg",
+      "successToastDescription": "Die Beobachtung wurde erfolgreich gespeichert.",
+      "errorToastTitle": "Fehler"
+    }
   },
   "ReportsPage": {
     "title": "Auswertungen",

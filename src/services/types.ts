@@ -111,6 +111,26 @@ export interface Field {
   crop: string;
 };
 
+// Represents a field observation or damage report.
+export interface Observation {
+  id: string; // UUID
+  tenantId: string;
+  companyId: string;
+  field: string;
+  date: string; // ISO-8601 date string
+  title: string;
+  description: string;
+  photoUrl?: string; // Optional URL to an uploaded photo
+}
+
+// Input type for adding a new observation.
+export interface AddObservationInput {
+  field: string;
+  date: string; // ISO-8601 date string
+  title: string;
+  description: string;
+}
+
 export type Role = "Tenant Admin" | "Firmen Admin" | "Betriebsleitung" | "Mitarbeiter" | "Werkstatt" | "Leser";
 
 export interface Company {
