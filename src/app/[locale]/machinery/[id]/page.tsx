@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useFormState, useFormStatus } from 'react-dom';
 import { useParams } from 'next/navigation';
 import { useSession } from '@/context/session-context';
 import dataService from '@/services';
@@ -10,11 +11,123 @@ import { useTranslations } from 'next-intl';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import { PlusCircle, Wrench, ArrowLeft } from 'lucide-react';
+import { PlusCircle, Wrench, ArrowLeft, Calendar as CalendarIcon } from 'lucide-react';
 import { format } from 'date-fns';
 import { de, enUS } from 'date-fns/locale';
 import { Skeleton } from '@/components/ui/skeleton';
 import Link from 'next/link';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar } from '@/components/ui/calendar';
+import { useToast } from '@/hooks/use-toast';
+import { addMaintenanceEvent } from '@/app/machinery/maintenance/actions';
+import { cn } from '@/lib/utils';
+
+
+const initialState = {
+  message: '',
+  errors: {},
+};
+
+function SubmitButton() {
+  const { pending } = useFormStatus();
+  const t = useTranslations('MachineDetailPage.addMaintenanceForm');
+  return (
+    <Button type="submit" aria-disabled={pending}>
+      {pending ? t('submitting') : t('submit')}
+    </Button>
+  );
+}
+
+function AddMaintenanceForm({
+  closeSheet,
+  tenantId,
+  companyId,
+  machineId,
+  locale
+}: {
+  closeSheet: () => void;
+  tenantId: string;
+  companyId: string;
+  machineId: string;
+  locale: string;
+}) {
+  const [state, formAction] = useFormState(addMaintenanceEvent, initialState);
+  const { toast } = useToast();
+  const t = useTranslations('MachineDetailPage.addMaintenanceForm');
+  const [date, setDate] = useState<Date>();
+
+  useEffect(() => {
+    if (state.message && Object.keys(state.errors).length === 0) {
+      toast({
+        title: t('successToastTitle'),
+        description: t('successToastDescription'),
+      });
+      closeSheet();
+    } else if (state.message && Object.keys(state.errors).length > 0) {
+      toast({
+        variant: 'destructive',
+        title: t('errorToastTitle'),
+        description: state.message,
+      });
+    }
+  }, [state, toast, closeSheet, t]);
+
+  return (
+    <form action={formAction} className="space-y-4">
+      <input type="hidden" name="tenantId" value={tenantId} />
+      <input type="hidden" name="companyId" value={companyId} />
+      <input type="hidden" name="machineId" value={machineId} />
+      <input type="hidden" name="date" value={date ? format(date, 'yyyy-MM-dd') : ''} />
+
+      <div className="space-y-2">
+        <Label htmlFor="date">{t('dateLabel')}</Label>
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              variant={'outline'}
+              className={cn('w-full justify-start text-left font-normal', !date && 'text-muted-foreground')}
+            >
+              <CalendarIcon className="mr-2 h-4 w-4" />
+              {date ? format(date, 'PPP', { locale: locale === 'de' ? de : enUS }) : <span>{t('datePlaceholder')}</span>}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0">
+            <Calendar
+              mode="single"
+              selected={date}
+              onSelect={setDate}
+              initialFocus
+              disabled={(d) => d > new Date()}
+            />
+          </PopoverContent>
+        </Popover>
+        {state.errors?.date && <p className="text-sm text-destructive">{state.errors.date.join(', ')}</p>}
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="description">{t('descriptionLabel')}</Label>
+        <Textarea id="description" name="description" required placeholder={t('descriptionPlaceholder')} />
+        {state.errors?.description && <p className="text-sm text-destructive">{state.errors.description.join(', ')}</p>}
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="cost">{t('costLabel')}</Label>
+        <div className="relative">
+            <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-muted-foreground text-sm">€</span>
+            <Input id="cost" name="cost" type="number" step="0.01" required placeholder="150.00" className="pl-7"/>
+        </div>
+        {state.errors?.cost && <p className="text-sm text-destructive">{state.errors.cost.join(', ')}</p>}
+      </div>
+      
+      <SubmitButton />
+    </form>
+  );
+}
+
 
 function MachineDetailSkeleton() {
   return (
@@ -70,6 +183,7 @@ export default function MachineDetailPage() {
   const [machine, setMachine] = useState<Machinery | null>(null);
   const [maintenanceHistory, setMaintenanceHistory] = useState<MaintenanceEvent[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isSheetOpen, setSheetOpen] = useState(false);
 
   const t = useTranslations('MachineDetailPage');
   const tGen = useTranslations('General');
@@ -147,10 +261,22 @@ export default function MachineDetailPage() {
                 <h1 className="text-2xl md:text-3xl font-bold tracking-tight">{machine.name}</h1>
                 <p className="text-muted-foreground">{t('description', { model: machine.model, type: tMachineTypes(machine.type) })}</p>
                 </div>
-                <Button size="sm" className="gap-1">
-                <PlusCircle className="h-4 w-4" />
-                {t('logMaintenanceButton')}
-                </Button>
+                 <Sheet open={isSheetOpen} onOpenChange={setSheetOpen}>
+                    <SheetTrigger asChild>
+                        <Button size="sm" className="gap-1">
+                            <PlusCircle className="h-4 w-4" />
+                            {t('logMaintenanceButton')}
+                        </Button>
+                    </SheetTrigger>
+                    <SheetContent>
+                        <SheetHeader>
+                            <SheetTitle>{t('logMaintenanceSheetTitle')}</SheetTitle>
+                        </SheetHeader>
+                        <div className="py-4">
+                            {activeCompany && <AddMaintenanceForm closeSheet={() => setSheetOpen(false)} tenantId={activeCompany.tenantId} companyId={activeCompany.id} machineId={machine.id} locale={locale} />}
+                        </div>
+                    </SheetContent>
+                </Sheet>
             </div>
 
             <div className="grid gap-6 md:grid-cols-3">

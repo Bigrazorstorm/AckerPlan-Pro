@@ -101,7 +101,20 @@
     "noMaintenanceDescription": "Für diese Maschine wurden noch keine Wartungsarbeiten protokolliert. Protokollieren Sie eine neue Wartung, um hier zu beginnen.",
     "notFoundTitle": "Maschine nicht gefunden",
     "notFoundDescription": "Die angeforderte Maschine konnte nicht gefunden werden. Möglicherweise wurde sie gelöscht oder Sie haben keine Berechtigung.",
-    "backToMachinery": "Zurück zur Maschinenübersicht"
+    "backToMachinery": "Zurück zur Maschinenübersicht",
+    "logMaintenanceSheetTitle": "Wartungsereignis protokollieren",
+    "addMaintenanceForm": {
+      "dateLabel": "Datum",
+      "datePlaceholder": "Datum auswählen",
+      "descriptionLabel": "Beschreibung",
+      "descriptionPlaceholder": "Beschreiben Sie die durchgeführten Arbeiten (z.B. Ölwechsel, Filtertausch)...",
+      "costLabel": "Kosten",
+      "submit": "Ereignis speichern",
+      "submitting": "Wird gespeichert...",
+      "successToastTitle": "Erfolg",
+      "successToastDescription": "Das Wartungsereignis wurde erfolgreich gespeichert.",
+      "errorToastTitle": "Fehler"
+    }
   },
   "MachineryTypes": {
     "Tractor": "Traktor",

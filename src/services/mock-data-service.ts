@@ -1,5 +1,5 @@
 import { DataService } from './data-service';
-import { Kpi, ChartDataPoint, Operation, Machinery, Session, Field, MaintenanceEvent } from './types';
+import { Kpi, ChartDataPoint, Operation, Machinery, Session, Field, MaintenanceEvent, AddMaintenanceEventInput } from './types';
 
 const session: Session = {
   user: {
@@ -224,5 +224,19 @@ export class MockDataService implements DataService {
     };
     operations.push(newOperation);
     return Promise.resolve(newOperation);
+  }
+  
+  async addMaintenanceEvent(tenantId: string, companyId: string, eventData: AddMaintenanceEventInput): Promise<MaintenanceEvent> {
+    console.log(`Adding Maintenance Event for tenant ${tenantId} and company ${companyId}.`);
+    const newEvent: MaintenanceEvent = {
+      id: `ME${String(maintenanceEvents.length + 1).padStart(3, '0')}`,
+      tenantId,
+      companyId,
+      createdAt: new Date().toISOString(),
+      ...eventData,
+    };
+    // Add to the beginning of the list
+    maintenanceEvents.unshift(newEvent);
+    return Promise.resolve(newEvent);
   }
 }

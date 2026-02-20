@@ -1,4 +1,4 @@
-import { Kpi, ChartDataPoint, Operation, Machinery, Session, Field, MaintenanceEvent } from './types';
+import { Kpi, ChartDataPoint, Operation, Machinery, Session, Field, MaintenanceEvent, AddMaintenanceEventInput } from './types';
 
 /**
  * Defines the contract for data access in the application.
@@ -54,6 +54,14 @@ export interface DataService {
    * @param machineId - The ID of the machine.
    */
   getMaintenanceHistory(tenantId: string, companyId: string, machineId: string): Promise<MaintenanceEvent[]>;
+
+  /**
+   * Adds a new maintenance event for a machine.
+   * @param tenantId - The ID of the tenant.
+   * @param companyId - The ID of the company.
+   * @param eventData - The data for the new maintenance event.
+   */
+  addMaintenanceEvent(tenantId: string, companyId: string, eventData: AddMaintenanceEventInput): Promise<MaintenanceEvent>;
 
   /**
    * Adds a new machine to the data store.

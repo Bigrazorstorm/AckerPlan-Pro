@@ -101,7 +101,20 @@
     "noMaintenanceDescription": "No maintenance has been logged for this machine yet. Log a new maintenance event to get started.",
     "notFoundTitle": "Machine Not Found",
     "notFoundDescription": "The requested machine could not be found. It may have been deleted or you may not have permission to view it.",
-    "backToMachinery": "Back to Machinery List"
+    "backToMachinery": "Back to Machinery List",
+    "logMaintenanceSheetTitle": "Log Maintenance Event",
+    "addMaintenanceForm": {
+      "dateLabel": "Date",
+      "datePlaceholder": "Pick a date",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "Describe the work performed (e.g., oil change, filter replacement)...",
+      "costLabel": "Cost",
+      "submit": "Save Event",
+      "submitting": "Saving...",
+      "successToastTitle": "Success",
+      "successToastDescription": "The maintenance event was saved successfully.",
+      "errorToastTitle": "Error"
+    }
   },
   "MachineryTypes": {
     "Tractor": "Tractor",

@@ -34,6 +34,14 @@ export interface MaintenanceEvent {
   createdAt: string; // ISO-8601 date string
 }
 
+// Input type for adding a new maintenance event
+export interface AddMaintenanceEventInput {
+  machineId: string;
+  date: string;
+  description: string;
+  cost: number;
+}
+
 // Represents the Machinery entity in the database.
 export interface Machinery {
   id: string; // Should be a UUID
