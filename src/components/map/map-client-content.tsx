@@ -22,7 +22,7 @@ export function MapClientContent() {
   const [observations, setObservations] = useState<Observation[]>([]);
   const [loading, setLoading] = useState(true);
   
-  const t = useTranslations('FieldsPage'); // Re-use some translations
+  const t = useTranslations('FieldsPage');
   const tDebug = useTranslations('MapDebug');
   const { toast } = useToast();
   
@@ -59,6 +59,11 @@ export function MapClientContent() {
         scrollWheelZoom: true,
     });
     mapInstanceRef.current = map;
+
+    // Force map to re-evaluate its size after initialization in a flex container
+    setTimeout(() => {
+        map.invalidateSize();
+    }, 0);
 
     const osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -122,11 +127,13 @@ export function MapClientContent() {
     L.control.layers(baseLayers, overlayLayers).addTo(map);
 
     return () => {
-        map.remove();
-        mapInstanceRef.current = null;
+        if (mapInstanceRef.current) {
+            mapInstanceRef.current.remove();
+            mapInstanceRef.current = null;
+        }
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [t]); 
+  }, []); 
 
   // Effect for updating data layers - runs when data changes
   useEffect(() => {
