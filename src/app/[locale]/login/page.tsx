@@ -17,7 +17,7 @@ export default async function LoginPage({params: {locale}}: {params: {locale: st
       <div className="w-full max-w-sm">
         <div className="flex justify-center items-center gap-2 mb-6">
            <Leaf className="h-8 w-8 text-primary" />
-           <h1 className="text-3xl font-bold tracking-tight">FieldSense</h1>
+           <h1 className="text-3xl font-bold tracking-tight">AgroTrack</h1>
         </div>
         <Card>
           <CardHeader className="text-center">

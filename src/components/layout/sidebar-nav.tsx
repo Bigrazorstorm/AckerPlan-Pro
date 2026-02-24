@@ -8,14 +8,18 @@ import {
   LayoutDashboard,
   Map,
   Layers,
-  Tractor,
   Combine,
   Siren,
+  Tractor,
   BarChart3,
   Settings,
   LogOut,
   ChevronDown,
   History,
+  Users,
+  Archive,
+  FileText,
+  Landmark,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
@@ -43,11 +47,15 @@ import { logout } from '@/app/auth/actions';
 const navItems = [
   { href: '/', icon: LayoutDashboard, labelKey: 'dashboard' },
   { href: '/map', icon: Map, labelKey: 'map' },
-  { href: '/fields', icon: Layers, labelKey: 'fields' },
-  { href: '/operations', icon: Combine, labelKey: 'operations' },
+  { href: '/fields', icon: Layers, labelKey: 'schlaege' },
+  { href: '/operations', icon: Combine, labelKey: 'auftraege' },
   { href: '/observations', icon: Siren, labelKey: 'observations' },
-  { href: '/machinery', icon: Tractor, labelKey: 'machinery' },
-  { href: '/reports', icon: BarChart3, labelKey: 'reports' },
+  { href: '/personal', icon: Users, labelKey: 'personal' },
+  { href: '/machinery', icon: Tractor, labelKey: 'fuhrpark' },
+  { href: '/lager', icon: Archive, labelKey: 'lager' },
+  { href: '/reports', icon: BarChart3, labelKey: 'controlling' },
+  { href: '/dokumentation', icon: FileText, labelKey: 'dokumentation' },
+  { href: '/foerderwesen', icon: Landmark, labelKey: 'foerderwesen' },
   { href: '/audit-log', icon: History, labelKey: 'auditLog' },
 ];
 

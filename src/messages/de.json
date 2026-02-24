@@ -1,17 +1,21 @@
 {
   "Metadata": {
-    "title": "FieldSense Agro",
+    "title": "AgroTrack",
     "description": "GIS-gestütztes, Mobile-First Produktions- und Wirtschaftlichkeits-Controlling für Ackerbau"
   },
   "Sidebar": {
-    "title": "FieldSense",
+    "title": "AgroTrack",
     "dashboard": "Dashboard",
     "map": "Karte",
-    "fields": "Flächen",
-    "operations": "Maßnahmen",
+    "schlaege": "Schläge",
+    "auftraege": "Aufträge",
     "observations": "Beobachtungen",
-    "machinery": "Maschinen",
-    "reports": "Auswertungen",
+    "fuhrpark": "Fuhrpark",
+    "personal": "Personal",
+    "lager": "Lager",
+    "controlling": "Controlling",
+    "dokumentation": "Dokumentation",
+    "foerderwesen": "Förderwesen",
     "settings": "Einstellungen",
     "logout": "Abmelden",
     "userName": "John Doe",
@@ -27,13 +31,13 @@
     "loadingCompany": "Firma wird geladen..."
   },
   "Dashboard": {
-    "welcome": "Willkommen bei FieldSense",
+    "welcome": "Willkommen bei AgroTrack",
     "description": "Hier ist ein schneller Überblick über die Leistung Ihres Betriebs.",
     "fromLastMonth": "zum Vormonat",
     "performanceTitle": "Leistung",
     "performanceDescription": "Ihre Kosten- und Ertragsübersicht für das laufende Jahr.",
-    "recentOperationsTitle": "Letzte Maßnahmen",
-    "recentOperationsDescription": "Eine Übersicht der zuletzt protokollierten Maßnahmen.",
+    "recentOperationsTitle": "Letzte Aufträge",
+    "recentOperationsDescription": "Eine Übersicht der zuletzt protokollierten Aufträge.",
     "activity": "Aktivität",
     "field": "Feld",
     "status": "Status",
@@ -52,7 +56,7 @@
     "submitting": "Wird gespeichert..."
   },
   "LoginPage": {
-    "title": "Anmelden",
+    "title": "Anmelden bei AgroTrack",
     "description": "Geben Sie Ihre Anmeldedaten ein, um auf Ihr Konto zuzugreifen.",
     "emailLabel": "E-Mail",
     "passwordLabel": "Passwort",
@@ -64,7 +68,7 @@
   },
   "MapPage": {
     "title": "Interaktive Karte",
-    "description": "Übersicht Ihrer Flächen, Beobachtungen und amtlicher Geodaten.",
+    "description": "Übersicht Ihrer Schläge, Beobachtungen und amtlicher Geodaten.",
     "importButton": "GIS-Daten importieren"
   },
   "MapDebug": {
@@ -72,42 +76,42 @@
     "layerErrorDescription": "Layer '{layerName}' konnte nicht geladen werden. Bitte prüfen Sie die Server-URL und Ihre Verbindung."
   },
   "FieldsPage": {
-    "title": "Flächen",
+    "title": "Schläge",
     "description": "Verwalten Sie Ihre Feldgrenzen und sehen Sie GIS-Daten ein.",
     "description_list": "Verwalten und sehen Sie Ihre Schläge in einer Listenübersicht.",
     "mapTitle": "Kartenübersicht",
-    "listTitle": "Flächenliste",
+    "listTitle": "Schlagliste",
     "importButton": "GIS-Daten importieren",
     "listHeaderName": "Name",
     "listHeaderCrop": "Kultur",
     "listHeaderArea": "Fläche",
-    "fieldsLayer": "Flächen",
+    "fieldsLayer": "Schläge",
     "observationsLayer": "Beobachtungen"
   },
   "FieldDetailPage": {
-    "backToList": "Zurück zur Flächenübersicht",
+    "backToList": "Zurück zur Schlagübersicht",
     "description": "Kultur: {crop} | Fläche: {area} ha",
     "detailsTitle": "Schlagdetails",
     "areaLabel": "Fläche (ha)",
     "cropLabel": "Aktuelle Kultur",
     "idLabel": "Interne ID",
-    "recentOperationsTitle": "Letzte Maßnahmen",
-    "recentOperationsDescription": "Eine Liste der zuletzt auf dieser Fläche durchgeführten Maßnahmen.",
-    "tableHeaderType": "Maßnahme",
+    "recentOperationsTitle": "Letzte Aufträge",
+    "recentOperationsDescription": "Eine Liste der zuletzt auf diesem Schlag durchgeführten Aufträge.",
+    "tableHeaderType": "Auftrag",
     "tableHeaderDate": "Datum",
     "tableHeaderMachine": "Maschine",
     "tableHeaderStatus": "Status",
-    "noOperationsTitle": "Keine Maßnahmen erfasst",
-    "noOperationsDescription": "Für diese Fläche wurden noch keine Maßnahmen protokolliert.",
-    "notFoundTitle": "Fläche nicht gefunden",
-    "notFoundDescription": "Die angeforderte Fläche konnte nicht gefunden werden.",
+    "noOperationsTitle": "Keine Aufträge erfasst",
+    "noOperationsDescription": "Für diesen Schlag wurden noch keine Aufträge protokolliert.",
+    "notFoundTitle": "Schlag nicht gefunden",
+    "notFoundDescription": "Der angeforderte Schlag konnte nicht gefunden werden.",
     "economicsTitle": "Wirtschaftlichkeit (kumuliert)",
     "revenueLabel": "Gesamterlös",
     "costsLabel": "Gesamtkosten",
     "marginLabel": "Deckungsbeitrag"
   },
   "MachineryPage": {
-    "title": "Maschinen",
+    "title": "Fuhrpark",
     "description": "Verwalten Sie Ihre Flotte von Traktoren, Erntemaschinen und anderen Geräten.",
     "addMachine": "Maschine hinzufügen",
     "name": "Name",
@@ -229,13 +233,13 @@
     "In Workshop": "In Werkstatt"
   },
   "OperationsPage": {
-    "title": "Maßnahmen",
-    "description": "Protokollieren Sie alle Produktionsmaßnahmen und den Ressourceneinsatz.",
-    "addOperation": "Maßnahme hinzufügen",
-    "addOperationSheetTitle": "Neue Maßnahme hinzufügen",
-    "editOperationSheetTitle": "Maßnahme bearbeiten",
-    "tableHeaderType": "Maßnahme",
-    "tableHeaderField": "Fläche",
+    "title": "Aufträge",
+    "description": "Protokollieren Sie alle Produktionsaufträge und den Ressourceneinsatz.",
+    "addOperation": "Auftrag hinzufügen",
+    "addOperationSheetTitle": "Neuen Auftrag hinzufügen",
+    "editOperationSheetTitle": "Auftrag bearbeiten",
+    "tableHeaderType": "Auftragstyp",
+    "tableHeaderField": "Schlag",
     "tableHeaderMachine": "Maschine",
     "tableHeaderDate": "Datum",
     "tableHeaderStatus": "Status",
@@ -245,18 +249,18 @@
     "actions": "Aktionen",
     "edit": "Bearbeiten",
     "delete": "Löschen",
-    "deleteConfirmationTitle": "Maßnahme wirklich löschen?",
-    "deleteConfirmationDescription": "Diese Aktion kann nicht rückgängig gemacht werden. Dadurch wird die Maßnahme endgültig aus den Aufzeichnungen entfernt.",
+    "deleteConfirmationTitle": "Auftrag wirklich löschen?",
+    "deleteConfirmationDescription": "Diese Aktion kann nicht rückgängig gemacht werden. Dadurch wird der Auftrag endgültig aus den Aufzeichnungen entfernt.",
     "deleteConfirmationCancel": "Abbrechen",
     "deleteConfirmationConfirm": "Löschen",
     "deleteSuccessToastTitle": "Erfolg",
     "deleteErrorToastTitle": "Fehler",
     "addOperationForm": {
-      "typeLabel": "Maßnahmentyp",
+      "typeLabel": "Auftragstyp",
       "typePlaceholder": "Typ auswählen",
-      "fieldLabel": "Fläche(n)",
-      "fieldPlaceholder": "Fläche(n) auswählen",
-      "multipleFieldsSelected": "{count} Flächen ausgewählt",
+      "fieldLabel": "Schlag/Schläge",
+      "fieldPlaceholder": "Schlag/Schläge auswählen",
+      "multipleFieldsSelected": "{count} Schläge ausgewählt",
       "machineLabel": "Maschine",
       "machinePlaceholder": "Maschine auswählen",
       "dateLabel": "Datum",
@@ -271,15 +275,15 @@
       "yieldPlaceholder": "z.B. 176.5",
       "revenueLabel": "Erlös (€)",
       "revenuePlaceholder": "z.B. 38500.00",
-      "submit": "Maßnahme hinzufügen",
+      "submit": "Auftrag hinzufügen",
       "submitting": "Wird hinzugefügt...",
       "successToastTitle": "Erfolg",
       "errorToastTitle": "Fehler"
     },
     "editOperationForm": {
-      "typeLabel": "Maßnahmentyp",
+      "typeLabel": "Auftragstyp",
       "typePlaceholder": "Typ auswählen",
-      "fieldLabel": "Fläche (nicht änderbar)",
+      "fieldLabel": "Schlag (nicht änderbar)",
       "machineLabel": "Maschine",
       "machinePlaceholder": "Maschine auswählen",
       "dateLabel": "Datum",
@@ -296,7 +300,7 @@
       "revenuePlaceholder": "z.B. 38500.00",
       "submit": "Änderungen speichern",
       "successToastTitle": "Erfolg",
-      "successToastDescription": "Maßnahme erfolgreich aktualisiert.",
+      "successToastDescription": "Auftrag erfolgreich aktualisiert.",
       "errorToastTitle": "Fehler"
     }
   },
@@ -307,7 +311,9 @@
     "PestControl": "Pflanzenschutz",
     "Harvesting": "Ernte",
     "Baling": "Ballenpressen",
-    "Mowing": "Mähen"
+    "Mowing": "Mähen",
+    "Transport": "Transport",
+    "Sonstiges": "Sonstiges"
   },
   "OperationStatuses": {
     "Completed": "Abgeschlossen",
@@ -358,7 +364,7 @@
     "deleteErrorToastTitle": "Fehler"
   },
   "ReportsPage": {
-    "title": "Auswertungen",
+    "title": "Controlling",
     "description": "Analysieren Sie Kosten, Deckungsbeiträge und die Gesamtleistung.",
     "profitabilityByCropTitle": "Deckungsbeitrag nach Kultur",
     "profitabilityByCropDescription": "Eine Übersicht über Erlöse, direkte Kosten und Deckungsbeiträge pro angebauter Kultur. Basiert auf erfassten Ernten, Arbeitszeiten und geschätzten Kraftstoffkosten.",
@@ -438,5 +444,21 @@
     "Mitarbeiter": "Mitarbeiter",
     "Werkstatt": "Werkstatt",
     "Leser": "Leser"
+  },
+  "PersonalPage": {
+    "title": "Personal",
+    "description": "Verwalten Sie Ihre Mitarbeiter, deren Qualifikationen und Arbeitszeiten."
+  },
+  "LagerPage": {
+    "title": "Lager",
+    "description": "Verwalten Sie Ihre Lagerbestände für Saatgut, Dünger, Pflanzenschutzmittel und mehr."
+  },
+  "DokumentationPage": {
+    "title": "Dokumentation",
+    "description": "Erzeugen und exportieren Sie alle für die Einhaltung der Vorschriften erforderlichen Dokumente."
+  },
+  "FoerderwesenPage": {
+    "title": "Förderwesen",
+    "description": "Verwalten Sie Anträge und analysieren Sie das Potenzial für Förderprogramme."
   }
 }
