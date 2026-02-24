@@ -25,6 +25,10 @@ export interface Operation {
       id: string;
       name: string;
   };
+  personnel?: {
+    id: string;
+    name: string;
+  }[];
   fuelConsumed?: number; // in liters
   yieldAmount?: number; // in tons
   revenue?: number; // in EUR
@@ -38,6 +42,7 @@ export interface AddOperationInput {
   status: "Completed" | "In Progress";
   laborHours: number;
   machineId: string;
+  personnelIds?: string[];
   yieldAmount?: number;
   revenue?: number;
 }
@@ -49,6 +54,7 @@ export interface UpdateOperationInput {
   status: "Completed" | "In Progress";
   laborHours: number;
   machineId: string;
+  personnelIds?: string[];
   yieldAmount?: number;
   revenue?: number;
 }

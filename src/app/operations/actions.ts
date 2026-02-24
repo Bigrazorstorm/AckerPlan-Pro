@@ -11,6 +11,7 @@ const AddOperationSchema = z.object({
   date: z.string().min(1, { message: 'Date is required' }),
   laborHours: z.coerce.number().min(0, { message: 'Labor hours must be a positive number' }),
   status: z.enum(['Completed', 'In Progress']),
+  personnelIds: z.array(z.string()).optional(),
   yieldAmount: z.preprocess(
     (val) => (val === '' ? undefined : val),
     z.coerce.number().positive({ message: 'Yield must be a positive number' }).optional()
@@ -36,6 +37,7 @@ export async function addOperation(prevState: any, formData: FormData) {
     date: formData.get('date'),
     laborHours: formData.get('laborHours'),
     status: formData.get('status'),
+    personnelIds: formData.getAll('personnelIds'),
     yieldAmount: formData.get('yieldAmount'),
     revenue: formData.get('revenue'),
     tenantId: formData.get('tenantId'),
@@ -70,6 +72,7 @@ export async function updateOperation(prevState: any, formData: FormData) {
         date: formData.get('date'),
         laborHours: formData.get('laborHours'),
         status: formData.get('status'),
+        personnelIds: formData.getAll('personnelIds'),
         yieldAmount: formData.get('yieldAmount'),
         revenue: formData.get('revenue'),
         tenantId: formData.get('tenantId'),

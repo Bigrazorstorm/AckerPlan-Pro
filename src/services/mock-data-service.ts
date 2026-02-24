@@ -157,13 +157,13 @@ let machinery: Machinery[] = [
 ];
 
 let operations: Operation[] = [
-  { id: '1', tenantId: 'tenant-123', companyId: 'company-456', type: "Harvesting", field: "Große Wiese", date: "2024-07-22T10:00:00Z", status: "Completed", laborHours: 8.5, machine: { id: 'M002', name: 'Claas Lexion 8900' }, fuelConsumed: 722.5, yieldAmount: 176, revenue: 38720 },
-  { id: '2', tenantId: 'tenant-123', companyId: 'company-456', type: "Fertilizing", field: "Südhang", date: "2024-07-21T10:00:00Z", status: "Completed", laborHours: 4, machine: { id: 'M003', name: 'Fendt 942 Vario' }, fuelConsumed: 168.0 },
-  { id: '3', tenantId: 'tenant-123', companyId: 'company-456', type: "PestControl", field: "Acker-Nord 1", date: "2024-07-20T10:00:00Z", status: "Completed", laborHours: 5.5, machine: { id: 'M001', name: 'John Deere 8R 370' }, fuelConsumed: 195.2 },
-  { id: '4', tenantId: 'tenant-123', companyId: 'company-456', type: "Seeding", field: "An der B2", date: "2024-07-17T10:00:00Z", status: "In Progress", laborHours: 12, machine: { id: 'M005', name: 'Horsch Maestro 12.50 SW' }, fuelConsumed: 144.0 },
+  { id: '1', tenantId: 'tenant-123', companyId: 'company-456', type: "Harvesting", field: "Große Wiese", date: "2024-07-22T10:00:00Z", status: "Completed", laborHours: 8.5, machine: { id: 'M002', name: 'Claas Lexion 8900' }, personnel: [{ id: 'user-3', name: 'Erika Mustermann' }], fuelConsumed: 722.5, yieldAmount: 176, revenue: 38720 },
+  { id: '2', tenantId: 'tenant-123', companyId: 'company-456', type: "Fertilizing", field: "Südhang", date: "2024-07-21T10:00:00Z", status: "Completed", laborHours: 4, machine: { id: 'M003', name: 'Fendt 942 Vario' }, personnel: [{ id: 'user-2', name: 'Max Mustermann' }], fuelConsumed: 168.0 },
+  { id: '3', tenantId: 'tenant-123', companyId: 'company-456', type: "PestControl", field: "Acker-Nord 1", date: "2024-07-20T10:00:00Z", status: "Completed", laborHours: 5.5, machine: { id: 'M001', name: 'John Deere 8R 370' }, personnel: [{ id: 'user-2', name: 'Max Mustermann' }, { id: 'user-3', name: 'Erika Mustermann' }], fuelConsumed: 195.2 },
+  { id: '4', tenantId: 'tenant-123', companyId: 'company-456', type: "Seeding", field: "An der B2", date: "2024-07-17T10:00:00Z", status: "In Progress", laborHours: 12, machine: { id: 'M005', name: 'Horsch Maestro 12.50 SW' }, personnel: [{ id: 'user-3', name: 'Erika Mustermann' }], fuelConsumed: 144.0 },
   { id: '5', tenantId: 'tenant-123', companyId: 'company-456', type: "Tillage", field: "Acker-Nord 1", date: "2024-07-10T10:00:00Z", status: "Completed", laborHours: 6, machine: { id: 'M004', name: 'Amazone Catros XL' }, fuelConsumed: 90.0 },
   // Data for another company to test multi-tenancy
-  { id: '6', tenantId: 'tenant-123', companyId: 'company-789', type: "Mowing", field: "Weide am Bach", date: "2024-07-19T10:00:00Z", status: "Completed", laborHours: 7, machine: { id: 'M007', name: 'Case IH Magnum 380' }, fuelConsumed: 266.0 },
+  { id: '6', tenantId: 'tenant-123', companyId: 'company-789', type: "Mowing", field: "Weide am Bach", date: "2024-07-19T10:00:00Z", status: "Completed", laborHours: 7, machine: { id: 'M007', name: 'Case IH Magnum 380' }, personnel: [{ id: 'user-3', name: 'Erika Mustermann' }], fuelConsumed: 266.0 },
   { id: '7', tenantId: 'tenant-123', companyId: 'company-789', type: "Baling", field: "Grünland-West", date: "2024-07-17T11:00:00Z", status: "Completed", laborHours: 9 }, // No machine assigned yet
 ];
 
@@ -339,6 +339,11 @@ export class MockDataService implements DataService {
         throw new Error('Machine not found');
     }
 
+    const personnel = (operationData.personnelIds || [])
+        .map(id => users.find(u => u.id === id))
+        .filter((u): u is User => !!u)
+        .map(u => ({ id: u.id, name: u.name }));
+
     const createdOps: Operation[] = [];
     const numFields = operationData.fields.length;
     if (numFields === 0) {
@@ -371,6 +376,7 @@ export class MockDataService implements DataService {
               id: machine.id,
               name: machine.name
           },
+          personnel: personnel,
           fuelConsumed: parseFloat(fuelConsumedPerField.toFixed(1)),
           yieldAmount: operationData.yieldAmount ? parseFloat((operationData.yieldAmount / numFields).toFixed(2)) : undefined,
           revenue: operationData.revenue ? parseFloat((operationData.revenue / numFields).toFixed(2)) : undefined,
@@ -380,7 +386,12 @@ export class MockDataService implements DataService {
     
     operations.unshift(...createdOps);
     const fieldsString = operationData.fields.join(', ');
+    const personnelString = personnel.map(p => p.name).join(', ');
     let logDetails = `Maßnahme "${operationData.type}" auf Fläche(n) "${fieldsString}" erstellt (Gesamtarbeitszeit: ${operationData.laborHours}h).`;
+
+    if (personnelString) {
+        logDetails += ` Personal: ${personnelString}.`;
+    }
     if (operationData.type === 'Harvesting' && operationData.yieldAmount) {
       logDetails += ` Gesamtertrag: ${operationData.yieldAmount}t.`
     }
@@ -411,11 +422,17 @@ export class MockDataService implements DataService {
     
     // Recalculate fuel consumption
     const fuelConsumed = newMachine.standardFuelConsumption * operationData.laborHours;
+    
+    const personnel = (operationData.personnelIds || [])
+        .map(id => users.find(u => u.id === id))
+        .filter((u): u is User => !!u)
+        .map(u => ({ id: u.id, name: u.name }));
 
     const updatedOperation: Operation = {
         ...oldOperation,
         ...operationData,
         machine: { id: newMachine.id, name: newMachine.name },
+        personnel: personnel,
         fuelConsumed: parseFloat(fuelConsumed.toFixed(1)),
     };
 

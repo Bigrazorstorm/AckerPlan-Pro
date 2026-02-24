@@ -4,7 +4,7 @@ import { useEffect, useState, useMemo, useActionState } from 'react'
 import { useFormStatus } from 'react-dom'
 import { useTranslations } from "next-intl"
 import { useToast } from '@/hooks/use-toast'
-import { Operation, Field, Machinery } from '@/services/types'
+import { Operation, Field, Machinery, User } from '@/services/types'
 import { addOperation, deleteOperation, updateOperation } from '@/app/operations/actions'
 import { useSession } from '@/context/session-context'
 import dataService from '@/services'
@@ -50,7 +50,7 @@ function SubmitButton({tKey, isEdit}: {tKey: string, isEdit?: boolean}) {
   )
 }
 
-function EditOperationForm({ closeSheet, tenantId, companyId, fields, machinery, operation }: { closeSheet: () => void; tenantId: string; companyId: string; fields: Field[], machinery: Machinery[], operation: Operation }) {
+function EditOperationForm({ closeSheet, tenantId, companyId, fields, machinery, operation, personnel }: { closeSheet: () => void; tenantId: string; companyId: string; fields: Field[], machinery: Machinery[], operation: Operation, personnel: User[] }) {
   const [state, formAction] = useActionState(updateOperation, initialState)
   const { toast } = useToast()
   const t = useTranslations('OperationsPage.editOperationForm');
@@ -58,6 +58,7 @@ function EditOperationForm({ closeSheet, tenantId, companyId, fields, machinery,
   const [date, setDate] = useState<Date | undefined>(operation ? parseISO(operation.date) : undefined);
   const [operationType, setOperationType] = useState<string>(operation.type);
   const { locale } = useParams<{ locale: string }>();
+  const [selectedPersonnel, setSelectedPersonnel] = useState<string[]>(operation.personnel?.map(p => p.id) || []);
 
   useEffect(() => {
     if (state.message && Object.keys(state.errors).length === 0) {
@@ -83,6 +84,7 @@ function EditOperationForm({ closeSheet, tenantId, companyId, fields, machinery,
       <input type="hidden" name="companyId" value={companyId} />
       <input type="hidden" name="id" value={operation.id} />
       <input type="hidden" name="date" value={date ? format(date, "yyyy-MM-dd") : ""} />
+      {selectedPersonnel.map(p => <input key={p} type="hidden" name="personnelIds" value={p} />)}
       
       <div className="space-y-2">
         <Label htmlFor="field">{t('fieldLabel')}</Label>
@@ -104,20 +106,56 @@ function EditOperationForm({ closeSheet, tenantId, companyId, fields, machinery,
         {state.errors?.type && <p className="text-sm text-destructive">{state.errors.type.join(', ')}</p>}
       </div>
 
-       <div className="space-y-2">
-          <Label htmlFor="machineId">{t('machineLabel')}</Label>
-          <Select name="machineId" required defaultValue={operation.machine?.id}>
-            <SelectTrigger>
-              <SelectValue placeholder={t('machinePlaceholder')} />
-            </SelectTrigger>
-            <SelectContent>
-              {machinery.map((machine) => (
-                  <SelectItem key={machine.id} value={machine.id}>{machine.name}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          {state.errors?.machineId && <p className="text-sm text-destructive">{state.errors.machineId.join(', ')}</p>}
-      </div>
+       <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="machineId">{t('machineLabel')}</Label>
+            <Select name="machineId" required defaultValue={operation.machine?.id}>
+                <SelectTrigger>
+                <SelectValue placeholder={t('machinePlaceholder')} />
+                </SelectTrigger>
+                <SelectContent>
+                {machinery.map((machine) => (
+                    <SelectItem key={machine.id} value={machine.id}>{machine.name}</SelectItem>
+                ))}
+                </SelectContent>
+            </Select>
+            {state.errors?.machineId && <p className="text-sm text-destructive">{state.errors.machineId.join(', ')}</p>}
+          </div>
+          <div className="space-y-2">
+            <Label>{t('personnelLabel')}</Label>
+            <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="w-full justify-between font-normal">
+                    <span className="truncate pr-1">
+                    {selectedPersonnel.length > 0
+                        ? selectedPersonnel.length === 1
+                        ? personnel.find(p => p.id === selectedPersonnel[0])?.name
+                        : t('multiplePersonnelSelected', { count: selectedPersonnel.length })
+                        : t('personnelPlaceholder')}
+                    </span>
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-[--radix-dropdown-menu-trigger-width]">
+                {personnel.map((user) => (
+                    <DropdownMenuCheckboxItem
+                    key={user.id}
+                    checked={selectedPersonnel.includes(user.id)}
+                    onSelect={(e) => e.preventDefault()}
+                    onCheckedChange={(checked) => {
+                        return checked
+                        ? setSelectedPersonnel((prev) => [...prev, user.id])
+                        : setSelectedPersonnel((prev) => prev.filter((id) => id !== user.id));
+                    }}
+                    >
+                    {user.name}
+                    </DropdownMenuCheckboxItem>
+                ))}
+                </DropdownMenuContent>
+            </DropdownMenu>
+            {state.errors?.personnelIds && <p className="text-sm text-destructive">{state.errors.personnelIds.join(', ')}</p>}
+          </div>
+       </div>
        
       {operationType === 'Harvesting' && (
         <div className="grid grid-cols-2 gap-4">
@@ -190,13 +228,14 @@ function EditOperationForm({ closeSheet, tenantId, companyId, fields, machinery,
   )
 }
 
-function AddOperationForm({ closeSheet, tenantId, companyId, fields, machinery }: { closeSheet: () => void; tenantId: string; companyId: string; fields: Field[], machinery: Machinery[] }) {
+function AddOperationForm({ closeSheet, tenantId, companyId, fields, machinery, personnel }: { closeSheet: () => void; tenantId: string; companyId: string; fields: Field[], machinery: Machinery[], personnel: User[] }) {
   const [state, formAction] = useActionState(addOperation, initialState)
   const { toast } = useToast()
   const t = useTranslations('OperationsPage.addOperationForm');
   const tOperationTypes = useTranslations('OperationTypes');
   const [date, setDate] = useState<Date>()
   const [selectedFields, setSelectedFields] = useState<string[]>([]);
+  const [selectedPersonnel, setSelectedPersonnel] = useState<string[]>([]);
   const [operationType, setOperationType] = useState<string>('');
   const { locale } = useParams<{ locale: string }>();
 
@@ -224,6 +263,7 @@ function AddOperationForm({ closeSheet, tenantId, companyId, fields, machinery }
       <input type="hidden" name="companyId" value={companyId} />
       <input type="hidden" name="date" value={date ? format(date, "yyyy-MM-dd") : ""} />
       {selectedFields.map(field => <input key={field} type="hidden" name="fields" value={field} />)}
+      {selectedPersonnel.map(p => <input key={p} type="hidden" name="personnelIds" value={p} />)}
 
       <div className="space-y-2">
         <Label htmlFor="type">{t('typeLabel')}</Label>
@@ -290,6 +330,42 @@ function AddOperationForm({ closeSheet, tenantId, companyId, fields, machinery }
             {state.errors?.machineId && <p className="text-sm text-destructive">{state.errors.machineId.join(', ')}</p>}
         </div>
        </div>
+
+      <div className="space-y-2">
+        <Label>{t('personnelLabel')}</Label>
+            <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="w-full justify-between font-normal">
+                <span className="truncate pr-1">
+                    {selectedPersonnel.length > 0
+                    ? selectedPersonnel.length === 1
+                        ? personnel.find(p => p.id === selectedPersonnel[0])?.name
+                        : t('multiplePersonnelSelected', { count: selectedPersonnel.length })
+                    : t('personnelPlaceholder')}
+                </span>
+                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-[--radix-dropdown-menu-trigger-width]">
+                {personnel.map((user) => (
+                <DropdownMenuCheckboxItem
+                    key={user.id}
+                    checked={selectedPersonnel.includes(user.id)}
+                    onSelect={(e) => e.preventDefault()}
+                    onCheckedChange={(checked) => {
+                    return checked
+                        ? setSelectedPersonnel((prev) => [...prev, user.id])
+                        : setSelectedPersonnel((prev) => prev.filter((id) => id !== user.id));
+                    }}
+                >
+                    {user.name}
+                </DropdownMenuCheckboxItem>
+                ))}
+            </DropdownMenuContent>
+            </DropdownMenu>
+            {state.errors?.personnelIds && <p className="text-sm text-destructive">{state.errors.personnelIds.join(', ')}</p>}
+      </div>
+
 
       {operationType === 'Harvesting' && (
         <div className="grid grid-cols-2 gap-4">
@@ -446,6 +522,7 @@ export function OperationsClientContent() {
   const [operations, setOperations] = useState<Operation[]>([]);
   const [fields, setFields] = useState<Field[]>([]);
   const [machinery, setMachinery] = useState<Machinery[]>([]);
+  const [personnel, setPersonnel] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const { locale } = useParams<{ locale: string }>();
   const [operationToDelete, setOperationToDelete] = useState<Operation | null>(null);
@@ -457,14 +534,16 @@ export function OperationsClientContent() {
     if (activeCompany) {
       const fetchData = async () => {
         setLoading(true);
-        const [operationsData, fieldsData, machineryData] = await Promise.all([
+        const [operationsData, fieldsData, machineryData, personnelData] = await Promise.all([
             dataService.getOperations(activeCompany.tenantId, activeCompany.id),
             dataService.getFields(activeCompany.tenantId, activeCompany.id),
-            dataService.getMachinery(activeCompany.tenantId, activeCompany.id)
+            dataService.getMachinery(activeCompany.tenantId, activeCompany.id),
+            dataService.getUsersForCompany(activeCompany.tenantId, activeCompany.id)
         ]);
         setOperations(operationsData);
         setFields(fieldsData);
         setMachinery(machineryData);
+        setPersonnel(personnelData);
         setLoading(false);
       }
       fetchData();
@@ -524,7 +603,7 @@ export function OperationsClientContent() {
                 <SheetTitle>{t('addOperationSheetTitle')}</SheetTitle>
               </SheetHeader>
               <div className="py-4">
-                {activeCompany && <AddOperationForm closeSheet={() => setAddSheetOpen(false)} tenantId={activeCompany.tenantId} companyId={activeCompany.id} fields={fields} machinery={machinery} />}
+                {activeCompany && <AddOperationForm closeSheet={() => setAddSheetOpen(false)} tenantId={activeCompany.tenantId} companyId={activeCompany.id} fields={fields} machinery={machinery} personnel={personnel} />}
               </div>
             </SheetContent>
           </Sheet>
@@ -566,12 +645,14 @@ export function OperationsClientContent() {
                       <span className="text-muted-foreground">{t('tableHeaderDate')}</span>
                       <span>{dateFormatter(op.date)}</span>
                   </div>
-                  {op.machine && (
-                    <div className="flex justify-between">
-                        <span className="text-muted-foreground">{t('tableHeaderMachine')}</span>
-                        <span>{op.machine.name}</span>
-                    </div>
-                  )}
+                  <div className="flex justify-between">
+                      <span className="text-muted-foreground">{t('tableHeaderMachine')}</span>
+                      <span>{op.machine?.name || '-'}</span>
+                  </div>
+                   <div className="flex justify-between">
+                      <span className="text-muted-foreground">{t('tableHeaderPersonnel')}</span>
+                      <span className="text-right truncate">{op.personnel?.map(p => p.name).join(', ') || '-'}</span>
+                  </div>
                   <div className="flex justify-between">
                       <span className="text-muted-foreground">{t('tableHeaderLaborHours')}</span>
                       <span className="font-medium">{op.laborHours.toLocaleString(locale)} h</span>
@@ -601,6 +682,7 @@ export function OperationsClientContent() {
                   <TableHead>{t('tableHeaderType')}</TableHead>
                   <TableHead>{t('tableHeaderField')}</TableHead>
                   <TableHead>{t('tableHeaderMachine')}</TableHead>
+                  <TableHead>{t('tableHeaderPersonnel')}</TableHead>
                   <TableHead>{t('tableHeaderDate')}</TableHead>
                   <TableHead className="text-right">{t('tableHeaderLaborHours')}</TableHead>
                   <TableHead className="text-right">{t('tableHeaderFuel')}</TableHead>
@@ -614,7 +696,8 @@ export function OperationsClientContent() {
                   <TableRow key={op.id}>
                       <TableCell className="font-medium">{tOperationTypes(op.type)}</TableCell>
                       <TableCell>{op.field}</TableCell>
-                      <TableCell>{op.machine?.name}</TableCell>
+                      <TableCell>{op.machine?.name || '-'}</TableCell>
+                      <TableCell className="truncate max-w-xs">{op.personnel?.map(p => p.name).join(', ') || '-'}</TableCell>
                       <TableCell>{dateFormatter(op.date)}</TableCell>
                       <TableCell className="text-right">{op.laborHours.toLocaleString(locale)} h</TableCell>
                       <TableCell className="text-right">{op.fuelConsumed?.toLocaleString(locale)} l</TableCell>
@@ -669,7 +752,7 @@ export function OperationsClientContent() {
             <SheetTitle>{t('editOperationSheetTitle')}</SheetTitle>
           </SheetHeader>
           <div className="py-4">
-            {activeCompany && operationToEdit && <EditOperationForm closeSheet={() => setEditSheetOpen(false)} tenantId={activeCompany.tenantId} companyId={activeCompany.id} fields={fields} machinery={machinery} operation={operationToEdit} />}
+            {activeCompany && operationToEdit && <EditOperationForm closeSheet={() => setEditSheetOpen(false)} tenantId={activeCompany.tenantId} companyId={activeCompany.id} fields={fields} machinery={machinery} operation={operationToEdit} personnel={personnel} />}
           </div>
         </SheetContent>
       </Sheet>
