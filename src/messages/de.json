@@ -77,7 +77,7 @@
   },
   "FieldsPage": {
     "title": "Schläge",
-    "description": "Verwalten Sie Ihre Feldgrenzen und sehen Sie GIS-Daten ein.",
+    "description": "Verwalten und sehen Sie Ihre Schläge in einer Listenübersicht.",
     "description_list": "Verwalten und sehen Sie Ihre Schläge in einer Listenübersicht.",
     "mapTitle": "Kartenübersicht",
     "listTitle": "Schlagliste",
@@ -402,32 +402,9 @@
     "companySettingsDescription": "Verwalten Sie die Stammdaten und Einstellungen Ihrer Firma.",
     "billingSettingsTitle": "Abrechnung & Lizenz",
     "billingSettingsDescription": "Verwalten Sie Ihr Abonnement und sehen Sie Rechnungen ein.",
-    "userManagement": {
-      "title": "Benutzerverwaltung",
-      "description": "Benutzer hinzufügen, Rollen bearbeiten und Berechtigungen für die aktuell ausgewählte Firma verwalten.",
-      "addUserButton": "Benutzer hinzufügen",
-      "tableHeaderName": "Name",
-      "tableHeaderEmail": "E-Mail",
-      "tableHeaderRole": "Rolle",
-      "actions": "Aktionen",
-      "editRole": "Rolle bearbeiten",
-      "removeUser": "Benutzer entfernen",
-      "accessDeniedTitle": "Keine Berechtigung",
-      "accessDeniedDescription": "Sie haben nicht die erforderlichen Berechtigungen, um Benutzer für diese Firma zu verwalten.",
-      "addUserSheetTitle": "Neuen Benutzer hinzufügen",
-      "addUserForm": {
-        "nameLabel": "Vollständiger Name",
-        "namePlaceholder": "z.B. Erika Mustermann",
-        "emailLabel": "E-Mail-Adresse",
-        "emailPlaceholder": "erika.mustermann@example.com",
-        "roleLabel": "Rolle",
-        "rolePlaceholder": "Rolle auswählen",
-        "submit": "Benutzer hinzufügen",
-        "submitting": "Benutzer wird hinzugefügt...",
-        "successToastTitle": "Benutzer hinzugefügt",
-        "errorToastTitle": "Fehler beim Hinzufügen"
-      }
-    }
+    "userManagementMovedTitle": "Benutzerverwaltung umgezogen",
+    "userManagementMovedDescription": "Die Verwaltung von Benutzern und deren Rollen finden Sie jetzt im eigenen Bereich 'Personal'.",
+    "goToPersonalButton": "Zur Personalverwaltung"
   },
   "AuditLogPage": {
     "title": "Logbuch / Audit Trail",
@@ -447,7 +424,29 @@
   },
   "PersonalPage": {
     "title": "Personal",
-    "description": "Verwalten Sie Ihre Mitarbeiter, deren Qualifikationen und Arbeitszeiten."
+    "description": "Verwalten Sie Ihre Mitarbeiter, deren Qualifikationen und Arbeitszeiten.",
+    "addUserButton": "Personal hinzufügen",
+    "addUserSheetTitle": "Neuen Mitarbeiter hinzufügen",
+    "tableHeaderName": "Name",
+    "tableHeaderEmail": "E-Mail",
+    "tableHeaderRole": "Rolle",
+    "actions": "Aktionen",
+    "editRole": "Rolle bearbeiten",
+    "removeUser": "Mitarbeiter entfernen",
+    "noUsersTitle": "Keine Mitarbeiter erfasst",
+    "noUsersDescription": "Für diese Firma wurden noch keine Mitarbeiter oder Benutzer hinzugefügt.",
+    "addUserForm": {
+      "nameLabel": "Vollständiger Name",
+      "namePlaceholder": "z.B. Erika Mustermann",
+      "emailLabel": "E-Mail-Adresse",
+      "emailPlaceholder": "erika.mustermann@example.com",
+      "roleLabel": "Rolle",
+      "rolePlaceholder": "Rolle auswählen",
+      "submit": "Mitarbeiter hinzufügen",
+      "submitting": "Wird hinzugefügt...",
+      "successToastTitle": "Mitarbeiter hinzugefügt",
+      "errorToastTitle": "Fehler beim Hinzufügen"
+    }
   },
   "LagerPage": {
     "title": "Lager",

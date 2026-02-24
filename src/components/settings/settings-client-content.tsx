@@ -4,10 +4,11 @@ import { useSession } from "@/context/session-context";
 import { useTranslations } from "next-intl";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Settings } from "lucide-react";
+import { Settings, Users } from "lucide-react";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
-import { UserManagementContent } from "./user-management-content";
+import Link from 'next-intl/link';
+import { Button } from "../ui/button";
 
 function PlaceholderContent({ titleKey, descriptionKey }: { titleKey: string; descriptionKey: string; }) {
   const t = useTranslations('SettingsPage');
@@ -66,7 +67,26 @@ export function SettingsClientContent() {
         </Card>
       </TabsContent>
       <TabsContent value="users">
-        <UserManagementContent />
+        <Card>
+            <CardHeader>
+                <CardTitle>{t('manageUsersTitle')}</CardTitle>
+                <CardDescription>{t('manageUsersDescription')}</CardDescription>
+            </CardHeader>
+            <CardContent>
+                <div className="flex flex-col items-center justify-center text-center gap-4 py-24 border-2 border-dashed rounded-lg">
+                    <Users className="w-16 h-16 text-muted-foreground" />
+                    <h3 className="text-xl font-semibold">{t('userManagementMovedTitle')}</h3>
+                    <p className="text-muted-foreground max-w-md">
+                        {t('userManagementMovedDescription')}
+                    </p>
+                    <Button asChild>
+                      <Link href="/personal">
+                        {t('goToPersonalButton')}
+                      </Link>
+                    </Button>
+                </div>
+            </CardContent>
+        </Card>
       </TabsContent>
       <TabsContent value="company">
          <Card>

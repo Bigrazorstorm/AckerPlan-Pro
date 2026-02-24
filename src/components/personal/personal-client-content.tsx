@@ -17,7 +17,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { addUser } from '@/app/settings/actions';
+import { addUser } from '@/app/personal/actions';
 
 
 const addUserInitialState = {
@@ -27,7 +27,7 @@ const addUserInitialState = {
 
 function AddUserSubmitButton() {
   const { pending } = useFormStatus();
-  const t = useTranslations('SettingsPage.userManagement.addUserForm');
+  const t = useTranslations('PersonalPage.addUserForm');
   return (
     <Button type="submit" aria-disabled={pending}>
       {pending ? t('submitting') : t('submit')}
@@ -38,7 +38,7 @@ function AddUserSubmitButton() {
 function AddUserForm({ closeSheet, tenantId, companyId }: { closeSheet: () => void; tenantId: string; companyId: string; }) {
   const [state, formAction] = useActionState(addUser, addUserInitialState);
   const { toast } = useToast();
-  const t = useTranslations('SettingsPage.userManagement.addUserForm');
+  const t = useTranslations('PersonalPage.addUserForm');
   const tRoles = useTranslations('Roles');
   
   const roles: Role[] = ["Firmen Admin", "Betriebsleitung", "Mitarbeiter", "Werkstatt", "Leser"];
@@ -127,18 +127,18 @@ function UserTableSkeleton() {
     );
 }
 
-export function UserManagementContent() {
+export function PersonalClientContent() {
     const { activeCompany, loading: sessionLoading, activeRole } = useSession();
     const [users, setUsers] = useState<User[]>([]);
     const [loading, setLoading] = useState(true);
     const [isAddSheetOpen, setAddSheetOpen] = useState(false);
-    const t = useTranslations('SettingsPage.userManagement');
+    const t = useTranslations('PersonalPage');
     const tRoles = useTranslations('Roles');
 
     const canManageUsers = activeRole === 'Firmen Admin' || activeRole === 'Tenant Admin';
 
     useEffect(() => {
-        if (activeCompany && canManageUsers) {
+        if (activeCompany) {
             const fetchUsers = async () => {
                 setLoading(true);
                 const data = await dataService.getUsersForCompany(activeCompany.tenantId, activeCompany.id);
@@ -149,16 +149,13 @@ export function UserManagementContent() {
         } else if (!sessionLoading) {
             setLoading(false);
         }
-    }, [activeCompany, canManageUsers, sessionLoading, isAddSheetOpen]); // Re-fetch when sheet closes
+    }, [activeCompany, sessionLoading, isAddSheetOpen]);
     
     if (sessionLoading || loading) {
         return (
             <Card>
                 <CardHeader className="flex flex-row items-center justify-between">
-                    <div>
-                        <CardTitle>{t('title')}</CardTitle>
-                        <CardDescription>{t('description')}</CardDescription>
-                    </div>
+                    <div/>
                     <Skeleton className="h-9 w-32" />
                 </CardHeader>
                 <CardContent>
@@ -167,33 +164,12 @@ export function UserManagementContent() {
             </Card>
         );
     }
-
-    if (!canManageUsers) {
-        return (
-            <Card>
-                <CardHeader>
-                     <CardTitle>{t('title')}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <div className="flex flex-col items-center justify-center text-center gap-4 py-24 border-2 border-dashed rounded-lg">
-                        <Users className="w-16 h-16 text-muted-foreground" />
-                        <h3 className="text-xl font-semibold">{t('accessDeniedTitle')}</h3>
-                        <p className="text-muted-foreground max-w-md">
-                            {t('accessDeniedDescription')}
-                        </p>
-                    </div>
-                </CardContent>
-            </Card>
-        );
-    }
-
+    
     return (
         <Card>
             <CardHeader className="flex flex-row items-center justify-between">
-                <div>
-                    <CardTitle>{t('title')}</CardTitle>
-                    <CardDescription>{t('description')}</CardDescription>
-                </div>
+                <div/>
+                {canManageUsers ? (
                  <Sheet open={isAddSheetOpen} onOpenChange={setAddSheetOpen}>
                     <SheetTrigger asChild>
                         <Button size="sm" className="gap-1">
@@ -210,15 +186,17 @@ export function UserManagementContent() {
                         </div>
                     </SheetContent>
                 </Sheet>
+                ) : null}
             </CardHeader>
             <CardContent>
+                {users.length > 0 ? (
                 <Table>
                     <TableHeader>
                         <TableRow>
                             <TableHead>{t('tableHeaderName')}</TableHead>
                             <TableHead>{t('tableHeaderEmail')}</TableHead>
                             <TableHead>{t('tableHeaderRole')}</TableHead>
-                            <TableHead><span className="sr-only">{t('actions')}</span></TableHead>
+                            {canManageUsers && <TableHead><span className="sr-only">{t('actions')}</span></TableHead>}
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -229,6 +207,7 @@ export function UserManagementContent() {
                                     <TableCell className="font-medium">{user.name}</TableCell>
                                     <TableCell>{user.email}</TableCell>
                                     <TableCell>{role ? tRoles(role) : '-'}</TableCell>
+                                    {canManageUsers && (
                                     <TableCell className="text-right">
                                         <DropdownMenu>
                                             <DropdownMenuTrigger asChild>
@@ -244,11 +223,21 @@ export function UserManagementContent() {
                                             </DropdownMenuContent>
                                         </DropdownMenu>
                                     </TableCell>
+                                    )}
                                 </TableRow>
                             );
                         })}
                     </TableBody>
                 </Table>
+                ) : (
+                    <div className="flex flex-col items-center justify-center text-center gap-4 py-24 border-2 border-dashed rounded-lg">
+                        <Users className="w-16 h-16 text-muted-foreground" />
+                        <h3 className="text-lg font-semibold">{t('noUsersTitle')}</h3>
+                        <p className="text-muted-foreground max-w-md">
+                            {t('noUsersDescription')}
+                        </p>
+                    </div>
+                )}
             </CardContent>
         </Card>
     );

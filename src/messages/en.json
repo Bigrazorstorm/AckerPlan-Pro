@@ -77,7 +77,7 @@
   },
   "FieldsPage": {
     "title": "Fields",
-    "description": "Manage your field boundaries and view GIS data.",
+    "description": "Manage and view your fields in a list overview.",
     "description_list": "Manage and view your fields in a list overview.",
     "mapTitle": "Map Overview",
     "listTitle": "Field List",
@@ -402,32 +402,9 @@
     "companySettingsDescription": "Manage your company's master data and settings.",
     "billingSettingsTitle": "Billing & Subscription",
     "billingSettingsDescription": "Manage your subscription and view invoices.",
-    "userManagement": {
-      "title": "User Management",
-      "description": "Add users, edit roles, and manage permissions for the currently selected company.",
-      "addUserButton": "Add User",
-      "tableHeaderName": "Name",
-      "tableHeaderEmail": "Email",
-      "tableHeaderRole": "Role",
-      "actions": "Actions",
-      "editRole": "Edit Role",
-      "removeUser": "Remove User",
-      "accessDeniedTitle": "Access Denied",
-      "accessDeniedDescription": "You do not have the required permissions to manage users for this company.",
-      "addUserSheetTitle": "Add New User",
-      "addUserForm": {
-        "nameLabel": "Full Name",
-        "namePlaceholder": "e.g. Jane Doe",
-        "emailLabel": "Email Address",
-        "emailPlaceholder": "jane.doe@example.com",
-        "roleLabel": "Role",
-        "rolePlaceholder": "Select a role",
-        "submit": "Add User",
-        "submitting": "Adding User...",
-        "successToastTitle": "User Added",
-        "errorToastTitle": "Error Adding User"
-      }
-    }
+    "userManagementMovedTitle": "User Management Has Moved",
+    "userManagementMovedDescription": "The management of users and their roles can now be found in the dedicated 'Personnel' section.",
+    "goToPersonalButton": "Go to Personnel"
   },
   "AuditLogPage": {
     "title": "Audit Log / Trail",
@@ -447,7 +424,29 @@
   },
   "PersonalPage": {
     "title": "Personnel",
-    "description": "Manage your employees, their qualifications, and working hours."
+    "description": "Manage your employees, their qualifications, and working hours.",
+    "addUserButton": "Add Personnel",
+    "addUserSheetTitle": "Add New Employee",
+    "tableHeaderName": "Name",
+    "tableHeaderEmail": "Email",
+    "tableHeaderRole": "Role",
+    "actions": "Actions",
+    "editRole": "Edit Role",
+    "removeUser": "Remove Employee",
+    "noUsersTitle": "No Employees Recorded",
+    "noUsersDescription": "No employees or users have been added for this company yet.",
+    "addUserForm": {
+      "nameLabel": "Full Name",
+      "namePlaceholder": "e.g., Jane Doe",
+      "emailLabel": "Email Address",
+      "emailPlaceholder": "jane.doe@example.com",
+      "roleLabel": "Role",
+      "rolePlaceholder": "Select a role",
+      "submit": "Add Employee",
+      "submitting": "Adding...",
+      "successToastTitle": "Employee Added",
+      "errorToastTitle": "Error Adding Employee"
+    }
   },
   "LagerPage": {
     "title": "Warehouse",

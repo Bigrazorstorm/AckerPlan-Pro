@@ -36,7 +36,7 @@ export async function addUser(prevState: any, formData: FormData) {
       email: userData.email,
       role: userData.role as Role,
     })
-    revalidatePath('/settings')
+    revalidatePath('/personal')
     return { message: 'User added successfully.', errors: {} }
   } catch (e) {
     const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
