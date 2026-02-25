@@ -1,7 +1,7 @@
 
 
 import { DataService } from './data-service';
-import { Kpi, ChartDataPoint, Operation, Machinery, Session, Field, MaintenanceEvent, AddMaintenanceEventInput, AuditLogEvent, RepairEvent, AddRepairEventInput, AddOperationInput, LaborHoursByCropReportData, Observation, AddObservationInput, ProfitabilityByCropReportData, UpdateMachineInput, FieldEconomics, User, AddUserInput, Role, UpdateOperationInput, ObservationType, WarehouseItem, AddWarehouseItemInput, UpdateObservationInput, UpdateWarehouseItemInput, UpdateUserData, ProfitabilityByFieldReportData, OperationMaterial } from './types';
+import { Kpi, ChartDataPoint, Operation, Machinery, Session, Field, MaintenanceEvent, AddMaintenanceEventInput, AuditLogEvent, RepairEvent, AddRepairEventInput, AddOperationInput, LaborHoursByCropReportData, Observation, AddObservationInput, ProfitabilityByCropReportData, UpdateMachineInput, FieldEconomics, User, AddUserInput, Role, UpdateOperationInput, ObservationType, WarehouseItem, AddWarehouseItemInput, UpdateObservationInput, UpdateWarehouseItemInput, UpdateUserData, ProfitabilityByFieldReportData, OperationMaterial, Company } from './types';
 
 let users: User[] = [
     {
@@ -56,16 +56,25 @@ let users: User[] = [
         companyRoles: [
             { companyId: 'company-abc', role: 'Firmen Admin' },
         ]
-    }
+    },
+    {
+        id: 'user-6',
+        name: 'Gerd Wildmann',
+        email: 'gerd.wildmann@example.com',
+        tenantId: 'tenant-123',
+        companyRoles: [
+            { companyId: 'company-456', role: 'Jäger' },
+        ],
+        pesticideLicenseNumber: undefined,
+        pesticideLicenseExpiry: undefined,
+    },
 ];
 
-const session: Session = {
-  user: users[0],
-  companies: [
+const allCompanies: Company[] = [
     { id: 'company-456', name: 'Ackerbau & Co. KG', tenantId: 'tenant-123' },
     { id: 'company-789', name: 'Grünland GmbH', tenantId: 'tenant-123' },
-  ]
-};
+    { id: 'company-abc', name: 'Other Farm Inc.', tenantId: 'tenant-other' },
+];
 
 // This is mock data. In a real application, this would come from a database.
 const kpis: Kpi[] = [
@@ -237,9 +246,19 @@ function logAuditEvent(tenantId: string, companyId: string, action: string, deta
 
 export class MockDataService implements DataService {
   
-  async getSession(): Promise<Session> {
-    console.log(`Fetching session.`);
-    return Promise.resolve(session);
+  async getSession(email?: string): Promise<Session> {
+    const userEmail = email || 'john.doe@example.com';
+    console.log(`Fetching session for ${userEmail}.`);
+    const user = users.find(u => u.email === userEmail);
+    if (!user) {
+        throw new Error(`User with email ${userEmail} not found`);
+    }
+    const userCompanies = allCompanies.filter(c => user.companyRoles.some(rc => rc.companyId === c.id));
+
+    return Promise.resolve({
+      user: user,
+      companies: userCompanies
+    });
   }
   
   async getKpis(tenantId: string, companyId: string): Promise<Kpi[]> {

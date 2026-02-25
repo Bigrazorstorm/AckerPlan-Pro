@@ -495,7 +495,9 @@ export function ObservationsClientContent() {
   const [observationToDelete, setObservationToDelete] = useState<Observation | null>(null);
   const [observationToEdit, setObservationToEdit] = useState<Observation | null>(null);
   
-  const canManageObservations = activeRole === 'Firmen Admin' || activeRole === 'Tenant Admin';
+  const canAdd = activeRole !== 'Jäger' && activeRole !== 'Leser';
+  const canEdit = activeRole !== 'Jäger' && activeRole !== 'Leser';
+  const canDelete = activeRole === 'Firmen Admin' || activeRole === 'Tenant Admin';
 
   useEffect(() => {
     if (activeCompany) {
@@ -505,13 +507,19 @@ export function ObservationsClientContent() {
             dataService.getObservations(activeCompany.tenantId, activeCompany.id),
             dataService.getFields(activeCompany.tenantId, activeCompany.id),
         ]);
-        setObservations(observationsData);
+        
+        if (activeRole === 'Jäger') {
+            setObservations(observationsData.filter(o => o.observationType === 'Damage' && o.damageCause === 'Wildlife'));
+        } else {
+            setObservations(observationsData);
+        }
+
         setFields(fieldsData);
         setLoading(false);
       }
       fetchData();
     }
-  }, [activeCompany, isAddSheetOpen, observationToDelete, isEditSheetOpen]);
+  }, [activeCompany, isAddSheetOpen, observationToDelete, isEditSheetOpen, activeRole]);
 
   const handleDelete = async () => {
     if (observationToDelete && activeCompany) {
@@ -556,22 +564,24 @@ export function ObservationsClientContent() {
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
         <div/>
-        <Sheet open={isAddSheetOpen} onOpenChange={setAddSheetOpen}>
-          <SheetTrigger asChild>
-            <Button size="sm" className="gap-1">
-              <PlusCircle className="h-4 w-4" />
-              {t('addObservation')}
-            </Button>
-          </SheetTrigger>
-          <SheetContent className="w-full sm:max-w-md overflow-y-auto">
-            <SheetHeader>
-              <SheetTitle>{t('addObservationSheetTitle')}</SheetTitle>
-            </SheetHeader>
-            <div className="py-4">
-              {activeCompany && <AddObservationForm closeSheet={() => setAddSheetOpen(false)} tenantId={activeCompany.tenantId} companyId={activeCompany.id} fields={fields} />}
-            </div>
-          </SheetContent>
-        </Sheet>
+        {canAdd && (
+          <Sheet open={isAddSheetOpen} onOpenChange={setAddSheetOpen}>
+            <SheetTrigger asChild>
+              <Button size="sm" className="gap-1">
+                <PlusCircle className="h-4 w-4" />
+                {t('addObservation')}
+              </Button>
+            </SheetTrigger>
+            <SheetContent className="w-full sm:max-w-md overflow-y-auto">
+              <SheetHeader>
+                <SheetTitle>{t('addObservationSheetTitle')}</SheetTitle>
+              </SheetHeader>
+              <div className="py-4">
+                {activeCompany && <AddObservationForm closeSheet={() => setAddSheetOpen(false)} tenantId={activeCompany.tenantId} companyId={activeCompany.id} fields={fields} />}
+              </div>
+            </SheetContent>
+          </Sheet>
+        )}
       </CardHeader>
       <CardContent>
          {observations.length > 0 ? (
@@ -621,8 +631,8 @@ export function ObservationsClientContent() {
                       <DropdownMenuContent align="end">
                         <DropdownMenuLabel>{t('actions')}</DropdownMenuLabel>
                         <DropdownMenuItem onSelect={() => setObservationToView(obs)}>{t('view')}</DropdownMenuItem>
-                        <DropdownMenuItem onSelect={() => handleEdit(obs)}>{t('edit')}</DropdownMenuItem>
-                        {canManageObservations && (
+                        {canEdit && <DropdownMenuItem onSelect={() => handleEdit(obs)}>{t('edit')}</DropdownMenuItem>}
+                        {canDelete && (
                           <>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem className="text-destructive" onSelect={() => setObservationToDelete(obs)}>{t('delete')}</DropdownMenuItem>

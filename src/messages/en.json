@@ -477,7 +477,8 @@
     "Betriebsleitung": "Management",
     "Mitarbeiter": "Employee",
     "Werkstatt": "Workshop",
-    "Leser": "Reader"
+    "Leser": "Reader",
+    "Jäger": "Hunter"
   },
   "PersonalPage": {
     "title": "Personnel",

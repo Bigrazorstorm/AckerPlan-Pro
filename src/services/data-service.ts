@@ -10,8 +10,9 @@ import { Kpi, ChartDataPoint, Operation, Machinery, Session, Field, MaintenanceE
 export interface DataService {
   /**
    * Retrieves the current user's session information, including available companies.
+   * @param email - The email of the user to get the session for.
    */
-  getSession(): Promise<Session>;
+  getSession(email?: string): Promise<Session>;
 
   /**
    * Retrieves Key Performance Indicators for a given company and tenant.

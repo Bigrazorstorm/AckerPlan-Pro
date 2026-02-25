@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { usePathname, useParams } from 'next/navigation';
 import Link from 'next/link';
 import {
@@ -43,8 +43,9 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { useTranslations } from 'next-intl';
 import { logout } from '@/app/auth/actions';
+import { useSession } from '@/context/session-context';
 
-const navItems = [
+const navItemsList = [
   { href: '/', icon: LayoutDashboard, labelKey: 'dashboard' },
   { href: '/map', icon: Map, labelKey: 'map' },
   { href: '/fields', icon: Layers, labelKey: 'schlaege' },
@@ -62,6 +63,7 @@ const navItems = [
 export function SidebarNav() {
   const pathname = usePathname();
   const params = useParams();
+  const { activeRole } = useSession();
   const [activePath, setActivePath] = useState('');
   const [locale, setLocale] = useState('de');
 
@@ -79,6 +81,14 @@ export function SidebarNav() {
 
   const userAvatar = PlaceHolderImages.find(p => p.id === 'user-avatar');
   const t = useTranslations('Sidebar');
+  
+  const navItems = useMemo(() => {
+    if (activeRole === 'Jäger') {
+      return navItemsList.filter(item => ['/map', '/observations'].includes(item.href));
+    }
+    return navItemsList;
+  }, [activeRole]);
+
 
   return (
     <>

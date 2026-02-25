@@ -12,12 +12,15 @@ export async function authenticate(
   formData: FormData,
 ) {
   try {
-    const email = formData.get('email');
+    const email = formData.get('email') as string;
     const password = formData.get('password');
     
     // Hardcoded credentials for mock user from mock data service
-    if (email === 'john.doe@example.com' && password === 'password') {
-      const mockSession = await dataService.getSession();
+    if (
+        (email === 'john.doe@example.com' && password === 'password') ||
+        (email === 'gerd.wildmann@example.com' && password === 'password')
+    ) {
+      const mockSession = await dataService.getSession(email);
       cookies().set(SESSION_COOKIE_NAME, JSON.stringify(mockSession), {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',

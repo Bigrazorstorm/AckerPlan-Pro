@@ -230,7 +230,7 @@ export interface UpdateObservationInput {
 }
 
 
-export type Role = "Tenant Admin" | "Firmen Admin" | "Betriebsleitung" | "Mitarbeiter" | "Werkstatt" | "Leser";
+export type Role = "Tenant Admin" | "Firmen Admin" | "Betriebsleitung" | "Mitarbeiter" | "Werkstatt" | "Leser" | "Jäger";
 
 export interface Company {
   id: string;

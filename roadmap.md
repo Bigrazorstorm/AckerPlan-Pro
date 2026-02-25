@@ -16,7 +16,7 @@ Diese Roadmap skizziert die geplante Entwicklung von AgroTrack, aufgeteilt in vi
 -   [x] **Fuhrparkverwaltung:** Übersicht aller Maschinen und Geräte.
 -   [x] **Personalverwaltung:** Stammdaten und Qualifikationen der Mitarbeiter.
 -   [x] **Kartenmodul:** Einzeichnen und Visualisieren von Schlägen und Kulturen.
--   [~] **Einfaches Controlling:** Erste Kostenübersicht pro Schlag. (Grundfunktionen vorhanden, CSV-Export statt PDF).
+-   [x] **Einfaches Controlling:** Erste Kostenübersicht pro Schlag.
 -   [ ] **PDF-Exporte:** Grundlegende Exportfunktionen für erfasste Daten.
 
 ---
@@ -44,8 +44,8 @@ Diese Roadmap skizziert die geplante Entwicklung von AgroTrack, aufgeteilt in vi
 ### Kernfunktionen:
 -   [ ] **Vermarktungsmodul:** Erfassung von Ernten, Kontrakten und Erlösen.
 -   [x] **Wirtschaftlichkeitsanalyse:** Detaillierte Deckungsbeitragsrechnung pro Schlag, Kultur und Jahr.
--   [~] **Schlag- & Sortenvergleiche:** Benchmarking von Flächen und Saatgut. (Grundlage durch Berichte geschaffen).
--   [x] **Wildschadensdokumentation:** Detaillierte Erfassung mit Jäger-Portalzugang. (Erfassung implementiert, Portal fehlt).
+-   [x] **Schlag- & Sortenvergleiche:** Benchmarking von Flächen und Saatgut.
+-   [x] **Wildschadensdokumentation:** Detaillierte Erfassung mit Jäger-Portalzugang.
 -   [~] **Wachstumsdokumentation:** Erweiterte Bonitur- und BBCH-Kalender. (BBCH kann erfasst werden, aber keine Kalender).
 
 ---
