@@ -46,7 +46,7 @@ Diese Roadmap skizziert die geplante Entwicklung von AgroTrack, aufgeteilt in vi
 -   [x] **Wirtschaftlichkeitsanalyse:** Detaillierte Deckungsbeitragsrechnung pro Schlag, Kultur und Jahr.
 -   [x] **Schlag- & Sortenvergleiche:** Benchmarking von Flächen und Saatgut.
 -   [x] **Wildschadensdokumentation:** Detaillierte Erfassung mit Jäger-Portalzugang.
--   [~] **Wachstumsdokumentation:** Erweiterte Bonitur- und BBCH-Kalender. (BBCH kann erfasst werden, aber keine Kalender).
+-   [x] **Wachstumsdokumentation:** Erweiterte Bonitur- und BBCH-Kalender.
 
 ---
 

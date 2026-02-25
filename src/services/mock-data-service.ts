@@ -229,6 +229,8 @@ let observations: Observation[] = [
     { id: 'obs-1', tenantId: 'tenant-123', companyId: 'company-456', field: 'Südhang', date: '2024-07-18T10:00:00Z', title: 'Verdacht auf Gelbrost', description: 'Im unteren Bereich des Schlags sind deutliche gelbe Pusteln auf den Blättern zu erkennen. Ca. 10-15% der Pflanzen betroffen.', photoUrl: 'https://picsum.photos/seed/rust/600/400', latitude: 52.505, longitude: 13.39, observationType: 'Pest', bbchStage: 39, intensity: 2 },
     { id: 'obs-2', tenantId: 'tenant-123', companyId: 'company-456', field: 'Acker-Nord 1', date: '2024-07-15T14:30:00Z', title: 'Wildschweinschaden', description: 'Am Waldrand wurden ca. 50-100qm von Wildschweinen umgebrochen. Schaden hält sich in Grenzen.', photoUrl: 'https://picsum.photos/seed/boar/600/400', observationType: 'Damage', bbchStage: 75, intensity: 1, damageCause: 'Wildlife', animal: 'Wildschwein', affectedArea: 75, damagePercentage: 5 },
     { id: 'obs-3', tenantId: 'tenant-123', companyId: 'company-789', field: 'Weide am Bach', date: '2024-07-20T08:00:00Z', title: 'Guter Klee-Anteil', description: 'Der Klee hat sich gut entwickelt, Bestand sieht sehr gut aus.', observationType: 'Routine', bbchStage: 55, intensity: 5 },
+    { id: 'obs-4', tenantId: 'tenant-123', companyId: 'company-456', field: 'Südhang', date: '2024-05-10T09:00:00Z', title: 'Routinebonitur', description: 'Bestand aufgelaufen, keine Auffälligkeiten.', observationType: 'Routine', bbchStage: 12, intensity: 5 },
+    { id: 'obs-5', tenantId: 'tenant-123', companyId: 'company-456', field: 'Südhang', date: '2024-06-05T11:00:00Z', title: 'Routinebonitur', description: 'Pflanzen im 6-Blatt-Stadium, leichter Trockenstress sichtbar.', observationType: 'Routine', bbchStage: 16, intensity: 4 },
 ];
 
 function logAuditEvent(tenantId: string, companyId: string, action: string, details: string) {
@@ -301,6 +303,11 @@ export class MockDataService implements DataService {
   async getOperationsForField(tenantId: string, companyId: string, fieldName: string): Promise<Operation[]> {
     console.log(`Fetching Operations for field ${fieldName}.`);
     return Promise.resolve(operations.filter(o => o.tenantId === tenantId && o.companyId === companyId && o.field === fieldName).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
+  }
+
+  async getObservationsForField(tenantId: string, companyId: string, fieldName: string): Promise<Observation[]> {
+    console.log(`Fetching Observations for field ${fieldName}.`);
+    return Promise.resolve(observations.filter(o => o.tenantId === tenantId && o.companyId === companyId && o.field === fieldName).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()));
   }
 
   async getMachineById(tenantId: string, companyId: string, machineId: string): Promise<Machinery | null> {

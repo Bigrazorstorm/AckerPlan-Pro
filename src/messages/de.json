@@ -108,7 +108,13 @@
     "economicsTitle": "Wirtschaftlichkeit (kumuliert)",
     "revenueLabel": "Gesamterlös",
     "costsLabel": "Gesamtkosten",
-    "marginLabel": "Deckungsbeitrag"
+    "marginLabel": "Deckungsbeitrag",
+    "growthHistoryTitle": "Wachstumsverlauf (Bonituren)",
+    "growthHistoryDescription": "BBCH-Entwicklung über die Zeit basierend auf Ihren Beobachtungen.",
+    "noGrowthDataTitle": "Keine Wachstumsdaten",
+    "noGrowthDataDescription": "Es wurden keine Beobachtungen mit BBCH-Stadien für diesen Schlag erfasst.",
+    "bbchAxisLabel": "BBCH-Stadium",
+    "dateAxisLabel": "Datum"
   },
   "MachineryPage": {
     "title": "Fuhrpark",

@@ -1,7 +1,7 @@
 
 
 import { DataService } from './data-service';
-import { Kpi, ChartDataPoint, Operation, Machinery, Session, Field, MaintenanceEvent, AddMaintenanceEventInput, AddRepairEventInput, RepairEvent, AuditLogEvent, AddOperationInput, LaborHoursByCropReportData, Observation, AddObservationInput, ProfitabilityByCropReportData, UpdateMachineInput, FieldEconomics, User, AddUserInput, UpdateOperationInput, WarehouseItem, AddWarehouseItemInput, UpdateObservationInput, UpdateWarehouseItemInput, ProfitabilityByFieldReportData } from './types';
+import { Kpi, ChartDataPoint, Operation, Machinery, Session, Field, MaintenanceEvent, AddMaintenanceEventInput, AddRepairEventInput, RepairEvent, AuditLogEvent, AddOperationInput, LaborHoursByCropReportData, Observation, AddObservationInput, ProfitabilityByCropReportData, UpdateMachineInput, FieldEconomics, User, AddUserInput, UpdateOperationInput, WarehouseItem, AddWarehouseItemInput, UpdateObservationInput, UpdateWarehouseItemInput, ProfitabilityByFieldReportData, UpdateUserData } from './types';
 
 // Hardcoded session for demonstration purposes, as this is a placeholder service.
 const session: Session = {
@@ -172,6 +172,11 @@ export class MySqlDataService implements DataService {
     this.log('getOperationsForField', { tenantId, companyId, fieldName });
     return Promise.resolve([]);
   }
+  
+  async getObservationsForField(tenantId: string, companyId: string, fieldName: string): Promise<Observation[]> {
+    this.log('getObservationsForField', { tenantId, companyId, fieldName });
+    return Promise.resolve([]);
+  }
 
   async getAuditLog(tenantId: string, companyId: string): Promise<AuditLogEvent[]> {
     this.log('getAuditLog', { tenantId, companyId });
@@ -251,6 +256,22 @@ export class MySqlDataService implements DataService {
       companyRoles: [{ companyId, role: userData.role }],
     };
     return Promise.resolve(newUser);
+  }
+
+  async updateUser(tenantId: string, companyId: string, userId: string, userData: UpdateUserData): Promise<User> {
+    this.log('updateUser', { tenantId, companyId, userId, userData });
+    const updatedUser: User = {
+      id: userId,
+      tenantId,
+      ...userData,
+      companyRoles: [{ companyId, role: userData.role }],
+    };
+    return Promise.resolve(updatedUser);
+  }
+
+  async deleteUser(tenantId: string, companyId: string, userId: string): Promise<void> {
+      this.log('deleteUser', { tenantId, companyId, userId });
+      return Promise.resolve();
   }
 
   async getWarehouseItems(tenantId: string, companyId: string): Promise<WarehouseItem[]> {

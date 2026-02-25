@@ -156,6 +156,14 @@ export interface DataService {
   getOperationsForField(tenantId: string, companyId: string, fieldName: string): Promise<Operation[]>;
 
   /**
+   * Retrieves observations for a specific field.
+   * @param tenantId - The ID of the tenant.
+   * @param companyId - The ID of the company.
+   * @param fieldName - The name of the field.
+   */
+  getObservationsForField(tenantId: string, companyId: string, fieldName: string): Promise<Observation[]>;
+
+  /**
    * Retrieves the audit log for a given company and tenant.
    * @param tenantId - The ID of the tenant.
    * @param companyId - The ID of the company.

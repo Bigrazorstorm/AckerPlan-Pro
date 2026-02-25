@@ -108,7 +108,13 @@
     "economicsTitle": "Economics (Cumulative)",
     "revenueLabel": "Total Revenue",
     "costsLabel": "Total Costs",
-    "marginLabel": "Contribution Margin"
+    "marginLabel": "Contribution Margin",
+    "growthHistoryTitle": "Growth History (Observations)",
+    "growthHistoryDescription": "BBCH stage development over time based on your observations.",
+    "noGrowthDataTitle": "No Growth Data",
+    "noGrowthDataDescription": "No observations with BBCH stages have been recorded for this field.",
+    "bbchAxisLabel": "BBCH Stage",
+    "dateAxisLabel": "Date"
   },
   "MachineryPage": {
     "title": "Fleet",

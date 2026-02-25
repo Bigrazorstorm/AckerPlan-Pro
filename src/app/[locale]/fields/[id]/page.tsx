@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { useSession } from '@/context/session-context';
 import dataService from '@/services';
-import { Field, Operation, FieldEconomics } from '@/services/types';
+import { Field, Operation, FieldEconomics, Observation } from '@/services/types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
@@ -16,6 +16,7 @@ import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
 import { de, enUS } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
+import { GrowthChart } from '@/components/fields/growth-chart';
 
 function FieldDetailSkeleton() {
   return (
@@ -72,6 +73,15 @@ function FieldDetailSkeleton() {
           </Card>
         </div>
       </div>
+      <Card>
+        <CardHeader>
+            <Skeleton className="h-6 w-1/3" />
+            <Skeleton className="h-4 w-3/4" />
+        </CardHeader>
+        <CardContent>
+            <Skeleton className="h-[300px] w-full" />
+        </CardContent>
+      </Card>
     </div>
   )
 }
@@ -81,6 +91,7 @@ export default function FieldDetailPage() {
   const { activeCompany, loading: sessionLoading } = useSession();
   const [field, setField] = useState<Field | null>(null);
   const [operations, setOperations] = useState<Operation[]>([]);
+  const [fieldObservations, setFieldObservations] = useState<Observation[]>([]);
   const [economics, setEconomics] = useState<FieldEconomics | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -96,12 +107,14 @@ export default function FieldDetailPage() {
         setField(fieldData);
 
         if (fieldData) {
-          const [opsData, economicsData] = await Promise.all([
+          const [opsData, economicsData, obsData] = await Promise.all([
              dataService.getOperationsForField(activeCompany.tenantId, activeCompany.id, fieldData.name),
              dataService.getFieldEconomics(activeCompany.tenantId, activeCompany.id, fieldData.id),
+             dataService.getObservationsForField(activeCompany.tenantId, activeCompany.id, fieldData.name),
           ]);
           setOperations(opsData);
           setEconomics(economicsData);
+          setFieldObservations(obsData);
         }
 
         setLoading(false);
@@ -254,6 +267,8 @@ export default function FieldDetailPage() {
           </Card>
         </div>
       </div>
+
+      <GrowthChart observations={fieldObservations} />
     </div>
   );
 }
