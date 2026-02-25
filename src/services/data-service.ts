@@ -1,5 +1,6 @@
 
-import { Kpi, ChartDataPoint, Operation, Machinery, Session, Field, MaintenanceEvent, AddMaintenanceEventInput, AuditLogEvent, RepairEvent, AddRepairEventInput, AddOperationInput, LaborHoursByCropReportData, Observation, AddObservationInput, ProfitabilityByCropReportData, UpdateMachineInput, FieldEconomics, User, AddUserInput, UpdateOperationInput, WarehouseItem, AddWarehouseItemInput, UpdateObservationInput, UpdateWarehouseItemInput } from './types';
+
+import { Kpi, ChartDataPoint, Operation, Machinery, Session, Field, MaintenanceEvent, AddMaintenanceEventInput, AuditLogEvent, RepairEvent, AddRepairEventInput, AddOperationInput, LaborHoursByCropReportData, Observation, AddObservationInput, ProfitabilityByCropReportData, UpdateMachineInput, FieldEconomics, User, AddUserInput, UpdateOperationInput, WarehouseItem, AddWarehouseItemInput, UpdateObservationInput, UpdateWarehouseItemInput, UpdateUserData } from './types';
 
 /**
  * Defines the contract for data access in the application.
@@ -235,6 +236,23 @@ export interface DataService {
    * @param userData The data for the new user.
    */
   addUser(tenantId: string, companyId: string, userData: AddUserInput): Promise<User>;
+
+  /**
+   * Updates an existing user's data for a specific company.
+   * @param tenantId The ID of the tenant.
+   * @param companyId The ID of the company.
+   * @param userId The ID of the user to update.
+   * @param userData The data to update.
+   */
+  updateUser(tenantId: string, companyId: string, userId: string, userData: UpdateUserData): Promise<User>;
+
+  /**
+   * Removes a user's role from a company.
+   * @param tenantId The ID of the tenant.
+   * @param companyId The ID of the company.
+   * @param userId The ID of the user to remove.
+   */
+  deleteUser(tenantId: string, companyId: string, userId: string): Promise<void>;
   
   /**
    * Retrieves warehouse items for a given company and tenant.

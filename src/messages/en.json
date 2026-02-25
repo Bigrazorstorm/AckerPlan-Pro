@@ -478,13 +478,14 @@
     "description": "Manage your employees, their qualifications, and working hours.",
     "addUserButton": "Add Personnel",
     "addUserSheetTitle": "Add New Employee",
+    "editUserSheetTitle": "Edit Employee",
     "tableHeaderName": "Name",
     "tableHeaderEmail": "Email",
     "tableHeaderRole": "Role",
     "tableHeaderLicenseExpiry": "Pesticide License Expiry",
     "actions": "Actions",
-    "editRole": "Edit Role",
-    "removeUser": "Remove Employee",
+    "edit": "Edit",
+    "removeUser": "Remove",
     "noUsersTitle": "No Employees Recorded",
     "noUsersDescription": "No employees or users have been added for this company yet.",
     "addUserForm": {
@@ -502,7 +503,19 @@
       "submitting": "Adding...",
       "successToastTitle": "Employee Added",
       "errorToastTitle": "Error Adding Employee"
-    }
+    },
+    "editUserForm": {
+      "submit": "Save Changes",
+      "submitting": "Saving...",
+      "successToastTitle": "User Updated",
+      "errorToastTitle": "Error Updating User"
+    },
+    "deleteConfirmationTitle": "Are you sure you want to remove this user?",
+    "deleteConfirmationDescription": "This action cannot be undone. User '{userName}' will be removed from this company. They will retain access to other companies they are a member of.",
+    "deleteConfirmationCancel": "Cancel",
+    "deleteConfirmationConfirm": "Remove",
+    "deleteSuccessToastTitle": "Success",
+    "deleteErrorToastTitle": "Error"
   },
   "LagerPage": {
     "title": "Warehouse Management",

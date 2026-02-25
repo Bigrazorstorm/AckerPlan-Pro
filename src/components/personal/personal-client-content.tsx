@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect, useActionState } from 'react';
@@ -17,7 +18,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { addUser } from '@/app/personal/actions';
+import { addUser, deleteUser, updateUser } from '@/app/personal/actions';
 import { Badge } from '@/components/ui/badge';
 import { format, parseISO } from 'date-fns';
 import { de, enUS } from 'date-fns/locale';
@@ -25,24 +26,125 @@ import { useParams } from 'next/navigation';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
 import { cn } from '@/lib/utils';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '../ui/alert-dialog';
 
-const addUserInitialState = {
+const formInitialState = {
   message: '',
   errors: {},
 };
 
-function AddUserSubmitButton() {
-  const { pending } = useFormStatus();
-  const t = useTranslations('PersonalPage.addUserForm');
+function SubmitButton({tKey, isEdit = false}: {tKey: string, isEdit?: boolean}) {
+  const { pending } = useFormStatus()
+  const tAdd = useTranslations('PersonalPage.addUserForm');
+  const tEdit = useTranslations('PersonalPage.editUserForm');
   return (
     <Button type="submit" aria-disabled={pending}>
-      {pending ? t('submitting') : t('submit')}
+      {pending ? (isEdit ? tEdit('submitting') : tAdd('submitting')) : (isEdit ? tEdit(tKey) : tAdd(tKey))}
     </Button>
+  )
+}
+
+function EditUserForm({ closeSheet, tenantId, companyId, user, activeCompanyRole }: { closeSheet: () => void; tenantId: string; companyId: string; user: User; activeCompanyRole: Role; }) {
+  const [state, formAction] = useActionState(updateUser, formInitialState);
+  const { toast } = useToast();
+  const t = useTranslations('PersonalPage.editUserForm');
+  const tShared = useTranslations('PersonalPage.addUserForm');
+  const tRoles = useTranslations('Roles');
+  const { locale } = useParams<{ locale: string }>();
+  const [expiryDate, setExpiryDate] = useState<Date | undefined>(user.pesticideLicenseExpiry ? parseISO(user.pesticideLicenseExpiry) : undefined);
+  
+  const roles: Role[] = ["Firmen Admin", "Betriebsleitung", "Mitarbeiter", "Werkstatt", "Leser"];
+
+  useEffect(() => {
+    if (state.message && Object.keys(state.errors).length === 0) {
+      toast({
+        title: t('successToastTitle'),
+        description: state.message,
+      });
+      closeSheet();
+    } else if (state.message && Object.keys(state.errors).length > 0) {
+       toast({
+        variant: 'destructive',
+        title: t('errorToastTitle'),
+        description: state.message,
+      });
+    }
+  }, [state, toast, closeSheet, t]);
+
+  return (
+    <form action={formAction} className="space-y-4">
+      <input type="hidden" name="id" value={user.id} />
+      <input type="hidden" name="tenantId" value={tenantId} />
+      <input type="hidden" name="companyId" value={companyId} />
+      <input type="hidden" name="pesticideLicenseExpiry" value={expiryDate ? format(expiryDate, "yyyy-MM-dd") : ""} />
+      
+      <div className="space-y-2">
+        <Label htmlFor="name">{tShared('nameLabel')}</Label>
+        <Input id="name" name="name" required defaultValue={user.name} />
+        {state.errors?.name && <p className="text-sm text-destructive">{state.errors.name.join(', ')}</p>}
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="email">{tShared('emailLabel')}</Label>
+        <Input id="email" name="email" type="email" required defaultValue={user.email} />
+        {state.errors?.email && <p className="text-sm text-destructive">{state.errors.email.join(', ')}</p>}
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="role">{tShared('roleLabel')}</Label>
+        <Select name="role" required defaultValue={activeCompanyRole}>
+          <SelectTrigger>
+            <SelectValue placeholder={tShared('rolePlaceholder')} />
+          </SelectTrigger>
+          <SelectContent>
+            {roles.map((role) => (
+              <SelectItem key={role} value={role}>{tRoles(role)}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        {state.errors?.role && <p className="text-sm text-destructive">{state.errors.role.join(', ')}</p>}
+      </div>
+      
+      <div className="space-y-2">
+        <Label htmlFor="pesticideLicenseNumber">{tShared('licenseNumberLabel')}</Label>
+        <Input id="pesticideLicenseNumber" name="pesticideLicenseNumber" defaultValue={user.pesticideLicenseNumber} />
+        {state.errors?.pesticideLicenseNumber && <p className="text-sm text-destructive">{state.errors.pesticideLicenseNumber.join(', ')}</p>}
+      </div>
+      
+      <div className="space-y-2">
+        <Label htmlFor="pesticideLicenseExpiry">{tShared('licenseExpiryLabel')}</Label>
+         <Popover>
+            <PopoverTrigger asChild>
+            <Button
+                variant={"outline"}
+                className={cn(
+                "w-full justify-start text-left font-normal",
+                !expiryDate && "text-muted-foreground"
+                )}
+            >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {expiryDate ? format(expiryDate, "PPP", { locale: locale === 'de' ? de : enUS }) : <span>{tShared('licenseExpiryPlaceholder')}</span>}
+            </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0">
+            <Calendar
+                mode="single"
+                selected={expiryDate}
+                onSelect={setExpiryDate}
+                initialFocus
+            />
+            </PopoverContent>
+        </Popover>
+        {state.errors?.pesticideLicenseExpiry && <p className="text-sm text-destructive">{state.errors.pesticideLicenseExpiry.join(', ')}</p>}
+      </div>
+
+      <SubmitButton tKey="submit" isEdit={true} />
+    </form>
   );
 }
 
 function AddUserForm({ closeSheet, tenantId, companyId }: { closeSheet: () => void; tenantId: string; companyId: string; }) {
-  const [state, formAction] = useActionState(addUser, addUserInitialState);
+  const [state, formAction] = useActionState(addUser, formInitialState);
   const { toast } = useToast();
   const t = useTranslations('PersonalPage.addUserForm');
   const tRoles = useTranslations('Roles');
@@ -58,12 +160,6 @@ function AddUserForm({ closeSheet, tenantId, companyId }: { closeSheet: () => vo
         description: state.message,
       });
       closeSheet();
-    } else if (state.message && state.message.startsWith('Failed to add user:')) {
-      toast({
-        variant: 'destructive',
-        title: t('errorToastTitle'),
-        description: state.message,
-      });
     } else if (state.message && Object.keys(state.errors).length > 0) {
        toast({
         variant: 'destructive',
@@ -139,7 +235,7 @@ function AddUserForm({ closeSheet, tenantId, companyId }: { closeSheet: () => vo
         {state.errors?.pesticideLicenseExpiry && <p className="text-sm text-destructive">{state.errors.pesticideLicenseExpiry.join(', ')}</p>}
       </div>
 
-      <AddUserSubmitButton />
+      <SubmitButton tKey="submit" />
     </form>
   );
 }
@@ -176,9 +272,14 @@ export function PersonalClientContent() {
     const [users, setUsers] = useState<User[]>([]);
     const [loading, setLoading] = useState(true);
     const [isAddSheetOpen, setAddSheetOpen] = useState(false);
+    const [isEditSheetOpen, setEditSheetOpen] = useState(false);
+    const [userToEdit, setUserToEdit] = useState<User | null>(null);
+    const [userToDelete, setUserToDelete] = useState<User | null>(null);
+    
     const t = useTranslations('PersonalPage');
     const tRoles = useTranslations('Roles');
     const { locale } = useParams<{ locale: string }>();
+    const { toast } = useToast();
 
     const canManageUsers = activeRole === 'Firmen Admin' || activeRole === 'Tenant Admin';
 
@@ -194,7 +295,31 @@ export function PersonalClientContent() {
         } else if (!sessionLoading) {
             setLoading(false);
         }
-    }, [activeCompany, sessionLoading, isAddSheetOpen]);
+    }, [activeCompany, sessionLoading, isAddSheetOpen, isEditSheetOpen, userToDelete]);
+
+    const handleEdit = (user: User) => {
+        setUserToEdit(user);
+        setEditSheetOpen(true);
+    };
+
+    const handleDelete = async () => {
+      if (userToDelete && activeCompany) {
+        const result = await deleteUser(userToDelete.id, activeCompany.tenantId, activeCompany.id);
+        if (result.message.includes('successfully')) {
+          toast({
+            title: t('deleteSuccessToastTitle'),
+            description: result.message,
+          });
+        } else {
+          toast({
+            variant: 'destructive',
+            title: t('deleteErrorToastTitle'),
+            description: result.message,
+          });
+        }
+        setUserToDelete(null);
+      }
+    };
 
     const getExpiryStatus = (expiryDate?: string) => {
         if (!expiryDate) return { text: '-', variant: 'secondary' as const, className: 'bg-transparent' };
@@ -235,6 +360,7 @@ export function PersonalClientContent() {
     }
     
     return (
+      <>
         <Card>
             <CardHeader className="flex flex-row items-center justify-between">
                 <div/>
@@ -291,9 +417,9 @@ export function PersonalClientContent() {
                                             </DropdownMenuTrigger>
                                             <DropdownMenuContent align="end">
                                                 <DropdownMenuLabel>{t('actions')}</DropdownMenuLabel>
-                                                <DropdownMenuItem>{t('editRole')}</DropdownMenuItem>
+                                                <DropdownMenuItem onSelect={() => handleEdit(user)}>{t('edit')}</DropdownMenuItem>
                                                 <DropdownMenuSeparator />
-                                                <DropdownMenuItem className="text-destructive">{t('removeUser')}</DropdownMenuItem>
+                                                <DropdownMenuItem className="text-destructive" onSelect={() => setUserToDelete(user)}>{t('removeUser')}</DropdownMenuItem>
                                             </DropdownMenuContent>
                                         </DropdownMenu>
                                     </TableCell>
@@ -314,5 +440,42 @@ export function PersonalClientContent() {
                 )}
             </CardContent>
         </Card>
+
+        {userToEdit && (
+            <Sheet open={isEditSheetOpen} onOpenChange={setEditSheetOpen}>
+                <SheetContent>
+                    <SheetHeader>
+                        <SheetTitle>{t('editUserSheetTitle')}</SheetTitle>
+                    </SheetHeader>
+                    <div className="py-4">
+                        {activeCompany && userToEdit && (
+                            <EditUserForm 
+                                closeSheet={() => setEditSheetOpen(false)} 
+                                tenantId={activeCompany.tenantId} 
+                                companyId={activeCompany.id} 
+                                user={userToEdit}
+                                activeCompanyRole={userToEdit.companyRoles.find(cr => cr.companyId === activeCompany.id)?.role || 'Leser'}
+                            />
+                        )}
+                    </div>
+                </SheetContent>
+            </Sheet>
+        )}
+
+        <AlertDialog open={!!userToDelete} onOpenChange={(open) => !open && setUserToDelete(null)}>
+            <AlertDialogContent>
+                <AlertDialogHeader>
+                    <AlertDialogTitle>{t('deleteConfirmationTitle')}</AlertDialogTitle>
+                    <AlertDialogDescription>
+                        {t('deleteConfirmationDescription', { userName: userToDelete?.name })}
+                    </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                    <AlertDialogCancel>{t('deleteConfirmationCancel')}</AlertDialogCancel>
+                    <AlertDialogAction onClick={handleDelete} className="bg-destructive hover:bg-destructive/90">{t('deleteConfirmationConfirm')}</AlertDialogAction>
+                </AlertDialogFooter>
+            </AlertDialogContent>
+        </AlertDialog>
+      </>
     );
 }

@@ -479,13 +479,14 @@
     "description": "Verwalten Sie Ihre Mitarbeiter, deren Qualifikationen und Arbeitszeiten.",
     "addUserButton": "Personal hinzufügen",
     "addUserSheetTitle": "Neuen Mitarbeiter hinzufügen",
+    "editUserSheetTitle": "Mitarbeiter bearbeiten",
     "tableHeaderName": "Name",
     "tableHeaderEmail": "E-Mail",
     "tableHeaderRole": "Rolle",
     "tableHeaderLicenseExpiry": "Sachkunde gültig bis",
     "actions": "Aktionen",
-    "editRole": "Rolle bearbeiten",
-    "removeUser": "Mitarbeiter entfernen",
+    "edit": "Bearbeiten",
+    "removeUser": "Entfernen",
     "noUsersTitle": "Keine Mitarbeiter erfasst",
     "noUsersDescription": "Für diese Firma wurden noch keine Mitarbeiter oder Benutzer hinzugefügt.",
     "addUserForm": {
@@ -503,7 +504,19 @@
       "submitting": "Wird hinzugefügt...",
       "successToastTitle": "Mitarbeiter hinzugefügt",
       "errorToastTitle": "Fehler beim Hinzufügen"
-    }
+    },
+    "editUserForm": {
+      "submit": "Änderungen speichern",
+      "submitting": "Wird gespeichert...",
+      "successToastTitle": "Benutzer aktualisiert",
+      "errorToastTitle": "Fehler beim Aktualisieren"
+    },
+    "deleteConfirmationTitle": "Benutzer wirklich entfernen?",
+    "deleteConfirmationDescription": "Diese Aktion kann nicht rückgängig gemacht werden. Der Benutzer '{userName}' wird aus dieser Firma entfernt. Er behält den Zugriff auf andere Firmen, in denen er Mitglied ist.",
+    "deleteConfirmationCancel": "Abbrechen",
+    "deleteConfirmationConfirm": "Entfernen",
+    "deleteSuccessToastTitle": "Erfolg",
+    "deleteErrorToastTitle": "Fehler"
   },
   "LagerPage": {
     "title": "Lagerverwaltung",

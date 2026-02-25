@@ -1,6 +1,7 @@
 
+
 import { DataService } from './data-service';
-import { Kpi, ChartDataPoint, Operation, Machinery, Session, Field, MaintenanceEvent, AddMaintenanceEventInput, AuditLogEvent, RepairEvent, AddRepairEventInput, AddOperationInput, LaborHoursByCropReportData, Observation, AddObservationInput, ProfitabilityByCropReportData, UpdateMachineInput, FieldEconomics, User, AddUserInput, Role, UpdateOperationInput, ObservationType, WarehouseItem, AddWarehouseItemInput, UpdateObservationInput, UpdateWarehouseItemInput, OperationMaterial } from './types';
+import { Kpi, ChartDataPoint, Operation, Machinery, Session, Field, MaintenanceEvent, AddMaintenanceEventInput, AuditLogEvent, RepairEvent, AddRepairEventInput, AddOperationInput, LaborHoursByCropReportData, Observation, AddObservationInput, ProfitabilityByCropReportData, UpdateMachineInput, FieldEconomics, User, AddUserInput, Role, UpdateOperationInput, ObservationType, WarehouseItem, AddWarehouseItemInput, UpdateObservationInput, UpdateWarehouseItemInput, UpdateUserData } from './types';
 
 let users: User[] = [
     {
@@ -819,6 +820,60 @@ export class MockDataService implements DataService {
     logAuditEvent(tenantId, companyId, 'user.add', `User "${userData.name}" (${userData.email}) was added to the company with role "${userData.role}".`);
     
     return Promise.resolve(user);
+  }
+
+  async updateUser(tenantId: string, companyId: string, userId: string, userData: UpdateUserData): Promise<User> {
+    console.log(`Updating user ${userId} for tenant ${tenantId}, company ${companyId}.`);
+    const userIndex = users.findIndex(u => u.id === userId && u.tenantId === tenantId);
+    if (userIndex === -1) {
+      throw new Error("User not found or you don't have permission to edit.");
+    }
+    
+    const user = users[userIndex];
+    
+    // Update basic properties
+    user.name = userData.name;
+    user.email = userData.email;
+    user.pesticideLicenseNumber = userData.pesticideLicenseNumber || undefined;
+    user.pesticideLicenseExpiry = userData.pesticideLicenseExpiry || undefined;
+
+    // Update role for the specific company
+    const roleIndex = user.companyRoles.findIndex(cr => cr.companyId === companyId);
+    if (roleIndex !== -1) {
+      user.companyRoles[roleIndex].role = userData.role;
+    } else {
+      // This case should ideally not happen if we are editing a user within a company context
+      // but we can add it for robustness.
+      user.companyRoles.push({ companyId, role: userData.role });
+    }
+    
+    users[userIndex] = user;
+
+    logAuditEvent(tenantId, companyId, 'user.update', `User details for "${userData.name}" were updated.`);
+    
+    return Promise.resolve(user);
+  }
+
+  async deleteUser(tenantId: string, companyId: string, userId: string): Promise<void> {
+    console.log(`Deleting user ${userId} from company ${companyId}.`);
+    const userIndex = users.findIndex(u => u.id === userId && u.tenantId === tenantId);
+    if (userIndex === -1) {
+        return Promise.reject(new Error("User not found."));
+    }
+    
+    const user = users[userIndex];
+    const roleIndex = user.companyRoles.findIndex(cr => cr.companyId === companyId);
+    
+    if (roleIndex === -1) {
+        return Promise.reject(new Error("User is not a member of this company."));
+    }
+
+    // Instead of deleting the user, just remove their role for this company
+    user.companyRoles.splice(roleIndex, 1);
+    
+    logAuditEvent(tenantId, companyId, 'user.remove', `User "${user.name}" was removed from the company.`);
+    
+    return Promise.resolve();
   }
 
   async getWarehouseItems(tenantId: string, companyId: string): Promise<WarehouseItem[]> {

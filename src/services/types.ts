@@ -190,6 +190,7 @@ export interface Observation {
   animal?: string;
   affectedArea?: number; // in sqm
   damagePercentage?: number; // in %
+  updatedAt?: string;
 }
 
 // Input type for adding a new observation.
@@ -249,6 +250,14 @@ export interface User {
 }
 
 export interface AddUserInput {
+  name: string;
+  email: string;
+  role: Role;
+  pesticideLicenseNumber?: string;
+  pesticideLicenseExpiry?: string;
+}
+
+export interface UpdateUserData {
   name: string;
   email: string;
   role: Role;
