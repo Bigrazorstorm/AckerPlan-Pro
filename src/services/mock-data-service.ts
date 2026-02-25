@@ -10,7 +10,9 @@ let users: User[] = [
         companyRoles: [
             { companyId: 'company-456', role: 'Firmen Admin' },
             { companyId: 'company-789', role: 'Mitarbeiter' },
-        ]
+        ],
+        pesticideLicenseNumber: 'TH-12345-AB',
+        pesticideLicenseExpiry: '2028-12-31',
     },
     {
         id: 'user-2',
@@ -19,7 +21,9 @@ let users: User[] = [
         tenantId: 'tenant-123',
         companyRoles: [
             { companyId: 'company-456', role: 'Betriebsleitung' },
-        ]
+        ],
+        pesticideLicenseNumber: 'TH-54321-CD',
+        pesticideLicenseExpiry: new Date(new Date().setMonth(new Date().getMonth() + 3)).toISOString().split('T')[0], // Expires in 3 months
     },
     {
         id: 'user-3',
@@ -29,7 +33,9 @@ let users: User[] = [
         companyRoles: [
             { companyId: 'company-456', role: 'Mitarbeiter' },
             { companyId: 'company-789', role: 'Mitarbeiter' },
-        ]
+        ],
+        pesticideLicenseNumber: 'TH-67890-EF',
+        pesticideLicenseExpiry: '2024-01-01', // Expired
     },
     {
         id: 'user-4',
@@ -767,25 +773,25 @@ export class MockDataService implements DataService {
   async addUser(tenantId: string, companyId: string, userData: AddUserInput): Promise<User> {
     console.log(`Adding user to tenant ${tenantId} and company ${companyId}.`);
     
-    // Check if user already exists in the system by email
     let user = users.find(u => u.email === userData.email);
 
     if (user) {
-        // User exists, check if they are already in the company
         const alreadyInCompany = user.companyRoles.some(cr => cr.companyId === companyId);
         if (alreadyInCompany) {
             throw new Error('User is already a member of this company.');
         }
-        // Add role for this company to existing user
         user.companyRoles.push({ companyId, role: userData.role });
+        if (userData.pesticideLicenseNumber) user.pesticideLicenseNumber = userData.pesticideLicenseNumber;
+        if (userData.pesticideLicenseExpiry) user.pesticideLicenseExpiry = userData.pesticideLicenseExpiry;
     } else {
-        // User does not exist, create a new user
         user = {
             id: `user-${users.length + 1}`,
             name: userData.name,
             email: userData.email,
             tenantId: tenantId,
             companyRoles: [{ companyId, role: userData.role }],
+            pesticideLicenseNumber: userData.pesticideLicenseNumber || undefined,
+            pesticideLicenseExpiry: userData.pesticideLicenseExpiry || undefined,
         };
         users.push(user);
     }

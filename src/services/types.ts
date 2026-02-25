@@ -215,12 +215,16 @@ export interface User {
   tenantId: string;
   // A user can have different roles for different companies
   companyRoles: { companyId: string, role: Role }[];
+  pesticideLicenseNumber?: string;
+  pesticideLicenseExpiry?: string; // ISO 8601 date string
 }
 
 export interface AddUserInput {
   name: string;
   email: string;
   role: Role;
+  pesticideLicenseNumber?: string;
+  pesticideLicenseExpiry?: string;
 }
 
 export interface Session {

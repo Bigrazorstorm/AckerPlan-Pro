@@ -9,6 +9,8 @@ const AddUserSchema = z.object({
   name: z.string().min(1, { message: 'Name is required' }),
   email: z.string().email({ message: 'Please enter a valid email.' }),
   role: z.string().min(1, { message: 'Role is required' }),
+  pesticideLicenseNumber: z.string().optional().or(z.literal('')),
+  pesticideLicenseExpiry: z.string().optional().or(z.literal('')),
   tenantId: z.string().min(1, { message: 'Tenant ID is required' }),
   companyId: z.string().min(1, { message: 'Company ID is required' }),
 })
@@ -18,6 +20,8 @@ export async function addUser(prevState: any, formData: FormData) {
     name: formData.get('name'),
     email: formData.get('email'),
     role: formData.get('role'),
+    pesticideLicenseNumber: formData.get('pesticideLicenseNumber'),
+    pesticideLicenseExpiry: formData.get('pesticideLicenseExpiry'),
     tenantId: formData.get('tenantId'),
     companyId: formData.get('companyId'),
   })
@@ -35,6 +39,8 @@ export async function addUser(prevState: any, formData: FormData) {
       name: userData.name,
       email: userData.email,
       role: userData.role as Role,
+      pesticideLicenseNumber: userData.pesticideLicenseNumber || undefined,
+      pesticideLicenseExpiry: userData.pesticideLicenseExpiry || undefined,
     })
     revalidatePath('/personal')
     return { message: 'User added successfully.', errors: {} }
