@@ -183,6 +183,11 @@ export interface Observation {
   observationType: ObservationType;
   bbchStage: number;
   intensity: number; // 1-5
+  // New fields for damage documentation
+  damageCause?: 'Wildlife' | 'Weather' | 'Other';
+  animal?: string;
+  affectedArea?: number; // in sqm
+  damagePercentage?: number; // in %
 }
 
 // Input type for adding a new observation.
@@ -197,6 +202,11 @@ export interface AddObservationInput {
   observationType: ObservationType;
   bbchStage: number;
   intensity: number; // 1-5
+  // New fields for damage documentation
+  damageCause?: 'Wildlife' | 'Weather' | 'Other';
+  animal?: string;
+  affectedArea?: number; // in sqm
+  damagePercentage?: number; // in %
 }
 
 

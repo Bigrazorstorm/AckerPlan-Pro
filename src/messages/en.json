@@ -128,7 +128,6 @@
     "deleteConfirmationConfirm": "Delete",
     "deleteSuccessToastTitle": "Success",
     "deleteErrorToastTitle": "Error",
-    "addMachineSheetTitle": "Add New Machine",
     "addMachineForm": {
       "nameLabel": "Machine Name",
       "typeLabel": "Machine Type",
@@ -373,6 +372,12 @@
       "bbchStageLabel": "BBCH Stage",
       "bbchStagePlaceholder": "e.g. 32",
       "intensityLabel": "Intensity / Severity (1-5)",
+      "damageCauseLabel": "Cause of Damage",
+      "damageCausePlaceholder": "Select a cause",
+      "animalLabel": "Animal Type (for Wildlife Damage)",
+      "animalPlaceholder": "e.g. Wild Boar",
+      "affectedAreaLabel": "Affected Area (m²)",
+      "damagePercentageLabel": "Estimated Damage (%)",
       "submit": "Save Observation",
       "submitting": "Saving...",
       "successToastTitle": "Success",
@@ -390,7 +395,12 @@
     "Routine": "Routine Check",
     "Pest": "Pest/Disease",
     "NutrientDeficiency": "Nutrient Deficiency",
-    "Damage": "Damage (Weather/Wildlife)",
+    "Damage": "Damage",
+    "Other": "Other"
+  },
+  "DamageCauses": {
+    "Wildlife": "Wildlife",
+    "Weather": "Weather",
     "Other": "Other"
   },
   "ReportsPage": {

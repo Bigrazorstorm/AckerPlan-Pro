@@ -373,6 +373,12 @@
       "bbchStageLabel": "BBCH-Stadium",
       "bbchStagePlaceholder": "z.B. 32",
       "intensityLabel": "Intensität / Befallsgrad (1-5)",
+      "damageCauseLabel": "Schadensursache",
+      "damageCausePlaceholder": "Ursache auswählen",
+      "animalLabel": "Tierart (bei Wildschaden)",
+      "animalPlaceholder": "z.B. Wildschwein",
+      "affectedAreaLabel": "Betroffene Fläche (m²)",
+      "damagePercentageLabel": "Geschätzter Schaden (%)",
       "submit": "Beobachtung speichern",
       "submitting": "Wird gespeichert...",
       "successToastTitle": "Erfolg",
@@ -390,7 +396,12 @@
     "Routine": "Routine-Bonitur",
     "Pest": "Schaderreger-Fund",
     "NutrientDeficiency": "Nährstoffmangel",
-    "Damage": "Schaden (Wetter/Wild)",
+    "Damage": "Schaden",
+    "Other": "Sonstiges"
+  },
+  "DamageCauses": {
+    "Wildlife": "Wildtier",
+    "Weather": "Wetter",
     "Other": "Sonstiges"
   },
   "ReportsPage": {

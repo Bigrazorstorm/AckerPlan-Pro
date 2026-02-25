@@ -62,11 +62,15 @@ function AddObservationForm({ closeSheet, tenantId, companyId, fields }: { close
   const { toast } = useToast()
   const t = useTranslations('ObservationsPage.addObservationForm');
   const tObservationTypes = useTranslations('ObservationTypes');
+  const tDamageCauses = useTranslations('DamageCauses');
   const [date, setDate] = useState<Date>()
   const [intensity, setIntensity] = useState(3);
+  const [observationType, setObservationType] = useState<ObservationType | ''>('');
+  const [damageCause, setDamageCause] = useState<'Wildlife' | 'Weather' | 'Other' | ''>('');
   const { locale } = useParams<{ locale: string }>();
 
   const observationTypes: ObservationType[] = ['Routine', 'Pest', 'NutrientDeficiency', 'Damage', 'Other'];
+  const damageCauses: ('Wildlife' | 'Weather' | 'Other')[] = ['Wildlife', 'Weather', 'Other'];
 
   useEffect(() => {
     if (state.message && Object.keys(state.errors).length === 0) {
@@ -105,7 +109,7 @@ function AddObservationForm({ closeSheet, tenantId, companyId, fields }: { close
       
       <div className="space-y-2">
           <Label htmlFor="observationType">{t('observationTypeLabel')}</Label>
-          <Select name="observationType" required>
+          <Select name="observationType" required onValueChange={(value) => setObservationType(value as ObservationType)}>
             <SelectTrigger>
               <SelectValue placeholder={t('observationTypePlaceholder')} />
             </SelectTrigger>
@@ -118,7 +122,45 @@ function AddObservationForm({ closeSheet, tenantId, companyId, fields }: { close
           {state.errors?.observationType && <p className="text-sm text-destructive">{state.errors.observationType.join(', ')}</p>}
       </div>
 
-       <div className="space-y-2">
+       {observationType === 'Damage' && (
+        <div className="space-y-4 rounded-md border p-4">
+            <div className="space-y-2">
+                <Label htmlFor="damageCause">{t('damageCauseLabel')}</Label>
+                <Select name="damageCause" onValueChange={(value) => setDamageCause(value as any)}>
+                    <SelectTrigger>
+                        <SelectValue placeholder={t('damageCausePlaceholder')} />
+                    </SelectTrigger>
+                    <SelectContent>
+                        {damageCauses.map((cause) => (
+                            <SelectItem key={cause} value={cause}>{tDamageCauses(cause)}</SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+                {state.errors?.damageCause && <p className="text-sm text-destructive">{state.errors.damageCause.join(', ')}</p>}
+            </div>
+            {damageCause === 'Wildlife' && (
+                 <div className="space-y-2">
+                    <Label htmlFor="animal">{t('animalLabel')}</Label>
+                    <Input id="animal" name="animal" placeholder={t('animalPlaceholder')} />
+                    {state.errors?.animal && <p className="text-sm text-destructive">{state.errors.animal.join(', ')}</p>}
+                 </div>
+            )}
+            <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                    <Label htmlFor="affectedArea">{t('affectedAreaLabel')}</Label>
+                    <Input id="affectedArea" name="affectedArea" type="number" step="any" placeholder="50" />
+                    {state.errors?.affectedArea && <p className="text-sm text-destructive">{state.errors.affectedArea.join(', ')}</p>}
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="damagePercentage">{t('damagePercentageLabel')}</Label>
+                    <Input id="damagePercentage" name="damagePercentage" type="number" step="1" min="0" max="100" placeholder="15" />
+                    {state.errors?.damagePercentage && <p className="text-sm text-destructive">{state.errors.damagePercentage.join(', ')}</p>}
+                </div>
+            </div>
+        </div>
+      )}
+
+      <div className="space-y-2">
         <Label htmlFor="photoUrl">{t('photoUrlLabel')}</Label>
         <Input id="photoUrl" name="photoUrl" placeholder={t('photoUrlPlaceholder')} />
         {state.errors?.photoUrl && <p className="text-sm text-destructive">{state.errors.photoUrl.join(', ')}</p>}
@@ -247,6 +289,7 @@ function ObservationsSkeleton() {
 export function ObservationsClientContent() {
   const t = useTranslations('ObservationsPage');
   const tObservationTypes = useTranslations('ObservationTypes');
+  const tDamageCauses = useTranslations('DamageCauses');
   const { toast } = useToast();
   const [isAddSheetOpen, setAddSheetOpen] = useState(false);
   const { activeCompany, loading: sessionLoading, activeRole } = useSession();
@@ -320,7 +363,7 @@ export function ObservationsClientContent() {
               {t('addObservation')}
             </Button>
           </SheetTrigger>
-          <SheetContent>
+          <SheetContent className="w-full sm:max-w-md overflow-y-auto">
             <SheetHeader>
               <SheetTitle>{t('addObservationSheetTitle')}</SheetTitle>
             </SheetHeader>
@@ -405,7 +448,7 @@ export function ObservationsClientContent() {
     </Card>
 
     <Sheet open={!!observationToView} onOpenChange={(open) => !open && setObservationToView(null)}>
-        <SheetContent>
+        <SheetContent className="w-full sm:max-w-md overflow-y-auto">
             <SheetHeader>
                 <SheetTitle>{observationToView?.title}</SheetTitle>
                 <SheetDescription>
@@ -430,6 +473,41 @@ export function ObservationsClientContent() {
                         <span className="text-sm font-medium">{observationToView?.intensity} / 5</span>
                     </div>
                  </div>
+                 
+                 {observationToView?.observationType === 'Damage' && (
+                    <Card>
+                        <CardHeader className="p-4">
+                            <CardTitle className="text-base">{t('addObservationForm.damageCauseLabel')}</CardTitle>
+                        </CardHeader>
+                        <CardContent className="p-4 pt-0 grid gap-2 text-sm">
+                             {observationToView.damageCause && (
+                                <div className="flex justify-between">
+                                    <span className="text-muted-foreground">{t('addObservationForm.damageCauseLabel')}</span>
+                                    <span className="font-medium">{tDamageCauses(observationToView.damageCause as any)}</span>
+                                </div>
+                             )}
+                            {observationToView.damageCause === 'Wildlife' && observationToView.animal && (
+                                <div className="flex justify-between">
+                                    <span className="text-muted-foreground">{t('addObservationForm.animalLabel')}</span>
+                                    <span className="font-medium">{observationToView.animal}</span>
+                                </div>
+                            )}
+                            {observationToView.affectedArea != null && (
+                                 <div className="flex justify-between">
+                                    <span className="text-muted-foreground">{t('addObservationForm.affectedAreaLabel')}</span>
+                                    <span className="font-medium">{observationToView.affectedArea.toLocaleString(locale)} m²</span>
+                                </div>
+                            )}
+                            {observationToView.damagePercentage != null && (
+                                 <div className="flex justify-between">
+                                    <span className="text-muted-foreground">{t('addObservationForm.damagePercentageLabel')}</span>
+                                    <span className="font-medium">{observationToView.damagePercentage} %</span>
+                                </div>
+                            )}
+                        </CardContent>
+                    </Card>
+                 )}
+
                 {observationToView?.photoUrl && (
                     <div className="aspect-video w-full overflow-hidden rounded-md border">
                         <Image

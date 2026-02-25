@@ -22,6 +22,19 @@ const AddObservationSchema = z.object({
   observationType: z.enum(['Routine', 'Pest', 'NutrientDeficiency', 'Damage', 'Other']),
   bbchStage: z.coerce.number().min(0, {message: 'BBCH must be a positive number'}).max(99, { message: 'BBCH must be between 0 and 99'}),
   intensity: z.coerce.number().min(1).max(5),
+  damageCause: z.preprocess(
+    (val) => (val === '' ? undefined : val),
+    z.enum(['Wildlife', 'Weather', 'Other']).optional()
+  ),
+  animal: z.string().optional().or(z.literal('')),
+  affectedArea: z.preprocess(
+    (val) => (val === '' ? undefined : val),
+    z.coerce.number().positive({ message: 'Affected area must be a positive number.' }).optional()
+  ),
+  damagePercentage: z.preprocess(
+    (val) => (val === '' ? undefined : val),
+    z.coerce.number().min(0, { message: 'Damage must be a positive number.' }).max(100, { message: 'Damage must be 100 or less.' }).optional()
+  ),
   tenantId: z.string().min(1, { message: 'Tenant ID is required' }),
   companyId: z.string().min(1, { message: 'Company ID is required' }),
 })
@@ -38,6 +51,10 @@ export async function addObservation(prevState: any, formData: FormData) {
     observationType: formData.get('observationType'),
     bbchStage: formData.get('bbchStage'),
     intensity: formData.get('intensity'),
+    damageCause: formData.get('damageCause'),
+    animal: formData.get('animal'),
+    affectedArea: formData.get('affectedArea'),
+    damagePercentage: formData.get('damagePercentage'),
     tenantId: formData.get('tenantId'),
     companyId: formData.get('companyId'),
   })
@@ -55,6 +72,7 @@ export async function addObservation(prevState: any, formData: FormData) {
         ...observationData,
         photoUrl: observationData.photoUrl || undefined,
         observationType: observationData.observationType as ObservationType,
+        animal: observationData.animal || undefined,
     })
     revalidatePath('/observations')
     return { message: 'Observation added successfully.', errors: {} }
