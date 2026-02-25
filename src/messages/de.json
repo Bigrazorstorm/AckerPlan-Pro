@@ -519,7 +519,19 @@
   },
   "DokumentationPage": {
     "title": "Dokumentation",
-    "description": "Erzeugen und exportieren Sie alle für die Einhaltung der Vorschriften erforderlichen Dokumente."
+    "description": "Erzeugen und exportieren Sie alle für die Einhaltung der Vorschriften erforderlichen Dokumente.",
+    "psmReportTitle": "Pflanzenschutzmittel-Anwendungen",
+    "psmReportDescription": "Eine detaillierte Aufzeichnung aller durchgeführten Pflanzenschutzmaßnahmen.",
+    "tableHeaderDate": "Datum",
+    "tableHeaderField": "Schlag",
+    "tableHeaderCrop": "Kultur",
+    "tableHeaderPsm": "Mittel",
+    "tableHeaderQuantity": "Aufwandmenge",
+    "tableHeaderRegNr": "Zul.-Nr.",
+    "tableHeaderWaitingPeriod": "Wartezeit",
+    "tableHeaderPersonnel": "Anwender",
+    "noPsmApplications": "Bisher wurden keine Pflanzenschutzmaßnahmen protokolliert.",
+    "noPsmApplicationsDescription": "Erfassen Sie eine Maßnahme vom Typ 'Pflanzenschutz', um sie hier zu sehen."
   },
   "FoerderwesenPage": {
     "title": "Förderwesen",
