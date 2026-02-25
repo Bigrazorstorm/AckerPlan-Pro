@@ -15,6 +15,7 @@
     "personal": "Personnel",
     "lager": "Warehouse",
     "controlling": "Controlling",
+    "vermarktung": "Marketing",
     "dokumentation": "Documentation",
     "foerderwesen": "Subsidies",
     "settings": "Settings",
@@ -623,5 +624,9 @@
   "FoerderwesenPage": {
     "title": "Subsidies",
     "description": "Manage applications and analyze the potential for funding programs."
+  },
+  "VermarktungPage": {
+    "title": "Marketing",
+    "description": "Record harvests, manage contracts, and track revenues."
   }
 }

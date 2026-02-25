@@ -20,6 +20,7 @@ import {
   Archive,
   FileText,
   Landmark,
+  Truck,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
@@ -55,6 +56,7 @@ const navItemsList = [
   { href: '/machinery', icon: Tractor, labelKey: 'fuhrpark' },
   { href: '/lager', icon: Archive, labelKey: 'lager' },
   { href: '/reports', icon: BarChart3, labelKey: 'controlling' },
+  { href: '/vermarktung', icon: Truck, labelKey: 'vermarktung' },
   { href: '/dokumentation', icon: FileText, labelKey: 'dokumentation' },
   { href: '/foerderwesen', icon: Landmark, labelKey: 'foerderwesen' },
   { href: '/audit-log', icon: History, labelKey: 'auditLog' },

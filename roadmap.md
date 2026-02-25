@@ -42,7 +42,7 @@ Diese Roadmap skizziert die geplante Entwicklung von AgroTrack, aufgeteilt in vi
 **Ziel:** Volle Deckungsbeitragsrechnung und strategische Auswertungen ermöglichen.
 
 ### Kernfunktionen:
--   [ ] **Vermarktungsmodul:** Erfassung von Ernten, Kontrakten und Erlösen.
+-   [~] **Vermarktungsmodul:** Erfassung von Ernten, Kontrakten und Erlösen.
 -   [x] **Wirtschaftlichkeitsanalyse:** Detaillierte Deckungsbeitragsrechnung pro Schlag, Kultur und Jahr.
 -   [x] **Schlag- & Sortenvergleiche:** Benchmarking von Flächen und Saatgut.
 -   [x] **Wildschadensdokumentation:** Detaillierte Erfassung mit Jäger-Portalzugang.

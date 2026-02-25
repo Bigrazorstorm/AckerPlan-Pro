@@ -15,6 +15,7 @@
     "personal": "Personal",
     "lager": "Lager",
     "controlling": "Controlling",
+    "vermarktung": "Vermarktung",
     "dokumentation": "Dokumentation",
     "foerderwesen": "Förderwesen",
     "settings": "Einstellungen",
@@ -624,5 +625,9 @@
   "FoerderwesenPage": {
     "title": "Förderwesen",
     "description": "Verwalten Sie Anträge und analysieren Sie das Potenzial für Förderprogramme."
+  },
+  "VermarktungPage": {
+    "title": "Vermarktung",
+    "description": "Erfassen Sie Ernten, verwalten Sie Kontrakte und verfolgen Sie Erlöse."
   }
 }
