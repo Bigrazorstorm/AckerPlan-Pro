@@ -300,6 +300,17 @@ export class MockDataService implements DataService {
     return Promise.resolve(field || null);
   }
 
+  async updateField(tenantId: string, companyId: string, field: Field): Promise<Field> {
+    console.log(`Updating Field ${field.id} for tenant ${tenantId} and company ${companyId}.`);
+    const fieldIndex = fields.findIndex(f => f.id === field.id && f.tenantId === tenantId && f.companyId === companyId);
+    if (fieldIndex === -1) {
+      throw new Error("Field not found or not authorized to update.");
+    }
+    fields[fieldIndex] = field;
+    logAuditEvent(tenantId, companyId, 'field.update', `Schlag "${field.name}" wurde aktualisiert.`);
+    return Promise.resolve(field);
+  }
+
   async getOperationsForField(tenantId: string, companyId: string, fieldName: string): Promise<Operation[]> {
     console.log(`Fetching Operations for field ${fieldName}.`);
     return Promise.resolve(operations.filter(o => o.tenantId === tenantId && o.companyId === companyId && o.field === fieldName).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()));

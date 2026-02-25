@@ -156,6 +156,14 @@ export interface DataService {
   updateField(tenantId: string, companyId: string, field: Field): Promise<Field>;
 
   /**
+   * Deletes a field from the data store.
+   * @param tenantId - The ID of the tenant.
+   * @param companyId - The ID of the company.
+   * @param fieldId - The ID of the field to delete.
+   */
+  deleteField(tenantId: string, companyId: string, fieldId: string): Promise<void>;
+
+  /**
    * Retrieves operations for a specific field.
    * @param tenantId - The ID of the tenant.
    * @param companyId - The ID of the company.
