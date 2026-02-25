@@ -3,6 +3,7 @@
 import dataService from '@/services'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
+import { ObservationType } from '@/services/types'
  
 const AddObservationSchema = z.object({
   title: z.string().min(1, { message: 'Title is required' }),
@@ -18,6 +19,9 @@ const AddObservationSchema = z.object({
     (val) => (val === '' ? undefined : val),
     z.coerce.number().optional()
   ),
+  observationType: z.enum(['Routine', 'Pest', 'NutrientDeficiency', 'Damage', 'Other']),
+  bbchStage: z.coerce.number().min(0, {message: 'BBCH must be a positive number'}).max(99, { message: 'BBCH must be between 0 and 99'}),
+  intensity: z.coerce.number().min(1).max(5),
   tenantId: z.string().min(1, { message: 'Tenant ID is required' }),
   companyId: z.string().min(1, { message: 'Company ID is required' }),
 })
@@ -31,6 +35,9 @@ export async function addObservation(prevState: any, formData: FormData) {
     photoUrl: formData.get('photoUrl'),
     latitude: formData.get('latitude'),
     longitude: formData.get('longitude'),
+    observationType: formData.get('observationType'),
+    bbchStage: formData.get('bbchStage'),
+    intensity: formData.get('intensity'),
     tenantId: formData.get('tenantId'),
     companyId: formData.get('companyId'),
   })
@@ -47,6 +54,7 @@ export async function addObservation(prevState: any, formData: FormData) {
     await dataService.addObservation(tenantId, companyId, {
         ...observationData,
         photoUrl: observationData.photoUrl || undefined,
+        observationType: observationData.observationType as ObservationType,
     })
     revalidatePath('/observations')
     return { message: 'Observation added successfully.', errors: {} }

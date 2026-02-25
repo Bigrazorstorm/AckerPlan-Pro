@@ -333,6 +333,7 @@
     "tableHeaderDate": "Datum",
     "tableHeaderPhoto": "Foto",
     "tableHeaderLocation": "Standort",
+    "tableHeaderType": "Typ",
     "actions": "Aktionen",
     "view": "Anzeigen",
     "edit": "Bearbeiten",
@@ -352,6 +353,11 @@
       "photoUrlPlaceholder": "https://beispiel.com/foto.jpg",
       "latitudeLabel": "Breitengrad",
       "longitudeLabel": "Längengrad",
+      "observationTypeLabel": "Beobachtungstyp",
+      "observationTypePlaceholder": "Typ auswählen",
+      "bbchStageLabel": "BBCH-Stadium",
+      "bbchStagePlaceholder": "z.B. 32",
+      "intensityLabel": "Intensität / Befallsgrad (1-5)",
       "submit": "Beobachtung speichern",
       "submitting": "Wird gespeichert...",
       "successToastTitle": "Erfolg",
@@ -364,6 +370,13 @@
     "deleteConfirmationConfirm": "Löschen",
     "deleteSuccessToastTitle": "Erfolg",
     "deleteErrorToastTitle": "Fehler"
+  },
+  "ObservationTypes": {
+    "Routine": "Routine-Bonitur",
+    "Pest": "Schaderreger-Fund",
+    "NutrientDeficiency": "Nährstoffmangel",
+    "Damage": "Schaden (Wetter/Wild)",
+    "Other": "Sonstiges"
   },
   "ReportsPage": {
     "title": "Controlling",

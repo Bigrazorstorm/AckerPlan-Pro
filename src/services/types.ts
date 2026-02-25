@@ -151,6 +151,8 @@ export interface FieldEconomics {
   contributionMargin: number;
 }
 
+export type ObservationType = 'Routine' | 'Pest' | 'NutrientDeficiency' | 'Damage' | 'Other';
+
 // Represents a field observation or damage report.
 export interface Observation {
   id: string; // UUID
@@ -163,6 +165,9 @@ export interface Observation {
   photoUrl?: string; // Optional URL to an uploaded photo
   latitude?: number;
   longitude?: number;
+  observationType: ObservationType;
+  bbchStage: number;
+  intensity: number; // 1-5
 }
 
 // Input type for adding a new observation.
@@ -174,7 +179,11 @@ export interface AddObservationInput {
   photoUrl?: string;
   latitude?: number;
   longitude?: number;
+  observationType: ObservationType;
+  bbchStage: number;
+  intensity: number; // 1-5
 }
+
 
 export type Role = "Tenant Admin" | "Firmen Admin" | "Betriebsleitung" | "Mitarbeiter" | "Werkstatt" | "Leser";
 

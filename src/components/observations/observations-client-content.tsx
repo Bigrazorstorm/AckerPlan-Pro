@@ -4,7 +4,7 @@ import { React, useEffect, useState, useActionState } from 'react'
 import { useFormStatus } from 'react-dom'
 import { useTranslations } from "next-intl"
 import { useToast } from '@/hooks/use-toast'
-import { Observation, Field } from '@/services/types'
+import { Observation, Field, ObservationType } from '@/services/types'
 import { addObservation, deleteObservation } from '@/app/observations/actions'
 import { useSession } from '@/context/session-context'
 import dataService from '@/services'
@@ -35,6 +35,7 @@ import { Calendar } from '@/components/ui/calendar'
 import { Skeleton } from '../ui/skeleton'
 import { cn } from '@/lib/utils'
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
+import { Slider } from '@/components/ui/slider'
 
 const ObservationLocationMap = dynamic(() => import('@/components/observations/observation-location-map').then(mod => mod.ObservationLocationMap), {
   ssr: false,
@@ -60,8 +61,12 @@ function AddObservationForm({ closeSheet, tenantId, companyId, fields }: { close
   const [state, formAction] = useActionState(addObservation, initialState)
   const { toast } = useToast()
   const t = useTranslations('ObservationsPage.addObservationForm');
+  const tObservationTypes = useTranslations('ObservationTypes');
   const [date, setDate] = useState<Date>()
+  const [intensity, setIntensity] = useState(3);
   const { locale } = useParams<{ locale: string }>();
+
+  const observationTypes: ObservationType[] = ['Routine', 'Pest', 'NutrientDeficiency', 'Damage', 'Other'];
 
   useEffect(() => {
     if (state.message && Object.keys(state.errors).length === 0) {
@@ -84,7 +89,8 @@ function AddObservationForm({ closeSheet, tenantId, companyId, fields }: { close
       <input type="hidden" name="tenantId" value={tenantId} />
       <input type="hidden" name="companyId" value={companyId} />
       <input type="hidden" name="date" value={date ? format(date, "yyyy-MM-dd") : ""} />
-      
+      <input type="hidden" name="intensity" value={intensity} />
+
       <div className="space-y-2">
         <Label htmlFor="title">{t('titleLabel')}</Label>
         <Input id="title" name="title" required placeholder={t('titlePlaceholder')} />
@@ -95,6 +101,21 @@ function AddObservationForm({ closeSheet, tenantId, companyId, fields }: { close
         <Label htmlFor="description">{t('descriptionLabel')}</Label>
         <Textarea id="description" name="description" required placeholder={t('descriptionPlaceholder')} />
         {state.errors?.description && <p className="text-sm text-destructive">{state.errors.description.join(', ')}</p>}
+      </div>
+      
+      <div className="space-y-2">
+          <Label htmlFor="observationType">{t('observationTypeLabel')}</Label>
+          <Select name="observationType" required>
+            <SelectTrigger>
+              <SelectValue placeholder={t('observationTypePlaceholder')} />
+            </SelectTrigger>
+            <SelectContent>
+              {observationTypes.map((type) => (
+                  <SelectItem key={type} value={type}>{tObservationTypes(type)}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          {state.errors?.observationType && <p className="text-sm text-destructive">{state.errors.observationType.join(', ')}</p>}
       </div>
 
        <div className="space-y-2">
@@ -115,10 +136,15 @@ function AddObservationForm({ closeSheet, tenantId, companyId, fields }: { close
           {state.errors?.longitude && <p className="text-sm text-destructive">{state.errors.longitude.join(', ')}</p>}
         </div>
       </div>
-
+      
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="field">{t('fieldLabel')}</Label>
+          <Label htmlFor="bbchStage">{t('bbchStageLabel')}</Label>
+          <Input id="bbchStage" name="bbchStage" type="number" required placeholder={t('bbchStagePlaceholder')} />
+          {state.errors?.bbchStage && <p className="text-sm text-destructive">{state.errors.bbchStage.join(', ')}</p>}
+        </div>
+        <div className="space-y-2">
+            <Label htmlFor="field">{t('fieldLabel')}</Label>
             <Select name="field" required>
               <SelectTrigger>
                 <SelectValue placeholder={t('fieldPlaceholder')} />
@@ -131,33 +157,51 @@ function AddObservationForm({ closeSheet, tenantId, companyId, fields }: { close
             </Select>
             {state.errors?.field && <p className="text-sm text-destructive">{state.errors.field.join(', ')}</p>}
         </div>
-         <div className="space-y-2">
-            <Label htmlFor="date">{t('dateLabel')}</Label>
-            <Popover>
-                <PopoverTrigger asChild>
-                <Button
-                    variant={"outline"}
-                    className={cn(
-                    "w-full justify-start text-left font-normal",
-                    !date && "text-muted-foreground"
-                    )}
-                >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {date ? format(date, "PPP", { locale: locale === 'de' ? de : enUS }) : <span>{t('datePlaceholder')}</span>}
-                </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0">
-                <Calendar
-                    mode="single"
-                    selected={date}
-                    onSelect={setDate}
-                    initialFocus
-                />
-                </PopoverContent>
-            </Popover>
-            {state.errors?.date && <p className="text-sm text-destructive">{state.errors.date.join(', ')}</p>}
-        </div>
       </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="date">{t('dateLabel')}</Label>
+        <Popover>
+            <PopoverTrigger asChild>
+            <Button
+                variant={"outline"}
+                className={cn(
+                "w-full justify-start text-left font-normal",
+                !date && "text-muted-foreground"
+                )}
+            >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {date ? format(date, "PPP", { locale: locale === 'de' ? de : enUS }) : <span>{t('datePlaceholder')}</span>}
+            </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0">
+            <Calendar
+                mode="single"
+                selected={date}
+                onSelect={setDate}
+                initialFocus
+            />
+            </PopoverContent>
+        </Popover>
+        {state.errors?.date && <p className="text-sm text-destructive">{state.errors.date.join(', ')}</p>}
+      </div>
+
+       <div className="space-y-3">
+          <div className="flex justify-between">
+            <Label htmlFor="intensity">{t('intensityLabel')}</Label>
+            <span className="text-sm text-muted-foreground font-medium">{intensity}</span>
+          </div>
+          <Slider
+            name="intensity-slider"
+            defaultValue={[3]}
+            min={1}
+            max={5}
+            step={1}
+            onValueChange={(value) => setIntensity(value[0])}
+          />
+          {state.errors?.intensity && <p className="text-sm text-destructive">{state.errors.intensity.join(', ')}</p>}
+        </div>
+
       <SubmitButton />
     </form>
   )
@@ -202,6 +246,7 @@ function ObservationsSkeleton() {
 
 export function ObservationsClientContent() {
   const t = useTranslations('ObservationsPage');
+  const tObservationTypes = useTranslations('ObservationTypes');
   const { toast } = useToast();
   const [isAddSheetOpen, setAddSheetOpen] = useState(false);
   const { activeCompany, loading: sessionLoading, activeRole } = useSession();
@@ -228,7 +273,7 @@ export function ObservationsClientContent() {
       }
       fetchData();
     }
-  }, [activeCompany]);
+  }, [activeCompany, isAddSheetOpen, observationToDelete]);
 
   const handleDelete = async () => {
     if (observationToDelete && activeCompany) {
@@ -291,6 +336,7 @@ export function ObservationsClientContent() {
             <TableHeader>
               <TableRow>
                 <TableHead>{t('tableHeaderTitle')}</TableHead>
+                <TableHead>{t('tableHeaderType')}</TableHead>
                 <TableHead>{t('tableHeaderField')}</TableHead>
                 <TableHead>{t('tableHeaderDate')}</TableHead>
                 <TableHead>{t('tableHeaderPhoto')}</TableHead>
@@ -302,6 +348,7 @@ export function ObservationsClientContent() {
               {observations.map((obs) => (
                 <TableRow key={obs.id}>
                   <TableCell className="font-medium">{obs.title}</TableCell>
+                  <TableCell>{tObservationTypes(obs.observationType)}</TableCell>
                   <TableCell>{obs.field}</TableCell>
                   <TableCell>{dateFormatter(obs.date)}</TableCell>
                   <TableCell>
@@ -366,6 +413,23 @@ export function ObservationsClientContent() {
                 </SheetDescription>
             </SheetHeader>
             <div className="py-4 space-y-4">
+                 <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-1">
+                        <Label>{t('addObservationForm.observationTypeLabel')}</Label>
+                        <p className="text-sm font-medium">{observationToView && tObservationTypes(observationToView.observationType)}</p>
+                    </div>
+                     <div className="space-y-1">
+                        <Label>{t('addObservationForm.bbchStageLabel')}</Label>
+                        <p className="text-sm font-medium">{observationToView?.bbchStage}</p>
+                    </div>
+                 </div>
+                 <div className="space-y-1">
+                    <Label>{t('addObservationForm.intensityLabel')}</Label>
+                    <div className="flex items-center gap-2">
+                        <Slider value={[observationToView?.intensity || 0]} max={5} min={1} step={1} disabled className="w-1/2" />
+                        <span className="text-sm font-medium">{observationToView?.intensity} / 5</span>
+                    </div>
+                 </div>
                 {observationToView?.photoUrl && (
                     <div className="aspect-video w-full overflow-hidden rounded-md border">
                         <Image
