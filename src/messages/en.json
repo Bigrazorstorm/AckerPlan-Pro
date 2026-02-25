@@ -1,8 +1,14 @@
-
 {
   "Metadata": {
     "title": "AgroTrack",
     "description": "GIS-based, mobile-first production and profitability controlling for agriculture"
+  },
+  "Navigation": {
+    "dashboard": "Dashboard",
+    "fields": "Fields",
+    "map": "Map",
+    "operations": "Operations",
+    "personal": "Personnel"
   },
   "Sidebar": {
     "title": "AgroTrack",
@@ -16,7 +22,7 @@
     "lager": "Warehouse",
     "controlling": "Controlling",
     "vermarktung": "Marketing",
-    "dokumentation": "Documentation",
+    "documentation": "Documentation",
     "foerderwesen": "Subsidies",
     "settings": "Settings",
     "logout": "Log out",
@@ -285,7 +291,7 @@
       "personnelLabel": "Personnel",
       "personnelPlaceholder": "Select personnel",
       "multiplePersonnelSelected": "{count} personnel selected",
-      "materialsLabel": "Material Consumption",
+      "materialsLabel": "Material consumption",
       "addMaterialButton": "Add Material",
       "materialPlaceholder": "Select material",
       "quantityPlaceholder": "Quantity",

@@ -23,7 +23,7 @@ interface PageLayoutProps extends React.HTMLAttributes<HTMLDivElement> {
  *   headerAction={<Button><Plus /> Neuer Schlag</Button>}
  * >
  *   <div className="grid gap-4">
- *     {/* Content */}
+ *     <div>Inhalt</div>
  *   </div>
  * </PageLayout>
  * ```

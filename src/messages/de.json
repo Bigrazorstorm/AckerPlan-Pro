@@ -1,8 +1,14 @@
-
 {
   "Metadata": {
     "title": "AgroTrack",
     "description": "GIS-gestütztes, Mobile-First Produktions- und Wirtschaftlichkeits-Controlling für Ackerbau"
+  },
+  "Navigation": {
+    "dashboard": "Dashboard",
+    "fields": "Schläge",
+    "map": "Karte",
+    "operations": "Aufträge",
+    "personal": "Personal"
   },
   "Sidebar": {
     "title": "AgroTrack",
