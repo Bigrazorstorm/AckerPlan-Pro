@@ -77,16 +77,11 @@
   },
   "FieldsPage": {
     "title": "Fields",
-    "description": "Manage and view your fields in a list overview.",
     "description_list": "Manage and view your fields in a list overview.",
-    "mapTitle": "Map Overview",
     "listTitle": "Field List",
-    "importButton": "Import GIS Data",
     "listHeaderName": "Name",
     "listHeaderCrop": "Crop",
-    "listHeaderArea": "Area",
-    "fieldsLayer": "Fields",
-    "observationsLayer": "Observations"
+    "listHeaderArea": "Area"
   },
   "FieldDetailPage": {
     "backToList": "Back to Fields List",

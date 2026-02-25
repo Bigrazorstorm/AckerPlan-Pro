@@ -392,7 +392,7 @@ export default function MachineDetailPage() {
       };
       fetchData();
     }
-  }, [activeCompany, id]);
+  }, [activeCompany, id, isMaintenanceSheetOpen, isRepairSheetOpen, isEditSheetOpen]);
 
   const currencyFormatter = new Intl.NumberFormat(locale, {
     style: 'currency',

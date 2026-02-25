@@ -77,16 +77,11 @@
   },
   "FieldsPage": {
     "title": "Schläge",
-    "description": "Verwalten und sehen Sie Ihre Schläge in einer Listenübersicht.",
     "description_list": "Verwalten und sehen Sie Ihre Schläge in einer Listenübersicht.",
-    "mapTitle": "Kartenübersicht",
     "listTitle": "Schlagliste",
-    "importButton": "GIS-Daten importieren",
     "listHeaderName": "Name",
     "listHeaderCrop": "Kultur",
-    "listHeaderArea": "Fläche",
-    "fieldsLayer": "Schläge",
-    "observationsLayer": "Beobachtungen"
+    "listHeaderArea": "Fläche"
   },
   "FieldDetailPage": {
     "backToList": "Zurück zur Schlagübersicht",
