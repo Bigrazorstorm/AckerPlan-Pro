@@ -253,6 +253,7 @@ export interface ProfitabilityByCropReportData {
   revenue: number;
   laborCost: number;
   fuelCost: number;
+  materialCost: number;
   contributionMargin: number;
 }
 

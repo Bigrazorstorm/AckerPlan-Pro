@@ -400,6 +400,7 @@
     "tableHeaderRevenue": "Erlös",
     "tableHeaderLaborCosts": "Arbeitskosten",
     "tableHeaderFuelCosts": "Kraftstoffkosten",
+    "tableHeaderMaterialCosts": "Materialkosten",
     "tableHeaderContributionMargin": "Deckungsbeitrag",
     "laborHoursByCropTitle": "Arbeitsstunden nach Kultur",
     "laborHoursByCropDescription": "Gesamte protokollierte Arbeitszeit, aufgeteilt nach den angebauten Kulturen.",

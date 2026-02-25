@@ -105,6 +105,7 @@ export function ReportsClientContent() {
         revenue: t('tableHeaderRevenue'),
         laborCost: t('tableHeaderLaborCosts'),
         fuelCost: t('tableHeaderFuelCosts'),
+        materialCost: t('tableHeaderMaterialCosts'),
         contributionMargin: t('tableHeaderContributionMargin'),
     };
 
@@ -164,6 +165,7 @@ export function ReportsClientContent() {
                 <TableHead className="text-right">{t('tableHeaderRevenue')}</TableHead>
                 <TableHead className="text-right">{t('tableHeaderLaborCosts')}</TableHead>
                 <TableHead className="text-right">{t('tableHeaderFuelCosts')}</TableHead>
+                <TableHead className="text-right">{t('tableHeaderMaterialCosts')}</TableHead>
                 <TableHead className="text-right">{t('tableHeaderContributionMargin')}</TableHead>
               </TableRow>
             </TableHeader>
@@ -174,6 +176,7 @@ export function ReportsClientContent() {
                   <TableCell className="text-right">{currencyFormatter.format(row.revenue)}</TableCell>
                   <TableCell className="text-right text-red-600">{currencyFormatter.format(row.laborCost)}</TableCell>
                   <TableCell className="text-right text-red-600">{currencyFormatter.format(row.fuelCost)}</TableCell>
+                  <TableCell className="text-right text-red-600">{currencyFormatter.format(row.materialCost)}</TableCell>
                   <TableCell className={`text-right font-bold ${row.contributionMargin >= 0 ? 'text-green-600' : 'text-red-600'}`}>{currencyFormatter.format(row.contributionMargin)}</TableCell>
                 </TableRow>
               ))}

@@ -400,6 +400,7 @@
     "tableHeaderRevenue": "Revenue",
     "tableHeaderLaborCosts": "Labor Costs",
     "tableHeaderFuelCosts": "Fuel Costs",
+    "tableHeaderMaterialCosts": "Material Costs",
     "tableHeaderContributionMargin": "Contribution Margin",
     "laborHoursByCropTitle": "Labor Hours by Crop",
     "laborHoursByCropDescription": "Total logged labor hours, broken down by the crops grown.",

@@ -627,12 +627,12 @@ export class MockDataService implements DataService {
     const companyOps = operations.filter(op => op.tenantId === tenantId && op.companyId === companyId);
     const companyFields = fields.filter(f => f.tenantId === tenantId && f.companyId === companyId);
 
-    const report: { [crop: string]: { revenue: number, laborCost: number, fuelCost: number } } = {};
+    const report: { [crop: string]: { revenue: number, laborCost: number, fuelCost: number, materialCost: number } } = {};
 
     // Initialize report object with all crops for the company
     for (const field of companyFields) {
         if (!report[field.crop]) {
-            report[field.crop] = { revenue: 0, laborCost: 0, fuelCost: 0 };
+            report[field.crop] = { revenue: 0, laborCost: 0, fuelCost: 0, materialCost: 0 };
         }
     }
 
@@ -648,6 +648,14 @@ export class MockDataService implements DataService {
               if (op.revenue) {
                   cropReport.revenue += op.revenue;
               }
+              if (op.materials) {
+                for (const material of op.materials) {
+                    const item = warehouseItems.find(i => i.id === material.itemId);
+                    if (item) {
+                        cropReport.materialCost += material.quantity * item.costPerUnit;
+                    }
+                }
+              }
             }
         }
     }
@@ -657,7 +665,8 @@ export class MockDataService implements DataService {
         revenue: data.revenue,
         laborCost: data.laborCost,
         fuelCost: data.fuelCost,
-        contributionMargin: data.revenue - data.laborCost - data.fuelCost,
+        materialCost: data.materialCost,
+        contributionMargin: data.revenue - data.laborCost - data.fuelCost - data.materialCost,
     }));
     
     return Promise.resolve(reportData.sort((a,b) => b.contributionMargin - a.contributionMargin));

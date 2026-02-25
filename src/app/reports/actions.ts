@@ -12,7 +12,11 @@ function convertToCSV(data: any[], headers: Record<string, string>): string {
 
     for (const row of data) {
         const values = headerKeys.map(key => {
-            const val = row[key as keyof typeof row];
+            let val = row[key as keyof typeof row];
+            // Format numbers to a consistent string format for CSV, using dot as decimal separator
+            if (typeof val === 'number') {
+                val = val.toFixed(2);
+            }
             let escaped = ('' + val).replace(/"/g, '""'); // Escape double quotes
             if (escaped.includes(',')) {
                 escaped = `"${escaped}"`; // Wrap in double quotes if it contains a comma
