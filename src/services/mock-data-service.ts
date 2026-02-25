@@ -686,6 +686,14 @@ export class MockDataService implements DataService {
         if (op.fuelConsumed) {
             totalCosts += op.fuelConsumed * DIESEL_PRICE_PER_LITER;
         }
+        if (op.materials) {
+            for (const material of op.materials) {
+                const item = warehouseItems.find(i => i.id === material.itemId);
+                if (item) {
+                    totalCosts += material.quantity * item.costPerUnit;
+                }
+            }
+        }
     }
     
     return Promise.resolve({
@@ -693,6 +701,49 @@ export class MockDataService implements DataService {
         costs: totalCosts,
         contributionMargin: totalRevenue - totalCosts,
     });
+  }
+
+  async getAllFieldEconomics(tenantId: string, companyId: string): Promise<Record<string, FieldEconomics>> {
+    console.log(`Fetching all Field Economics for company ${companyId}.`);
+    const DIESEL_PRICE_PER_LITER = 1.50;
+    const LABOR_COST_PER_HOUR = 25.00;
+    
+    const companyFields = fields.filter(f => f.tenantId === tenantId && f.companyId === companyId);
+    const companyOps = operations.filter(op => op.tenantId === tenantId && op.companyId === companyId);
+    
+    const economicsByFieldId: Record<string, FieldEconomics> = {};
+
+    for (const field of companyFields) {
+        let totalRevenue = 0;
+        let totalCosts = 0;
+        const fieldOps = companyOps.filter(op => op.field === field.name);
+
+        for (const op of fieldOps) {
+            if (op.revenue) {
+                totalRevenue += op.revenue;
+            }
+            totalCosts += op.laborHours * LABOR_COST_PER_HOUR;
+            if (op.fuelConsumed) {
+                totalCosts += op.fuelConsumed * DIESEL_PRICE_PER_LITER;
+            }
+            if (op.materials) {
+                for (const material of op.materials) {
+                    const item = warehouseItems.find(i => i.id === material.itemId);
+                    if (item) {
+                        totalCosts += material.quantity * item.costPerUnit;
+                    }
+                }
+            }
+        }
+        
+        economicsByFieldId[field.id] = {
+            revenue: totalRevenue,
+            costs: totalCosts,
+            contributionMargin: totalRevenue - totalCosts,
+        };
+    }
+    
+    return Promise.resolve(economicsByFieldId);
   }
 
   async getUsersForCompany(tenantId: string, companyId: string): Promise<User[]> {

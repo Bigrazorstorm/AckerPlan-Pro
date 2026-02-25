@@ -71,7 +71,9 @@
     "description": "Overview of your fields, observations, and official geodata.",
     "importButton": "Import GIS Data",
     "fieldsLayer": "Fields",
-    "observationsLayer": "Observations"
+    "observationsLayer": "Observations",
+    "profitabilityLayer": "Profitability",
+    "contributionMarginLabel": "Contribution Margin"
   },
   "MapDebug": {
     "layerErrorTitle": "Map Layer Error",

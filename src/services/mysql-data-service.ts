@@ -211,6 +211,11 @@ export class MySqlDataService implements DataService {
     this.log('getFieldEconomics', { tenantId, companyId, fieldId });
     return Promise.resolve({ revenue: 0, costs: 0, contributionMargin: 0 });
   }
+
+  async getAllFieldEconomics(tenantId: string, companyId: string): Promise<Record<string, FieldEconomics>> {
+    this.log('getAllFieldEconomics', { tenantId, companyId });
+    return Promise.resolve({});
+  }
   
   async getUsersForCompany(tenantId: string, companyId: string): Promise<User[]> {
     this.log('getUsersForCompany', { tenantId, companyId });

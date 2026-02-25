@@ -71,7 +71,9 @@
     "description": "Übersicht Ihrer Schläge, Beobachtungen und amtlicher Geodaten.",
     "importButton": "GIS-Daten importieren",
     "fieldsLayer": "Schläge",
-    "observationsLayer": "Beobachtungen"
+    "observationsLayer": "Beobachtungen",
+    "profitabilityLayer": "Wirtschaftlichkeit",
+    "contributionMarginLabel": "Deckungsbeitrag"
   },
   "MapDebug": {
     "layerErrorTitle": "Karten-Layer Fehler",

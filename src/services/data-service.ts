@@ -205,6 +205,13 @@ export interface DataService {
   getFieldEconomics(tenantId: string, companyId: string, fieldId: string): Promise<FieldEconomics>;
 
   /**
+   * Retrieves economic data for all fields.
+   * @param tenantId - The ID of the tenant.
+   * @param companyId - The ID of the company.
+   */
+  getAllFieldEconomics(tenantId: string, companyId: string): Promise<Record<string, FieldEconomics>>;
+
+  /**
    * Retrieves all users associated with a specific company.
    * @param tenantId The ID of the tenant.
    * @param companyId The ID of the company.
