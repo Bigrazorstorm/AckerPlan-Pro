@@ -1,5 +1,6 @@
+
 import { DataService } from './data-service';
-import { Kpi, ChartDataPoint, Operation, Machinery, Session, Field, MaintenanceEvent, AddMaintenanceEventInput, AddRepairEventInput, RepairEvent, AuditLogEvent, AddOperationInput, LaborHoursByCropReportData, Observation, AddObservationInput, ProfitabilityByCropReportData, UpdateMachineInput, FieldEconomics, User, AddUserInput, UpdateOperationInput, WarehouseItem, AddWarehouseItemInput } from './types';
+import { Kpi, ChartDataPoint, Operation, Machinery, Session, Field, MaintenanceEvent, AddMaintenanceEventInput, AddRepairEventInput, RepairEvent, AuditLogEvent, AddOperationInput, LaborHoursByCropReportData, Observation, AddObservationInput, ProfitabilityByCropReportData, UpdateMachineInput, FieldEconomics, User, AddUserInput, UpdateOperationInput, WarehouseItem, AddWarehouseItemInput, UpdateObservationInput } from './types';
 
 // Hardcoded session for demonstration purposes, as this is a placeholder service.
 const session: Session = {
@@ -190,6 +191,18 @@ export class MySqlDataService implements DataService {
       ...observationData,
     };
     return Promise.resolve(newObservation);
+  }
+
+  async updateObservation(tenantId: string, companyId: string, observationId: string, observationData: UpdateObservationInput): Promise<Observation> {
+    this.log('updateObservation', { tenantId, companyId, observationId, observationData });
+    const updatedObservation: Observation = {
+      id: observationId,
+      tenantId,
+      companyId,
+      field: 'Placeholder Field', // Should come from existing record
+      ...observationData,
+    };
+    return Promise.resolve(updatedObservation);
   }
 
   async deleteObservation(tenantId: string, companyId: string, observationId: string): Promise<void> {

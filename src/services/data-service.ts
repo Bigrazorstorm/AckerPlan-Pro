@@ -1,4 +1,5 @@
-import { Kpi, ChartDataPoint, Operation, Machinery, Session, Field, MaintenanceEvent, AddMaintenanceEventInput, AuditLogEvent, RepairEvent, AddRepairEventInput, AddOperationInput, LaborHoursByCropReportData, Observation, AddObservationInput, ProfitabilityByCropReportData, UpdateMachineInput, FieldEconomics, User, AddUserInput, UpdateOperationInput, WarehouseItem, AddWarehouseItemInput } from './types';
+
+import { Kpi, ChartDataPoint, Operation, Machinery, Session, Field, MaintenanceEvent, AddMaintenanceEventInput, AuditLogEvent, RepairEvent, AddRepairEventInput, AddOperationInput, LaborHoursByCropReportData, Observation, AddObservationInput, ProfitabilityByCropReportData, UpdateMachineInput, FieldEconomics, User, AddUserInput, UpdateOperationInput, WarehouseItem, AddWarehouseItemInput, UpdateObservationInput } from './types';
 
 /**
  * Defines the contract for data access in the application.
@@ -173,6 +174,15 @@ export interface DataService {
    * @param observationData - The data for the new observation.
    */
   addObservation(tenantId: string, companyId: string, observationData: AddObservationInput): Promise<Observation>;
+
+  /**
+   * Updates an existing observation.
+   * @param tenantId The ID of the tenant.
+   * @param companyId The ID of the company.
+   * @param observationId The ID of the observation to update.
+   * @param observationData The data to update.
+   */
+  updateObservation(tenantId: string, companyId: string, observationId: string, observationData: UpdateObservationInput): Promise<Observation>;
 
   /**
    * Deletes an observation from the data store.

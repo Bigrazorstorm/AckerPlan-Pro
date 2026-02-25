@@ -1,3 +1,4 @@
+
 {
   "Metadata": {
     "title": "AgroTrack",
@@ -341,6 +342,7 @@
     "description": "Dokumentieren Sie Pflanzenwachstum, Schäden und andere Feldbeobachtungen.",
     "addObservation": "Beobachtung hinzufügen",
     "addObservationSheetTitle": "Neue Beobachtung hinzufügen",
+    "editObservationSheetTitle": "Beobachtung bearbeiten",
     "detailsSheetDescription": "Auf {field} am {date}",
     "locationLabel": "Standort der Beobachtung",
     "tableHeaderTitle": "Titel",
@@ -383,6 +385,14 @@
       "submitting": "Wird gespeichert...",
       "successToastTitle": "Erfolg",
       "successToastDescription": "Die Beobachtung wurde erfolgreich gespeichert.",
+      "errorToastTitle": "Fehler"
+    },
+    "editObservationForm": {
+      "fieldLabel": "Feld (nicht änderbar)",
+      "submit": "Änderungen speichern",
+      "submitting": "Wird gespeichert...",
+      "successToastTitle": "Erfolg",
+      "successToastDescription": "Die Beobachtung wurde erfolgreich aktualisiert.",
       "errorToastTitle": "Fehler"
     },
     "deleteConfirmationTitle": "Beobachtung wirklich löschen?",

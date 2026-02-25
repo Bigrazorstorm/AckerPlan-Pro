@@ -1,3 +1,4 @@
+
 'use server'
  
 import dataService from '@/services'
@@ -38,6 +39,10 @@ const AddObservationSchema = z.object({
   tenantId: z.string().min(1, { message: 'Tenant ID is required' }),
   companyId: z.string().min(1, { message: 'Company ID is required' }),
 })
+
+const UpdateObservationSchema = AddObservationSchema.extend({
+  id: z.string().min(1, { message: 'Observation ID is required' }),
+}).omit({ field: true }); // Field cannot be changed on update
  
 export async function addObservation(prevState: any, formData: FormData) {
   const validatedFields = AddObservationSchema.safeParse({
@@ -79,6 +84,52 @@ export async function addObservation(prevState: any, formData: FormData) {
   } catch (e) {
     return {
       message: 'Failed to add observation.',
+      errors: {},
+    }
+  }
+}
+
+export async function updateObservation(prevState: any, formData: FormData) {
+  const validatedFields = UpdateObservationSchema.safeParse({
+    id: formData.get('id'),
+    title: formData.get('title'),
+    description: formData.get('description'),
+    date: formData.get('date'),
+    photoUrl: formData.get('photoUrl'),
+    latitude: formData.get('latitude'),
+    longitude: formData.get('longitude'),
+    observationType: formData.get('observationType'),
+    bbchStage: formData.get('bbchStage'),
+    intensity: formData.get('intensity'),
+    damageCause: formData.get('damageCause'),
+    animal: formData.get('animal'),
+    affectedArea: formData.get('affectedArea'),
+    damagePercentage: formData.get('damagePercentage'),
+    tenantId: formData.get('tenantId'),
+    companyId: formData.get('companyId'),
+  });
+
+  if (!validatedFields.success) {
+    return {
+      errors: validatedFields.error.flatten().fieldErrors,
+      message: 'Validation failed. Please check the fields.',
+    }
+  }
+
+  try {
+    const { tenantId, companyId, id, ...observationData } = validatedFields.data;
+    await dataService.updateObservation(tenantId, companyId, id, {
+        ...observationData,
+        photoUrl: observationData.photoUrl || undefined,
+        observationType: observationData.observationType as ObservationType,
+        animal: observationData.animal || undefined,
+    });
+    revalidatePath('/observations');
+    return { message: 'Observation updated successfully.', errors: {} };
+  } catch (e) {
+    const message = e instanceof Error ? e.message : 'An unknown error occurred.';
+    return {
+      message: `Failed to update observation: ${message}`,
       errors: {},
     }
   }

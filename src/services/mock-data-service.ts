@@ -1,5 +1,6 @@
+
 import { DataService } from './data-service';
-import { Kpi, ChartDataPoint, Operation, Machinery, Session, Field, MaintenanceEvent, AddMaintenanceEventInput, AuditLogEvent, RepairEvent, AddRepairEventInput, AddOperationInput, LaborHoursByCropReportData, Observation, AddObservationInput, ProfitabilityByCropReportData, UpdateMachineInput, FieldEconomics, User, AddUserInput, Role, UpdateOperationInput, ObservationType, WarehouseItem, AddWarehouseItemInput, OperationMaterial } from './types';
+import { Kpi, ChartDataPoint, Operation, Machinery, Session, Field, MaintenanceEvent, AddMaintenanceEventInput, AuditLogEvent, RepairEvent, AddRepairEventInput, AddOperationInput, LaborHoursByCropReportData, Observation, AddObservationInput, ProfitabilityByCropReportData, UpdateMachineInput, FieldEconomics, User, AddUserInput, Role, UpdateOperationInput, ObservationType, WarehouseItem, AddWarehouseItemInput, UpdateObservationInput } from './types';
 
 let users: User[] = [
     {
@@ -583,6 +584,20 @@ export class MockDataService implements DataService {
     observations.unshift(newObservation);
     logAuditEvent(tenantId, companyId, 'observation.create', `Beobachtung "${observationData.title}" auf Fläche "${observationData.field}" erstellt.`);
     return Promise.resolve(newObservation);
+  }
+
+  async updateObservation(tenantId: string, companyId: string, observationId: string, observationData: UpdateObservationInput): Promise<Observation> {
+    console.log(`Updating Observation ${observationId} for tenant ${tenantId}, company ${companyId}.`);
+    const obsIndex = observations.findIndex(o => o.id === observationId && o.tenantId === tenantId && o.companyId === companyId);
+    if (obsIndex === -1) {
+      throw new Error("Observation not found or not authorized to update.");
+    }
+    const updatedObservation = { ...observations[obsIndex], ...observationData, updatedAt: new Date().toISOString() };
+    observations[obsIndex] = updatedObservation as Observation;
+
+    logAuditEvent(tenantId, companyId, 'observation.update', `Beobachtung "${updatedObservation.title}" auf Fläche "${(updatedObservation as Observation).field}" wurde aktualisiert.`);
+    
+    return Promise.resolve(updatedObservation as Observation);
   }
 
   async deleteObservation(tenantId: string, companyId: string, observationId: string): Promise<void> {

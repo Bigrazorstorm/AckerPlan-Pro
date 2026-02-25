@@ -1,3 +1,4 @@
+
 'use client'
 
 import { React, useEffect, useState, useActionState } from 'react'
@@ -5,10 +6,10 @@ import { useFormStatus } from 'react-dom'
 import { useTranslations } from "next-intl"
 import { useToast } from '@/hooks/use-toast'
 import { Observation, Field, ObservationType } from '@/services/types'
-import { addObservation, deleteObservation } from '@/app/observations/actions'
+import { addObservation, deleteObservation, updateObservation } from '@/app/observations/actions'
 import { useSession } from '@/context/session-context'
 import dataService from '@/services'
-import { format } from "date-fns"
+import { format, parseISO } from "date-fns"
 import { de, enUS } from 'date-fns/locale'
 import { useParams } from 'next/navigation'
 import Image from 'next/image'
@@ -47,15 +48,207 @@ const initialState = {
   errors: {},
 }
 
-function SubmitButton() {
+function SubmitButton({isEdit = false}: {isEdit?: boolean}) {
   const { pending } = useFormStatus()
   const t = useTranslations('ObservationsPage.addObservationForm');
+  const tEdit = useTranslations('ObservationsPage.editObservationForm');
+
+  const buttonText = isEdit ? tEdit('submit') : t('submit');
+  const submittingText = isEdit ? tEdit('submitting') : t('submitting');
+
   return (
     <Button type="submit" aria-disabled={pending}>
-      {pending ? t('submitting') : t('submit')}
+      {pending ? submittingText : buttonText}
     </Button>
   )
 }
+
+function EditObservationForm({ closeSheet, tenantId, companyId, observation }: { closeSheet: () => void; tenantId: string; companyId: string; observation: Observation }) {
+  const [state, formAction] = useActionState(updateObservation, initialState);
+  const { toast } = useToast();
+  const t = useTranslations('ObservationsPage.editObservationForm');
+  const tShared = useTranslations('ObservationsPage.addObservationForm');
+  const tObservationTypes = useTranslations('ObservationTypes');
+  const tDamageCauses = useTranslations('DamageCauses');
+  const { locale } = useParams<{ locale: string }>();
+
+  const [date, setDate] = useState<Date | undefined>(observation.date ? parseISO(observation.date) : undefined);
+  const [intensity, setIntensity] = useState(observation.intensity);
+  const [observationType, setObservationType] = useState<ObservationType | ''>(observation.observationType);
+  const [damageCause, setDamageCause] = useState<'Wildlife' | 'Weather' | 'Other' | ''>(observation.damageCause || '');
+
+  const observationTypes: ObservationType[] = ['Routine', 'Pest', 'NutrientDeficiency', 'Damage', 'Other'];
+  const damageCauses: ('Wildlife' | 'Weather' | 'Other')[] = ['Wildlife', 'Weather', 'Other'];
+
+  useEffect(() => {
+    if (state.message && Object.keys(state.errors).length === 0) {
+      toast({
+        title: t('successToastTitle'),
+        description: t('successToastDescription'),
+      });
+      closeSheet();
+    } else if (state.message && Object.keys(state.errors).length > 0) {
+      toast({
+        variant: 'destructive',
+        title: t('errorToastTitle'),
+        description: state.message,
+      });
+    }
+  }, [state, toast, closeSheet, t]);
+  
+  return (
+    <form action={formAction} className="space-y-4">
+      <input type="hidden" name="tenantId" value={tenantId} />
+      <input type="hidden" name="companyId" value={companyId} />
+      <input type="hidden" name="id" value={observation.id} />
+      <input type="hidden" name="date" value={date ? format(date, "yyyy-MM-dd") : ""} />
+      <input type="hidden" name="intensity" value={intensity} />
+
+      <div className="space-y-2">
+        <Label htmlFor="title">{tShared('titleLabel')}</Label>
+        <Input id="title" name="title" required defaultValue={observation.title} />
+        {state.errors?.title && <p className="text-sm text-destructive">{state.errors.title.join(', ')}</p>}
+      </div>
+      
+       <div className="space-y-2">
+        <Label htmlFor="description">{tShared('descriptionLabel')}</Label>
+        <Textarea id="description" name="description" required defaultValue={observation.description} />
+        {state.errors?.description && <p className="text-sm text-destructive">{state.errors.description.join(', ')}</p>}
+      </div>
+
+      <div className="space-y-2">
+          <Label htmlFor="field">{t('fieldLabel')}</Label>
+          <Input id="field" name="field" readOnly disabled value={observation.field} />
+      </div>
+      
+      <div className="space-y-2">
+          <Label htmlFor="observationType">{tShared('observationTypeLabel')}</Label>
+          <Select name="observationType" required onValueChange={(value) => setObservationType(value as ObservationType)} defaultValue={observation.observationType}>
+            <SelectTrigger>
+              <SelectValue placeholder={tShared('observationTypePlaceholder')} />
+            </SelectTrigger>
+            <SelectContent>
+              {observationTypes.map((type) => (
+                  <SelectItem key={type} value={type}>{tObservationTypes(type)}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          {state.errors?.observationType && <p className="text-sm text-destructive">{state.errors.observationType.join(', ')}</p>}
+      </div>
+
+       {observationType === 'Damage' && (
+        <div className="space-y-4 rounded-md border p-4">
+            <div className="space-y-2">
+                <Label htmlFor="damageCause">{tShared('damageCauseLabel')}</Label>
+                <Select name="damageCause" onValueChange={(value) => setDamageCause(value as any)} defaultValue={observation.damageCause}>
+                    <SelectTrigger>
+                        <SelectValue placeholder={tShared('damageCausePlaceholder')} />
+                    </SelectTrigger>
+                    <SelectContent>
+                        {damageCauses.map((cause) => (
+                            <SelectItem key={cause} value={cause}>{tDamageCauses(cause)}</SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+                {state.errors?.damageCause && <p className="text-sm text-destructive">{state.errors.damageCause.join(', ')}</p>}
+            </div>
+            {damageCause === 'Wildlife' && (
+                 <div className="space-y-2">
+                    <Label htmlFor="animal">{tShared('animalLabel')}</Label>
+                    <Input id="animal" name="animal" placeholder={tShared('animalPlaceholder')} defaultValue={observation.animal} />
+                    {state.errors?.animal && <p className="text-sm text-destructive">{state.errors.animal.join(', ')}</p>}
+                 </div>
+            )}
+            <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                    <Label htmlFor="affectedArea">{tShared('affectedAreaLabel')}</Label>
+                    <Input id="affectedArea" name="affectedArea" type="number" step="any" placeholder="50" defaultValue={observation.affectedArea} />
+                    {state.errors?.affectedArea && <p className="text-sm text-destructive">{state.errors.affectedArea.join(', ')}</p>}
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="damagePercentage">{tShared('damagePercentageLabel')}</Label>
+                    <Input id="damagePercentage" name="damagePercentage" type="number" step="1" min="0" max="100" placeholder="15" defaultValue={observation.damagePercentage} />
+                    {state.errors?.damagePercentage && <p className="text-sm text-destructive">{state.errors.damagePercentage.join(', ')}</p>}
+                </div>
+            </div>
+        </div>
+      )}
+
+      <div className="space-y-2">
+        <Label htmlFor="photoUrl">{tShared('photoUrlLabel')}</Label>
+        <Input id="photoUrl" name="photoUrl" placeholder={tShared('photoUrlPlaceholder')} defaultValue={observation.photoUrl} />
+        {state.errors?.photoUrl && <p className="text-sm text-destructive">{state.errors.photoUrl.join(', ')}</p>}
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="latitude">{tShared('latitudeLabel')}</Label>
+          <Input id="latitude" name="latitude" type="number" step="any" placeholder="52.515" defaultValue={observation.latitude} />
+          {state.errors?.latitude && <p className="text-sm text-destructive">{state.errors.latitude.join(', ')}</p>}
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="longitude">{tShared('longitudeLabel')}</Label>
+          <Input id="longitude" name="longitude" type="number" step="any" placeholder="13.360" defaultValue={observation.longitude} />
+          {state.errors?.longitude && <p className="text-sm text-destructive">{state.errors.longitude.join(', ')}</p>}
+        </div>
+      </div>
+      
+      <div className="grid grid-cols-1 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="bbchStage">{tShared('bbchStageLabel')}</Label>
+          <Input id="bbchStage" name="bbchStage" type="number" required defaultValue={observation.bbchStage} />
+          {state.errors?.bbchStage && <p className="text-sm text-destructive">{state.errors.bbchStage.join(', ')}</p>}
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="date">{tShared('dateLabel')}</Label>
+        <Popover>
+            <PopoverTrigger asChild>
+            <Button
+                variant={"outline"}
+                className={cn(
+                "w-full justify-start text-left font-normal",
+                !date && "text-muted-foreground"
+                )}
+            >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {date ? format(date, "PPP", { locale: locale === 'de' ? de : enUS }) : <span>{tShared('datePlaceholder')}</span>}
+            </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0">
+            <Calendar
+                mode="single"
+                selected={date}
+                onSelect={setDate}
+                initialFocus
+            />
+            </PopoverContent>
+        </Popover>
+        {state.errors?.date && <p className="text-sm text-destructive">{state.errors.date.join(', ')}</p>}
+      </div>
+
+       <div className="space-y-3">
+          <div className="flex justify-between">
+            <Label htmlFor="intensity">{tShared('intensityLabel')}</Label>
+            <span className="text-sm text-muted-foreground font-medium">{intensity}</span>
+          </div>
+          <Slider
+            name="intensity-slider"
+            defaultValue={[intensity]}
+            min={1}
+            max={5}
+            step={1}
+            onValueChange={(value) => setIntensity(value[0])}
+          />
+          {state.errors?.intensity && <p className="text-sm text-destructive">{state.errors.intensity.join(', ')}</p>}
+        </div>
+
+      <SubmitButton isEdit={true} />
+    </form>
+  );
+}
+
 
 function AddObservationForm({ closeSheet, tenantId, companyId, fields }: { closeSheet: () => void; tenantId: string; companyId: string; fields: Field[] }) {
   const [state, formAction] = useActionState(addObservation, initialState)
@@ -292,6 +485,7 @@ export function ObservationsClientContent() {
   const tDamageCauses = useTranslations('DamageCauses');
   const { toast } = useToast();
   const [isAddSheetOpen, setAddSheetOpen] = useState(false);
+  const [isEditSheetOpen, setEditSheetOpen] = useState(false);
   const { activeCompany, loading: sessionLoading, activeRole } = useSession();
   const [observations, setObservations] = useState<Observation[]>([]);
   const [fields, setFields] = useState<Field[]>([]);
@@ -299,6 +493,7 @@ export function ObservationsClientContent() {
   const { locale } = useParams<{ locale: string }>();
   const [observationToView, setObservationToView] = useState<Observation | null>(null);
   const [observationToDelete, setObservationToDelete] = useState<Observation | null>(null);
+  const [observationToEdit, setObservationToEdit] = useState<Observation | null>(null);
   
   const canManageObservations = activeRole === 'Firmen Admin' || activeRole === 'Tenant Admin';
 
@@ -316,7 +511,7 @@ export function ObservationsClientContent() {
       }
       fetchData();
     }
-  }, [activeCompany, isAddSheetOpen, observationToDelete]);
+  }, [activeCompany, isAddSheetOpen, observationToDelete, isEditSheetOpen]);
 
   const handleDelete = async () => {
     if (observationToDelete && activeCompany) {
@@ -337,11 +532,16 @@ export function ObservationsClientContent() {
     }
   };
 
+  const handleEdit = (observation: Observation) => {
+    setObservationToEdit(observation);
+    setEditSheetOpen(true);
+  };
+
 
   const dateFormatter = (dateString: string) => {
     if (!dateString) return '';
     try {
-      return format(new Date(dateString), 'PP', { locale: locale === 'de' ? de : enUS });
+      return format(parseISO(dateString), 'PP', { locale: locale === 'de' ? de : enUS });
     } catch (e) {
       return dateString;
     }
@@ -421,7 +621,7 @@ export function ObservationsClientContent() {
                       <DropdownMenuContent align="end">
                         <DropdownMenuLabel>{t('actions')}</DropdownMenuLabel>
                         <DropdownMenuItem onSelect={() => setObservationToView(obs)}>{t('view')}</DropdownMenuItem>
-                        <DropdownMenuItem>{t('edit')}</DropdownMenuItem>
+                        <DropdownMenuItem onSelect={() => handleEdit(obs)}>{t('edit')}</DropdownMenuItem>
                         {canManageObservations && (
                           <>
                             <DropdownMenuSeparator />
@@ -546,6 +746,17 @@ export function ObservationsClientContent() {
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
+    
+    <Sheet open={isEditSheetOpen} onOpenChange={setEditSheetOpen}>
+        <SheetContent className="w-full sm:max-w-md overflow-y-auto">
+            <SheetHeader>
+                <SheetTitle>{t('editObservationSheetTitle')}</SheetTitle>
+            </SheetHeader>
+            <div className="py-4">
+              {activeCompany && observationToEdit && <EditObservationForm closeSheet={() => setEditSheetOpen(false)} tenantId={activeCompany.tenantId} companyId={activeCompany.id} observation={observationToEdit} />}
+            </div>
+        </SheetContent>
+    </Sheet>
     </>
   )
 }

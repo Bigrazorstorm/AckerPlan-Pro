@@ -1,3 +1,4 @@
+
 export interface Kpi {
   labelKey: string;
   value: string;
@@ -203,6 +204,23 @@ export interface AddObservationInput {
   bbchStage: number;
   intensity: number; // 1-5
   // New fields for damage documentation
+  damageCause?: 'Wildlife' | 'Weather' | 'Other';
+  animal?: string;
+  affectedArea?: number; // in sqm
+  damagePercentage?: number; // in %
+}
+
+// Input type for updating an existing observation.
+export interface UpdateObservationInput {
+  date: string; // ISO-8601 date string
+  title: string;
+  description: string;
+  photoUrl?: string;
+  latitude?: number;
+  longitude?: number;
+  observationType: ObservationType;
+  bbchStage: number;
+  intensity: number; // 1-5
   damageCause?: 'Wildlife' | 'Weather' | 'Other';
   animal?: string;
   affectedArea?: number; // in sqm
