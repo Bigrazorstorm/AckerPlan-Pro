@@ -39,6 +39,18 @@ const initialState = {
   errors: {},
 }
 
+const isUserQualifiedForPsm = (user: User) => {
+    if (!user.pesticideLicenseExpiry) return false;
+    try {
+        const expiryDate = parseISO(user.pesticideLicenseExpiry);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0); // Compare dates only
+        return expiryDate >= today;
+    } catch (e) {
+        return false;
+    }
+};
+
 function SubmitButton({tKey, isEdit}: {tKey: string, isEdit?: boolean}) {
   const { pending } = useFormStatus()
   const t = useTranslations('OperationsPage.addOperationForm');
@@ -54,6 +66,7 @@ function EditOperationForm({ closeSheet, tenantId, companyId, fields, machinery,
   const [state, formAction] = useActionState(updateOperation, initialState)
   const { toast } = useToast()
   const t = useTranslations('OperationsPage.editOperationForm');
+  const tShared = useTranslations('OperationsPage');
   const tOperationTypes = useTranslations('OperationTypes');
   const [date, setDate] = useState<Date | undefined>(operation ? parseISO(operation.date) : undefined);
   const [operationType, setOperationType] = useState<string>(operation.type);
@@ -78,6 +91,14 @@ function EditOperationForm({ closeSheet, tenantId, companyId, fields, machinery,
   const removeMaterial = (index: number) => {
     setMaterials(materials.filter((_, i) => i !== index));
   };
+  
+  const anySelectedPersonnelIsUnqualified = useMemo(() => {
+    if (operationType !== 'PestControl') return false;
+    return selectedPersonnel.some(id => {
+        const user = personnel.find(p => p.id === id);
+        return user && !isUserQualifiedForPsm(user);
+    });
+  }, [operationType, selectedPersonnel, personnel]);
 
 
   useEffect(() => {
@@ -159,22 +180,33 @@ function EditOperationForm({ closeSheet, tenantId, companyId, fields, machinery,
                 </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-[--radix-dropdown-menu-trigger-width]">
-                {personnel.map((user) => (
-                    <DropdownMenuCheckboxItem
-                    key={user.id}
-                    checked={selectedPersonnel.includes(user.id)}
-                    onSelect={(e) => e.preventDefault()}
-                    onCheckedChange={(checked) => {
-                        return checked
-                        ? setSelectedPersonnel((prev) => [...prev, user.id])
-                        : setSelectedPersonnel((prev) => prev.filter((id) => id !== user.id));
-                    }}
-                    >
-                    {user.name}
-                    </DropdownMenuCheckboxItem>
-                ))}
+                {personnel.map((user) => {
+                    const isQualified = isUserQualifiedForPsm(user);
+                    return (
+                        <DropdownMenuCheckboxItem
+                        key={user.id}
+                        checked={selectedPersonnel.includes(user.id)}
+                        onSelect={(e) => e.preventDefault()}
+                        onCheckedChange={(checked) => {
+                            return checked
+                            ? setSelectedPersonnel((prev) => [...prev, user.id])
+                            : setSelectedPersonnel((prev) => prev.filter((id) => id !== user.id));
+                        }}
+                        >
+                        <span>
+                            {user.name}
+                            {operationType === 'PestControl' && !isQualified && (
+                                <span className="text-destructive/80 text-xs ml-2">({tShared('licenseNotValid')})</span>
+                            )}
+                        </span>
+                        </DropdownMenuCheckboxItem>
+                    );
+                })}
                 </DropdownMenuContent>
             </DropdownMenu>
+            {anySelectedPersonnelIsUnqualified && (
+                <p className="text-xs text-destructive">{tShared('unqualifiedPersonnelWarning')}</p>
+            )}
             {state.errors?.personnelIds && <p className="text-sm text-destructive">{state.errors.personnelIds.join(', ')}</p>}
           </div>
        </div>
@@ -309,6 +341,7 @@ function AddOperationForm({ closeSheet, tenantId, companyId, fields, machinery, 
   const [state, formAction] = useActionState(addOperation, initialState)
   const { toast } = useToast()
   const t = useTranslations('OperationsPage.addOperationForm');
+  const tShared = useTranslations('OperationsPage');
   const tOperationTypes = useTranslations('OperationTypes');
   const [date, setDate] = useState<Date>()
   const [selectedFields, setSelectedFields] = useState<string[]>([]);
@@ -334,6 +367,14 @@ function AddOperationForm({ closeSheet, tenantId, companyId, fields, machinery, 
   const removeMaterial = (index: number) => {
     setMaterials(materials.filter((_, i) => i !== index));
   };
+  
+  const anySelectedPersonnelIsUnqualified = useMemo(() => {
+    if (operationType !== 'PestControl') return false;
+    return selectedPersonnel.some(id => {
+        const user = personnel.find(p => p.id === id);
+        return user && !isUserQualifiedForPsm(user);
+    });
+  }, [operationType, selectedPersonnel, personnel]);
 
 
   useEffect(() => {
@@ -446,22 +487,33 @@ function AddOperationForm({ closeSheet, tenantId, companyId, fields, machinery, 
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-[--radix-dropdown-menu-trigger-width]">
-                {personnel.map((user) => (
-                <DropdownMenuCheckboxItem
-                    key={user.id}
-                    checked={selectedPersonnel.includes(user.id)}
-                    onSelect={(e) => e.preventDefault()}
-                    onCheckedChange={(checked) => {
-                    return checked
-                        ? setSelectedPersonnel((prev) => [...prev, user.id])
-                        : setSelectedPersonnel((prev) => prev.filter((id) => id !== user.id));
-                    }}
-                >
-                    {user.name}
-                </DropdownMenuCheckboxItem>
-                ))}
+                {personnel.map((user) => {
+                    const isQualified = isUserQualifiedForPsm(user);
+                    return (
+                        <DropdownMenuCheckboxItem
+                            key={user.id}
+                            checked={selectedPersonnel.includes(user.id)}
+                            onSelect={(e) => e.preventDefault()}
+                            onCheckedChange={(checked) => {
+                                return checked
+                                    ? setSelectedPersonnel((prev) => [...prev, user.id])
+                                    : setSelectedPersonnel((prev) => prev.filter((id) => id !== user.id));
+                            }}
+                        >
+                            <span>
+                                {user.name}
+                                {operationType === 'PestControl' && !isQualified && (
+                                    <span className="text-destructive/80 text-xs ml-2">({tShared('licenseNotValid')})</span>
+                                )}
+                            </span>
+                        </DropdownMenuCheckboxItem>
+                    );
+                })}
             </DropdownMenuContent>
             </DropdownMenu>
+            {anySelectedPersonnelIsUnqualified && (
+                <p className="text-xs text-destructive">{tShared('unqualifiedPersonnelWarning')}</p>
+            )}
             {state.errors?.personnelIds && <p className="text-sm text-destructive">{state.errors.personnelIds.join(', ')}</p>}
       </div>
 

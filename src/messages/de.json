@@ -250,6 +250,8 @@
     "actions": "Aktionen",
     "edit": "Bearbeiten",
     "delete": "Löschen",
+    "licenseNotValid": "Lizenz ungültig",
+    "unqualifiedPersonnelWarning": "Warnung: Ausgewähltes Personal hat keine gültige Pflanzenschutz-Sachkunde.",
     "deleteConfirmationTitle": "Auftrag wirklich löschen?",
     "deleteConfirmationDescription": "Diese Aktion kann nicht rückgängig gemacht werden. Dadurch wird der Auftrag endgültig aus den Aufzeichnungen entfernt.",
     "deleteConfirmationCancel": "Abbrechen",
