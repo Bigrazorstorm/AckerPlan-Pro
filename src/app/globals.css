@@ -208,7 +208,7 @@
 
   /* Links: Mit Akzentfarbe */
   a {
-    @apply text-primary hover:underline focus:outline-offset-2 focus:outline-offset-primary;
+    @apply text-primary hover:underline focus:outline-offset-2 focus:outline-primary;
   }
 
   /* Inputs: Moderne Border-Radius */
