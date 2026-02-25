@@ -1,4 +1,5 @@
 
+
 export interface Kpi {
   labelKey: string;
   value: string;
@@ -313,6 +314,18 @@ export interface AddWarehouseItemInput {
   name: string;
   itemType: WarehouseItemType;
   quantity: number;
+  unit: string;
+  costPerUnit: number;
+  n?: number;
+  p?: number;
+  k?: number;
+  registrationNumber?: string;
+  waitingPeriodDays?: number;
+}
+
+export interface UpdateWarehouseItemInput {
+  name: string;
+  itemType: WarehouseItemType;
   unit: string;
   costPerUnit: number;
   n?: number;

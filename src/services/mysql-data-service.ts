@@ -1,6 +1,6 @@
 
 import { DataService } from './data-service';
-import { Kpi, ChartDataPoint, Operation, Machinery, Session, Field, MaintenanceEvent, AddMaintenanceEventInput, AddRepairEventInput, RepairEvent, AuditLogEvent, AddOperationInput, LaborHoursByCropReportData, Observation, AddObservationInput, ProfitabilityByCropReportData, UpdateMachineInput, FieldEconomics, User, AddUserInput, UpdateOperationInput, WarehouseItem, AddWarehouseItemInput, UpdateObservationInput } from './types';
+import { Kpi, ChartDataPoint, Operation, Machinery, Session, Field, MaintenanceEvent, AddMaintenanceEventInput, AddRepairEventInput, RepairEvent, AuditLogEvent, AddOperationInput, LaborHoursByCropReportData, Observation, AddObservationInput, ProfitabilityByCropReportData, UpdateMachineInput, FieldEconomics, User, AddUserInput, UpdateOperationInput, WarehouseItem, AddWarehouseItemInput, UpdateObservationInput, UpdateWarehouseItemInput } from './types';
 
 // Hardcoded session for demonstration purposes, as this is a placeholder service.
 const session: Session = {
@@ -263,6 +263,20 @@ export class MySqlDataService implements DataService {
       ...itemData,
     };
     return Promise.resolve(newItem);
+  }
+
+  async updateWarehouseItem(tenantId: string, companyId: string, itemId: string, itemData: UpdateWarehouseItemInput): Promise<WarehouseItem> {
+    this.log('updateWarehouseItem', { tenantId, companyId, itemId, itemData });
+    const updatedItem: WarehouseItem = {
+      id: itemId,
+      tenantId,
+      companyId,
+      quantity: 0, // Should come from existing record
+      createdAt: new Date().toISOString(), // Should come from existing record
+      updatedAt: new Date().toISOString(),
+      ...itemData,
+    };
+    return Promise.resolve(updatedItem);
   }
 
   async deleteWarehouseItem(tenantId: string, companyId: string, itemId: string): Promise<void> {

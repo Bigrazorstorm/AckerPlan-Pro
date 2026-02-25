@@ -19,11 +19,16 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { addWarehouseItem, deleteWarehouseItem } from '@/app/lager/actions';
+import { addWarehouseItem, deleteWarehouseItem, updateWarehouseItem } from '@/app/lager/actions';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 
 
 const addItemInitialState = {
+  message: '',
+  errors: {},
+};
+
+const editItemInitialState = {
   message: '',
   errors: {},
 };
@@ -151,6 +156,121 @@ function AddItemForm({ closeSheet, tenantId, companyId }: { closeSheet: () => vo
   );
 }
 
+function EditItemForm({ closeSheet, tenantId, companyId, item }: { closeSheet: () => void; tenantId: string; companyId: string; item: WarehouseItem; }) {
+  const [state, formAction] = useActionState(updateWarehouseItem, editItemInitialState);
+  const { toast } = useToast();
+  const t = useTranslations('LagerPage.editItemForm');
+  const tShared = useTranslations('LagerPage.addItemForm');
+  const tItemTypes = useTranslations('WarehouseItemTypes');
+  const [itemType, setItemType] = useState<WarehouseItemType | ''>(item.itemType);
+  
+  const itemTypes: WarehouseItemType[] = ['Seed', 'Fertilizer', 'Pesticide', 'Other'];
+
+  useEffect(() => {
+    if (state.message && Object.keys(state.errors).length === 0) {
+      toast({
+        title: t('successToastTitle'),
+        description: state.message,
+      });
+      closeSheet();
+    } else if (state.message && Object.keys(state.errors).length > 0) {
+      toast({
+        variant: 'destructive',
+        title: t('errorToastTitle'),
+        description: state.message,
+      });
+    }
+  }, [state, toast, closeSheet, t]);
+
+  return (
+    <form action={formAction} className="space-y-4">
+      <input type="hidden" name="id" value={item.id} />
+      <input type="hidden" name="tenantId" value={tenantId} />
+      <input type="hidden" name="companyId" value={companyId} />
+      
+      <div className="space-y-2">
+        <Label htmlFor="name">{tShared('nameLabel')}</Label>
+        <Input id="name" name="name" required defaultValue={item.name} />
+        {state.errors?.name && <p className="text-sm text-destructive">{state.errors.name.join(', ')}</p>}
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="itemType">{tShared('typeLabel')}</Label>
+        <Select name="itemType" required onValueChange={(value) => setItemType(value as WarehouseItemType)} defaultValue={item.itemType}>
+          <SelectTrigger>
+            <SelectValue placeholder={tShared('typePlaceholder')} />
+          </SelectTrigger>
+          <SelectContent>
+            {itemTypes.map((type) => (
+              <SelectItem key={type} value={type}>{tItemTypes(type)}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        {state.errors?.itemType && <p className="text-sm text-destructive">{state.errors.itemType.join(', ')}</p>}
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="quantity">{tShared('quantityLabel')}</Label>
+          <Input id="quantity" name="quantity" type="number" step="any" required defaultValue={item.quantity} disabled readOnly />
+           <p className="text-xs text-muted-foreground">{t('quantityHelpText')}</p>
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="unit">{tShared('unitLabel')}</Label>
+          <Input id="unit" name="unit" required defaultValue={item.unit} />
+          {state.errors?.unit && <p className="text-sm text-destructive">{state.errors.unit.join(', ')}</p>}
+        </div>
+      </div>
+      
+      <div className="space-y-2">
+        <Label htmlFor="costPerUnit">{tShared('costPerUnitLabel')}</Label>
+        <div className="relative">
+            <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-muted-foreground text-sm">€</span>
+            <Input id="costPerUnit" name="costPerUnit" type="number" step="0.01" required defaultValue={item.costPerUnit} className="pl-7"/>
+        </div>
+        {state.errors?.costPerUnit && <p className="text-sm text-destructive">{state.errors.costPerUnit.join(', ')}</p>}
+      </div>
+
+      {itemType === 'Fertilizer' && (
+        <div className="grid grid-cols-3 gap-4">
+            <div className="space-y-2">
+                <Label htmlFor="n">{tShared('nLabel')}</Label>
+                <Input id="n" name="n" type="number" step="0.1" placeholder="27" defaultValue={item.n} />
+                {state.errors?.n && <p className="text-sm text-destructive">{state.errors.n.join(', ')}</p>}
+            </div>
+            <div className="space-y-2">
+                <Label htmlFor="p">{tShared('pLabel')}</Label>
+                <Input id="p" name="p" type="number" step="0.1" placeholder="5" defaultValue={item.p} />
+                {state.errors?.p && <p className="text-sm text-destructive">{state.errors.p.join(', ')}</p>}
+            </div>
+            <div className="space-y-2">
+                <Label htmlFor="k">{tShared('kLabel')}</Label>
+                <Input id="k" name="k" type="number" step="0.1" placeholder="5" defaultValue={item.k} />
+                {state.errors?.k && <p className="text-sm text-destructive">{state.errors.k.join(', ')}</p>}
+            </div>
+        </div>
+      )}
+
+      {itemType === 'Pesticide' && (
+        <>
+          <div className="space-y-2">
+            <Label htmlFor="registrationNumber">{tShared('registrationNumberLabel')}</Label>
+            <Input id="registrationNumber" name="registrationNumber" placeholder={tShared('registrationNumberPlaceholder')} defaultValue={item.registrationNumber}/>
+            {state.errors?.registrationNumber && <p className="text-sm text-destructive">{state.errors.registrationNumber.join(', ')}</p>}
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="waitingPeriodDays">{tShared('waitingPeriodDaysLabel')}</Label>
+            <Input id="waitingPeriodDays" name="waitingPeriodDays" type="number" step="1" placeholder={tShared('waitingPeriodDaysPlaceholder')} defaultValue={item.waitingPeriodDays}/>
+            {state.errors?.waitingPeriodDays && <p className="text-sm text-destructive">{state.errors.waitingPeriodDays.join(', ')}</p>}
+          </div>
+        </>
+      )}
+
+      <SubmitButton />
+    </form>
+  );
+}
+
 
 function LagerSkeleton() {
     const t = useTranslations('LagerPage');
@@ -196,7 +316,9 @@ export function LagerClientContent() {
     const [items, setItems] = useState<WarehouseItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [isAddSheetOpen, setAddSheetOpen] = useState(false);
+    const [isEditSheetOpen, setEditSheetOpen] = useState(false);
     const [itemToDelete, setItemToDelete] = useState<WarehouseItem | null>(null);
+    const [itemToEdit, setItemToEdit] = useState<WarehouseItem | null>(null);
     const t = useTranslations('LagerPage');
     const tItemTypes = useTranslations('WarehouseItemTypes');
     const { locale } = useParams<{ locale: string }>();
@@ -216,7 +338,7 @@ export function LagerClientContent() {
         } else if (!sessionLoading) {
             setLoading(false);
         }
-    }, [activeCompany, sessionLoading, isAddSheetOpen, itemToDelete]);
+    }, [activeCompany, sessionLoading, isAddSheetOpen, itemToDelete, isEditSheetOpen]);
     
     const currencyFormatter = new Intl.NumberFormat(locale, {
         style: 'currency',
@@ -240,6 +362,11 @@ export function LagerClientContent() {
         }
         setItemToDelete(null); // Close dialog & trigger refetch
       }
+    };
+    
+    const handleEdit = (item: WarehouseItem) => {
+        setItemToEdit(item);
+        setEditSheetOpen(true);
     };
 
     if (sessionLoading || loading) {
@@ -307,7 +434,7 @@ export function LagerClientContent() {
                                                 </DropdownMenuTrigger>
                                                 <DropdownMenuContent align="end">
                                                     <DropdownMenuLabel>{t('actions')}</DropdownMenuLabel>
-                                                    <DropdownMenuItem disabled>{t('edit')}</DropdownMenuItem>
+                                                    <DropdownMenuItem onSelect={() => handleEdit(item)}>{t('edit')}</DropdownMenuItem>
                                                     <DropdownMenuSeparator />
                                                     <DropdownMenuItem className="text-destructive" onSelect={() => setItemToDelete(item)}>{t('delete')}</DropdownMenuItem>
                                                 </DropdownMenuContent>
@@ -343,6 +470,16 @@ export function LagerClientContent() {
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
+        <Sheet open={isEditSheetOpen} onOpenChange={setEditSheetOpen}>
+          <SheetContent>
+              <SheetHeader>
+                  <SheetTitle>{t('editItemSheetTitle')}</SheetTitle>
+              </SheetHeader>
+              <div className="py-4">
+                  {activeCompany && itemToEdit && <EditItemForm closeSheet={() => setEditSheetOpen(false)} tenantId={activeCompany.tenantId} companyId={activeCompany.id} item={itemToEdit} />}
+              </div>
+          </SheetContent>
+        </Sheet>
       </>
     );
 }

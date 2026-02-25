@@ -510,6 +510,7 @@
     "description": "Verwalten Sie Ihre Lagerbestände für Saatgut, Dünger, Pflanzenschutzmittel und mehr.",
     "addItemButton": "Artikel hinzufügen",
     "addItemSheetTitle": "Neuen Lagerartikel hinzufügen",
+    "editItemSheetTitle": "Lagerartikel bearbeiten",
     "tableHeaderName": "Bezeichnung",
     "tableHeaderType": "Typ",
     "tableHeaderQuantity": "Menge",
@@ -544,6 +545,11 @@
       "submitting": "Wird hinzugefügt...",
       "successToastTitle": "Artikel hinzugefügt",
       "errorToastTitle": "Fehler"
+    },
+    "editItemForm": {
+      "successToastTitle": "Artikel aktualisiert",
+      "errorToastTitle": "Fehler",
+      "quantityHelpText": "Die Menge kann nur durch Arbeitsaufträge oder Inventurbuchungen geändert werden."
     },
     "deleteSuccessToastTitle": "Erfolg",
     "deleteErrorToastTitle": "Fehler",

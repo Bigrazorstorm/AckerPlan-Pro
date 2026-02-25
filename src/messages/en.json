@@ -509,6 +509,7 @@
     "description": "Manage your stock levels for seeds, fertilizers, pesticides, and more.",
     "addItemButton": "Add Item",
     "addItemSheetTitle": "Add New Warehouse Item",
+    "editItemSheetTitle": "Edit Warehouse Item",
     "tableHeaderName": "Name",
     "tableHeaderType": "Type",
     "tableHeaderQuantity": "Quantity",
@@ -543,6 +544,11 @@
       "submitting": "Adding...",
       "successToastTitle": "Item Added",
       "errorToastTitle": "Error"
+    },
+    "editItemForm": {
+      "successToastTitle": "Item Updated",
+      "errorToastTitle": "Error",
+      "quantityHelpText": "Quantity can only be changed via work orders or inventory adjustments."
     },
     "deleteSuccessToastTitle": "Success",
     "deleteErrorToastTitle": "Error",

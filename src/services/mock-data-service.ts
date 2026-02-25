@@ -1,6 +1,6 @@
 
 import { DataService } from './data-service';
-import { Kpi, ChartDataPoint, Operation, Machinery, Session, Field, MaintenanceEvent, AddMaintenanceEventInput, AuditLogEvent, RepairEvent, AddRepairEventInput, AddOperationInput, LaborHoursByCropReportData, Observation, AddObservationInput, ProfitabilityByCropReportData, UpdateMachineInput, FieldEconomics, User, AddUserInput, Role, UpdateOperationInput, ObservationType, WarehouseItem, AddWarehouseItemInput, UpdateObservationInput } from './types';
+import { Kpi, ChartDataPoint, Operation, Machinery, Session, Field, MaintenanceEvent, AddMaintenanceEventInput, AuditLogEvent, RepairEvent, AddRepairEventInput, AddOperationInput, LaborHoursByCropReportData, Observation, AddObservationInput, ProfitabilityByCropReportData, UpdateMachineInput, FieldEconomics, User, AddUserInput, Role, UpdateOperationInput, ObservationType, WarehouseItem, AddWarehouseItemInput, UpdateObservationInput, UpdateWarehouseItemInput, OperationMaterial } from './types';
 
 let users: User[] = [
     {
@@ -839,6 +839,28 @@ export class MockDataService implements DataService {
     warehouseItems.unshift(newItem);
     logAuditEvent(tenantId, companyId, 'warehouse.item.create', `Lagerartikel "${itemData.name}" wurde hinzugefügt (Menge: ${itemData.quantity} ${itemData.unit}).`);
     return Promise.resolve(newItem);
+  }
+  
+  async updateWarehouseItem(tenantId: string, companyId: string, itemId: string, itemData: UpdateWarehouseItemInput): Promise<WarehouseItem> {
+    console.log(`Updating Warehouse Item ${itemId} for tenant ${tenantId}, company ${companyId}.`);
+    const itemIndex = warehouseItems.findIndex(i => i.id === itemId && i.tenantId === tenantId && i.companyId === companyId);
+    if (itemIndex === -1) {
+      throw new Error("Item not found or not authorized to update.");
+    }
+    const updatedItem = { 
+        ...warehouseItems[itemIndex], 
+        ...itemData, 
+        // ensure nutrient/psm fields are nulled if type changes
+        n: itemData.itemType === 'Fertilizer' ? itemData.n : undefined,
+        p: itemData.itemType === 'Fertilizer' ? itemData.p : undefined,
+        k: itemData.itemType === 'Fertilizer' ? itemData.k : undefined,
+        registrationNumber: itemData.itemType === 'Pesticide' ? itemData.registrationNumber : undefined,
+        waitingPeriodDays: itemData.itemType === 'Pesticide' ? itemData.waitingPeriodDays : undefined,
+        updatedAt: new Date().toISOString() 
+    };
+    warehouseItems[itemIndex] = updatedItem;
+    logAuditEvent(tenantId, companyId, 'warehouse.item.update', `Lagerartikel "${updatedItem.name}" wurde aktualisiert.`);
+    return Promise.resolve(updatedItem);
   }
 
   async deleteWarehouseItem(tenantId: string, companyId: string, itemId: string): Promise<void> {
