@@ -11,6 +11,18 @@ const AddWarehouseItemSchema = z.object({
   quantity: z.coerce.number().min(0, { message: 'Quantity must be a positive number' }),
   unit: z.string().min(1, { message: 'Unit is required' }),
   costPerUnit: z.coerce.number().min(0, { message: 'Cost must be a positive number' }),
+  n: z.preprocess(
+    (val) => (val === '' ? undefined : val),
+    z.coerce.number().min(0, { message: 'N must be a positive number' }).max(100).optional()
+  ),
+  p: z.preprocess(
+    (val) => (val === '' ? undefined : val),
+    z.coerce.number().min(0, { message: 'P must be a positive number' }).max(100).optional()
+  ),
+  k: z.preprocess(
+    (val) => (val === '' ? undefined : val),
+    z.coerce.number().min(0, { message: 'K must be a positive number' }).max(100).optional()
+  ),
   registrationNumber: z.string().optional().or(z.literal('')),
   waitingPeriodDays: z.preprocess(
     (val) => (val === '' ? undefined : val),
@@ -27,6 +39,9 @@ export async function addWarehouseItem(prevState: any, formData: FormData) {
     quantity: formData.get('quantity'),
     unit: formData.get('unit'),
     costPerUnit: formData.get('costPerUnit'),
+    n: formData.get('n'),
+    p: formData.get('p'),
+    k: formData.get('k'),
     registrationNumber: formData.get('registrationNumber'),
     waitingPeriodDays: formData.get('waitingPeriodDays'),
     tenantId: formData.get('tenantId'),

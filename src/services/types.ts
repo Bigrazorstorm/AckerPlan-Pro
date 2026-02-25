@@ -267,6 +267,9 @@ export interface WarehouseItem {
   quantity: number;
   unit: string; // e.g., 'kg', 'l', 'Sack'
   costPerUnit: number;
+  n?: number; // Nitrogen in %
+  p?: number; // Phosphorus in %
+  k?: number; // Potassium in %
   registrationNumber?: string; // Zulassungsnummer
   waitingPeriodDays?: number; // Wartezeit in Tagen
   createdAt: string;
@@ -279,6 +282,9 @@ export interface AddWarehouseItemInput {
   quantity: number;
   unit: string;
   costPerUnit: number;
+  n?: number;
+  p?: number;
+  k?: number;
   registrationNumber?: string;
   waitingPeriodDays?: number;
 }

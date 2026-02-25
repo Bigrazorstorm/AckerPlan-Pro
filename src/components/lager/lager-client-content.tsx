@@ -109,6 +109,26 @@ function AddItemForm({ closeSheet, tenantId, companyId }: { closeSheet: () => vo
         {state.errors?.costPerUnit && <p className="text-sm text-destructive">{state.errors.costPerUnit.join(', ')}</p>}
       </div>
 
+      {itemType === 'Fertilizer' && (
+        <div className="grid grid-cols-3 gap-4">
+            <div className="space-y-2">
+                <Label htmlFor="n">{t('nLabel')}</Label>
+                <Input id="n" name="n" type="number" step="0.1" placeholder="27" />
+                {state.errors?.n && <p className="text-sm text-destructive">{state.errors.n.join(', ')}</p>}
+            </div>
+            <div className="space-y-2">
+                <Label htmlFor="p">{t('pLabel')}</Label>
+                <Input id="p" name="p" type="number" step="0.1" placeholder="5" />
+                {state.errors?.p && <p className="text-sm text-destructive">{state.errors.p.join(', ')}</p>}
+            </div>
+            <div className="space-y-2">
+                <Label htmlFor="k">{t('kLabel')}</Label>
+                <Input id="k" name="k" type="number" step="0.1" placeholder="5" />
+                {state.errors?.k && <p className="text-sm text-destructive">{state.errors.k.join(', ')}</p>}
+            </div>
+        </div>
+      )}
+
       {itemType === 'Pesticide' && (
         <>
           <div className="space-y-2">
@@ -234,6 +254,7 @@ export function LagerClientContent() {
                                 <TableHead>{t('tableHeaderName')}</TableHead>
                                 <TableHead>{t('tableHeaderType')}</TableHead>
                                 <TableHead className="hidden md:table-cell">{t('tableHeaderRegNr')}</TableHead>
+                                <TableHead className="hidden md:table-cell">{t('tableHeaderNutrients')}</TableHead>
                                 <TableHead className="hidden md:table-cell text-right">{t('tableHeaderWaitingPeriod')}</TableHead>
                                 <TableHead className="text-right">{t('tableHeaderQuantity')}</TableHead>
                                 <TableHead className="text-right">{t('tableHeaderValue')}</TableHead>
@@ -246,6 +267,9 @@ export function LagerClientContent() {
                                     <TableCell className="font-medium">{item.name}</TableCell>
                                     <TableCell>{tItemTypes(item.itemType)}</TableCell>
                                     <TableCell className="hidden md:table-cell font-mono text-xs">{item.registrationNumber || '-'}</TableCell>
+                                    <TableCell className="hidden md:table-cell font-mono text-xs">
+                                        {item.itemType === 'Fertilizer' ? `${item.n || 0}-${item.p || 0}-${item.k || 0}` : '-'}
+                                    </TableCell>
                                     <TableCell className="hidden md:table-cell text-right">{item.waitingPeriodDays ? `${item.waitingPeriodDays} ${t('daysSuffix')}` : '-'}</TableCell>
                                     <TableCell className="text-right">{item.quantity.toLocaleString(locale)} {item.unit}</TableCell>
                                     <TableCell className="text-right">{currencyFormatter.format(item.quantity * item.costPerUnit)}</TableCell>

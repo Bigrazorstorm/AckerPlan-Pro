@@ -485,6 +485,7 @@
     "tableHeaderUnit": "Einheit",
     "tableHeaderValue": "Gesamtwert",
     "tableHeaderRegNr": "Zul.-Nr.",
+    "tableHeaderNutrients": "N-P-K (%)",
     "tableHeaderWaitingPeriod": "Wartezeit",
     "daysSuffix": "Tage",
     "actions": "Aktionen",
@@ -505,6 +506,9 @@
       "registrationNumberPlaceholder": "z.B. 005717-00",
       "waitingPeriodDaysLabel": "Wartezeit (Tage)",
       "waitingPeriodDaysPlaceholder": "z.B. 21",
+      "nLabel": "N (%)",
+      "pLabel": "P (%)",
+      "kLabel": "K (%)",
       "submit": "Artikel hinzufügen",
       "submitting": "Wird hinzugefügt...",
       "successToastTitle": "Artikel hinzugefügt",
@@ -520,6 +524,8 @@
   "DokumentationPage": {
     "title": "Dokumentation",
     "description": "Erzeugen und exportieren Sie alle für die Einhaltung der Vorschriften erforderlichen Dokumente.",
+    "psmTab": "Pflanzenschutz",
+    "fertilizationTab": "Düngung",
     "psmReportTitle": "Pflanzenschutzmittel-Anwendungen",
     "psmReportDescription": "Eine detaillierte Aufzeichnung aller durchgeführten Pflanzenschutzmaßnahmen.",
     "tableHeaderDate": "Datum",
@@ -531,7 +537,13 @@
     "tableHeaderWaitingPeriod": "Wartezeit",
     "tableHeaderPersonnel": "Anwender",
     "noPsmApplications": "Bisher wurden keine Pflanzenschutzmaßnahmen protokolliert.",
-    "noPsmApplicationsDescription": "Erfassen Sie eine Maßnahme vom Typ 'Pflanzenschutz', um sie hier zu sehen."
+    "noPsmApplicationsDescription": "Erfassen Sie eine Maßnahme vom Typ 'Pflanzenschutz', um sie hier zu sehen.",
+    "fertilizationReportTitle": "Düngemaßnahmen",
+    "fertilizationReportDescription": "Eine detaillierte Aufzeichnung aller durchgeführten Düngemaßnahmen mit Nährstoffbilanz.",
+    "tableHeaderFertilizer": "Düngemittel",
+    "tableHeaderNutrientsPerHa": "{nutrient} (kg/ha)",
+    "noFertilizationApplications": "Bisher wurden keine Düngemaßnahmen protokolliert.",
+    "noFertilizationApplicationsDescription": "Erfassen Sie eine Maßnahme vom Typ 'Düngung', um sie hier zu sehen."
   },
   "FoerderwesenPage": {
     "title": "Förderwesen",

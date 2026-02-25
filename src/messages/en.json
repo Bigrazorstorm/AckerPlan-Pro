@@ -485,6 +485,7 @@
     "tableHeaderUnit": "Unit",
     "tableHeaderValue": "Total Value",
     "tableHeaderRegNr": "Reg. No.",
+    "tableHeaderNutrients": "N-P-K (%)",
     "tableHeaderWaitingPeriod": "Waiting Period",
     "daysSuffix": "days",
     "actions": "Actions",
@@ -505,6 +506,9 @@
       "registrationNumberPlaceholder": "e.g. 005717-00",
       "waitingPeriodDaysLabel": "Waiting Period (Days)",
       "waitingPeriodDaysPlaceholder": "e.g. 21",
+      "nLabel": "N (%)",
+      "pLabel": "P (%)",
+      "kLabel": "K (%)",
       "submit": "Add Item",
       "submitting": "Adding...",
       "successToastTitle": "Item Added",
@@ -520,6 +524,8 @@
   "DokumentationPage": {
     "title": "Documentation",
     "description": "Generate and export all documents required for compliance.",
+    "psmTab": "Pesticides",
+    "fertilizationTab": "Fertilization",
     "psmReportTitle": "Pesticide Applications",
     "psmReportDescription": "A detailed record of all pesticide control measures performed.",
     "tableHeaderDate": "Date",
@@ -531,7 +537,13 @@
     "tableHeaderWaitingPeriod": "Waiting Period",
     "tableHeaderPersonnel": "Applied by",
     "noPsmApplications": "No pesticide applications have been logged yet.",
-    "noPsmApplicationsDescription": "Log a 'Pest Control' work order to see it here."
+    "noPsmApplicationsDescription": "Log a 'Pest Control' work order to see it here.",
+    "fertilizationReportTitle": "Fertilization Measures",
+    "fertilizationReportDescription": "A detailed record of all fertilization measures performed, with nutrient balance.",
+    "tableHeaderFertilizer": "Fertilizer",
+    "tableHeaderNutrientsPerHa": "{nutrient} (kg/ha)",
+    "noFertilizationApplications": "No fertilization measures have been logged yet.",
+    "noFertilizationApplicationsDescription": "Log a 'Fertilizing' work order to see it here."
   },
   "FoerderwesenPage": {
     "title": "Subsidies",
