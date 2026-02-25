@@ -13,19 +13,19 @@
 @layer base {
   :root {
     /* ────────────────────────────────────────────────────────
-       FARBEN – Agrarisch authentisch
+       FARBEN – Neutral, professionell, harmonisch
        ──────────────────────────────────────────────────────── */
     
-    /* Primäre Farbe: Modernes Agrar-Grün */
-    --primary: 140 52% 37%;              /* #2d7a3c */
+    /* Primäre Farbe: Frisches, klares Grün */
+    --primary: 161 85% 33%;              /* #059669 */
     --primary-foreground: 210 40% 98%;   /* Weiß */
     
-    /* Sekundäre Farbe: Warmes Erdbraun */
-    --secondary: 32 35% 45%;             /* #8b6f47 */
+    /* Sekundäre Farbe: Neutrales Grau */
+    --secondary: 217 13% 43%;            /* #6b7280 */
     --secondary-foreground: 210 40% 98%; /* Weiß */
     
-    /* Akzentfarbe: Energisches Gelb-Grün für Handlungen */
-    --accent: 87 62% 56%;                /* #a8d968 */
+    /* Akzentfarbe: Warm Bernstein/Amber für Handlungen */
+    --accent: 38 92% 50%;                /* #f59e0b */
     --accent-foreground: 210 40% 4%;     /* Sehr dunkel */
     
     /* Status-Farben */
@@ -61,22 +61,22 @@
     /* Borders & Input */
     --border: 210 13% 85%;               /* Hellgrau */
     --input: 210 13% 90%;                /* Für Input-Hintergründe */
-    --ring: 140 52% 37%;                 /* Primary für Focus-Ring */
+    --ring: 161 85% 33%;                 /* Primary für Focus-Ring */
     
     /* Sidebar (für Betriebsleiter-Seiten) */
-    --sidebar-background: 140 52% 7%;    /* Sehr dunkles Grün */
+    --sidebar-background: 161 85% 20%;   /* Dunkles Grün */
     --sidebar-foreground: 210 40% 98%;   /* Weiß */
-    --sidebar-primary: 87 62% 56%;       /* Gelb-Grün Akzent */
+    --sidebar-primary: 38 92% 50%;       /* Bernstein Akzent */
     --sidebar-primary-foreground: 210 40% 4%;
-    --sidebar-accent: 32 35% 45%;        /* Erdbraun */
+    --sidebar-accent: 217 13% 43%;       /* Neutrales Grau */
     --sidebar-accent-foreground: 210 40% 98%;
-    --sidebar-border: 140 52% 15%;       /* Dunkelgrün */
-    --sidebar-ring: 87 62% 56%;          /* Akzent */
+    --sidebar-border: 161 85% 28%;       /* Helles Dunkelgrün */
+    --sidebar-ring: 38 92% 50%;          /* Akzent */
     
     /* Chart-Farben */
-    --chart-1: 140 52% 37%;              /* Primäres Grün */
-    --chart-2: 32 35% 45%;               /* Erdbraun */
-    --chart-3: 87 62% 56%;               /* Akzent-Grün */
+    --chart-1: 161 85% 33%;              /* Primäres Grün */
+    --chart-2: 217 13% 43%;              /* Neutrales Grau */
+    --chart-3: 38 92% 50%;               /* Bernstein-Akzent */
     --chart-4: 142 65% 48%;              /* Success-Grün */
     --chart-5: 38 89% 57%;               /* Warning-Orange */
     
@@ -97,7 +97,7 @@
     --popover: 210 40% 16%;
     --popover-foreground: 210 40% 97%;
     
-    --primary: 140 52% 55%;              /* Heller Grün für sichtbar */
+    --primary: 161 85% 55%;              /* Heller Grün für Dark Mode */
     --primary-foreground: 210 40% 10%;
     
     --secondary: 32 35% 60%;             /* Helleres Erdbraun */
