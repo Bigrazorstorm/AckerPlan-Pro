@@ -240,4 +240,12 @@ export interface DataService {
    * @param itemData - The data for the new item.
    */
   addWarehouseItem(tenantId: string, companyId: string, itemData: AddWarehouseItemInput): Promise<WarehouseItem>;
+
+  /**
+   * Deletes an item from the warehouse.
+   * @param tenantId The ID of the tenant.
+   * @param companyId The ID of the company.
+   * @param itemId The ID of the item to delete.
+   */
+  deleteWarehouseItem(tenantId: string, companyId: string, itemId: string): Promise<void>;
 }

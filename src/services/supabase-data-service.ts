@@ -251,4 +251,9 @@ export class SupabaseDataService implements DataService {
     };
     return Promise.resolve(newItem);
   }
+
+  async deleteWarehouseItem(tenantId: string, companyId: string, itemId: string): Promise<void> {
+    this.log('deleteWarehouseItem', { tenantId, companyId, itemId });
+    return Promise.resolve();
+  }
 }

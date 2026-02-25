@@ -72,3 +72,17 @@ export async function addWarehouseItem(prevState: any, formData: FormData) {
     }
   }
 }
+
+export async function deleteWarehouseItem(itemId: string, tenantId: string, companyId: string) {
+  if (!itemId || !tenantId || !companyId) {
+    return { message: 'Failed to delete item: Missing required IDs.' };
+  }
+  try {
+    await dataService.deleteWarehouseItem(tenantId, companyId, itemId);
+    revalidatePath('/lager');
+    return { message: 'Warehouse item deleted successfully.' };
+  } catch (e) {
+    const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
+    return { message: `Failed to delete item: ${errorMessage}` };
+  }
+}

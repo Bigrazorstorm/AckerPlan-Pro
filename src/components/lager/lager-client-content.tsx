@@ -19,7 +19,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { addWarehouseItem } from '@/app/lager/actions';
+import { addWarehouseItem, deleteWarehouseItem } from '@/app/lager/actions';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+
 
 const addItemInitialState = {
   message: '',
@@ -194,9 +196,11 @@ export function LagerClientContent() {
     const [items, setItems] = useState<WarehouseItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [isAddSheetOpen, setAddSheetOpen] = useState(false);
+    const [itemToDelete, setItemToDelete] = useState<WarehouseItem | null>(null);
     const t = useTranslations('LagerPage');
     const tItemTypes = useTranslations('WarehouseItemTypes');
     const { locale } = useParams<{ locale: string }>();
+    const { toast } = useToast();
 
     const canManageWarehouse = activeRole === 'Firmen Admin' || activeRole === 'Tenant Admin' || activeRole === 'Betriebsleitung';
     
@@ -212,18 +216,38 @@ export function LagerClientContent() {
         } else if (!sessionLoading) {
             setLoading(false);
         }
-    }, [activeCompany, sessionLoading, isAddSheetOpen]);
+    }, [activeCompany, sessionLoading, isAddSheetOpen, itemToDelete]);
     
     const currencyFormatter = new Intl.NumberFormat(locale, {
         style: 'currency',
         currency: 'EUR',
     });
 
+    const handleDelete = async () => {
+      if (itemToDelete && activeCompany) {
+        const result = await deleteWarehouseItem(itemToDelete.id, activeCompany.tenantId, activeCompany.id);
+        if (result.message.includes('successfully')) {
+          toast({
+            title: t('deleteSuccessToastTitle'),
+            description: result.message,
+          });
+        } else {
+          toast({
+            variant: 'destructive',
+            title: t('deleteErrorToastTitle'),
+            description: result.message,
+          });
+        }
+        setItemToDelete(null); // Close dialog & trigger refetch
+      }
+    };
+
     if (sessionLoading || loading) {
         return <LagerSkeleton />;
     }
     
     return (
+      <>
         <Card>
             <CardHeader className="flex flex-row items-center justify-between">
                 <div/>
@@ -285,7 +309,7 @@ export function LagerClientContent() {
                                                     <DropdownMenuLabel>{t('actions')}</DropdownMenuLabel>
                                                     <DropdownMenuItem disabled>{t('edit')}</DropdownMenuItem>
                                                     <DropdownMenuSeparator />
-                                                    <DropdownMenuItem className="text-destructive" disabled>{t('delete')}</DropdownMenuItem>
+                                                    <DropdownMenuItem className="text-destructive" onSelect={() => setItemToDelete(item)}>{t('delete')}</DropdownMenuItem>
                                                 </DropdownMenuContent>
                                             </DropdownMenu>
                                         </TableCell>
@@ -305,5 +329,20 @@ export function LagerClientContent() {
                 )}
             </CardContent>
         </Card>
+        <AlertDialog open={!!itemToDelete} onOpenChange={(open) => !open && setItemToDelete(null)}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>{t('deleteConfirmationTitle')}</AlertDialogTitle>
+              <AlertDialogDescription>
+                {t('deleteConfirmationDescription')}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>{t('deleteConfirmationCancel')}</AlertDialogCancel>
+              <AlertDialogAction onClick={handleDelete} className="bg-destructive hover:bg-destructive/90">{t('deleteConfirmationConfirm')}</AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      </>
     );
 }

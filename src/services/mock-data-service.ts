@@ -338,6 +338,11 @@ export class MockDataService implements DataService {
         return Promise.reject(new Error('Machine not found or not authorized to delete.'));
     }
 
+    const isUsed = operations.some(op => op.machine?.id === machineId);
+    if (isUsed) {
+        return Promise.reject(new Error('Machine cannot be deleted because it is used in at least one work order.'));
+    }
+
     machinery = machinery.filter(m => m.id !== machineId || m.tenantId !== tenantId || m.companyId !== companyId);
     
     if (machinery.length < initialLength) {
@@ -819,5 +824,29 @@ export class MockDataService implements DataService {
     warehouseItems.unshift(newItem);
     logAuditEvent(tenantId, companyId, 'warehouse.item.create', `Lagerartikel "${itemData.name}" wurde hinzugefügt (Menge: ${itemData.quantity} ${itemData.unit}).`);
     return Promise.resolve(newItem);
+  }
+
+  async deleteWarehouseItem(tenantId: string, companyId: string, itemId: string): Promise<void> {
+    console.log(`Deleting Warehouse Item ${itemId} for tenant ${tenantId} and company ${companyId}.`);
+    const initialLength = warehouseItems.length;
+    const itemToDelete = warehouseItems.find(i => i.id === itemId && i.tenantId === tenantId && i.companyId === companyId);
+    
+    if (!itemToDelete) {
+        return Promise.reject(new Error('Item not found or not authorized to delete.'));
+    }
+    
+    const isUsed = operations.some(op => op.materials?.some(mat => mat.itemId === itemId));
+    if (isUsed) {
+        return Promise.reject(new Error('Item cannot be deleted because it is used in at least one work order.'));
+    }
+
+    warehouseItems = warehouseItems.filter(i => !(i.id === itemId && i.tenantId === tenantId && i.companyId === companyId));
+    
+    if (warehouseItems.length < initialLength) {
+        logAuditEvent(tenantId, companyId, 'warehouse.item.delete', `Lagerartikel "${itemToDelete.name}" wurde gelöscht.`);
+        return Promise.resolve();
+    } else {
+        return Promise.reject(new Error('Deletion failed unexpectedly.'));
+    }
   }
 }

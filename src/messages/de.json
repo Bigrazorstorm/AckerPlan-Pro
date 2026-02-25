@@ -523,7 +523,13 @@
       "submitting": "Wird hinzugefügt...",
       "successToastTitle": "Artikel hinzugefügt",
       "errorToastTitle": "Fehler"
-    }
+    },
+    "deleteSuccessToastTitle": "Erfolg",
+    "deleteErrorToastTitle": "Fehler",
+    "deleteConfirmationTitle": "Artikel wirklich löschen?",
+    "deleteConfirmationDescription": "Diese Aktion kann nicht rückgängig gemacht werden. Dadurch wird der Artikel endgültig aus dem Lager entfernt. Artikel, die bereits in Aufträgen verwendet werden, können nicht gelöscht werden.",
+    "deleteConfirmationCancel": "Abbrechen",
+    "deleteConfirmationConfirm": "Löschen"
   },
   "WarehouseItemTypes": {
     "Seed": "Saatgut",
