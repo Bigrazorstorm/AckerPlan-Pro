@@ -3,6 +3,35 @@
     "title": "AgroTrack",
     "description": "GIS-based, mobile-first production and profitability controlling for agriculture"
   },
+  "Common": {
+    "close": "Close",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success"
+  },
+  "PWA": {
+    "installTitle": "Install App",
+    "installDescription": "Install AckerPlan Pro for faster access and offline usage",
+    "install": "Install",
+    "later": "Later",
+    "updateTitle": "Update Available",
+    "updateDescription": "A new version is available. Update now?",
+    "update": "Update",
+    "offline": "Offline Mode",
+    "offlineDescription": "You are working in offline mode. Some features are limited.",
+    "online": "Connection restored",
+    "syncing": "Syncing...",
+    "syncComplete": "Sync completed",
+    "syncError": "Sync error",
+    "syncPending": "{count} changes waiting to sync",
+    "offlineChanges": "Offline changes saved",
+    "manualSync": "Sync manually"
+  },
   "Navigation": {
     "dashboard": "Dashboard",
     "fields": "Fields",
@@ -86,6 +115,18 @@
   "MapDebug": {
     "layerErrorTitle": "Map Layer Error",
     "layerErrorDescription": "Layer '{layerName}' could not be loaded. Please check the server URL and your connection."
+  },
+  "Fields": {
+    "searchPlaceholder": "Search field...",
+    "filterAll": "All",
+    "filterActive": "Active",
+    "filterFallow": "Fallow",
+    "newField": "New Field",
+    "emptyTitle": "No fields available",
+    "emptyDescription": "Create your first field to get started",
+    "noCompany": "No company selected",
+    "cropLabel": "Crop",
+    "updatedLabel": "Updated:"
   },
   "FieldsPage": {
     "title": "Fields",

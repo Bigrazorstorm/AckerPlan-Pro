@@ -89,6 +89,7 @@ export interface Field {
   isEnvironmentalZone?: boolean; // In Umweltzone?
   environmentalMeasures?: string[]; // AUKM Maßnahmen
   restrictions?: string[];      // Weitere Auflagen
+  huntingArea?: string;         // Zugeordnetes Jagdrevier
   
   // System
   createdAt: Date;

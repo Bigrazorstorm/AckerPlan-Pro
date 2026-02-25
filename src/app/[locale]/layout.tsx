@@ -5,6 +5,7 @@ import { SidebarProvider, Sidebar } from '@/components/ui/sidebar';
 import { Header } from '@/components/layout/header';
 import { SidebarNav } from '@/components/layout/sidebar-nav';
 import { MobileNavLayout } from '@/components/layout/mobile-nav-layout';
+import { PWAPrompts } from '@/components/pwa/pwa-prompts';
 import {NextIntlClientProvider} from 'next-intl';
 import {getMessages, getTranslations, setRequestLocale} from 'next-intl/server';
 import { SessionProvider } from '@/context/session-context';
@@ -20,9 +21,23 @@ export async function generateMetadata({params: {locale}}: {params: {locale: str
       template: `%s | ${t('title')}`,
     },
     description: t('description'),
+    manifest: '/manifest.json',
+    appleWebApp: {
+      capable: true,
+      statusBarStyle: 'default',
+      title: 'AckerPlan Pro',
+    },
+    formatDetection: {
+      telephone: false,
+    },
     icons: {
       icon: '/favicon.ico',
-    }
+      apple: [
+        { url: '/icons/icon-152x152.png', sizes: '152x152', type: 'image/png' },
+        { url: '/icons/icon-192x192.png', sizes: '192x192', type: 'image/png' },
+      ],
+    },
+    themeColor: '#2d7a3c',
   };
 }
 
@@ -69,6 +84,7 @@ export default async function RootLayout({
                 <main>{children}</main>
               )}
               <Toaster />
+              <PWAPrompts />
           </SessionProvider>
         </NextIntlClientProvider>
       </body>

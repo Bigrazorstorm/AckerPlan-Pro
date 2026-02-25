@@ -59,7 +59,6 @@ export {
   Package,
   Briefcase,
   Wrench,
-  Tool,
   Hammer,
   Boxes,
   Container,
@@ -75,7 +74,6 @@ export {
   Unlock,
   // Spezial
   Loader2,
-  Spinner,
   CheckCircle2,
   Circle,
   Heart,

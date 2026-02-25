@@ -151,6 +151,18 @@ class MockFieldService {
   }
 
   /**
+   * Alle Felder mit vollständigen Details abrufen
+   */
+  async getAllFieldsDetailed(
+    tenantId: string,
+    companyId: string
+  ): Promise<Field[]> {
+    return MOCK_FIELDS.filter(
+      f => f.tenantId === tenantId && f.companyId === companyId
+    );
+  }
+
+  /**
    * Feld erstellen
    */
   async createField(

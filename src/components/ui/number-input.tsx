@@ -33,6 +33,7 @@ const NumberInput = React.forwardRef<HTMLDivElement, NumberInputProps>(
       >
         <input
           type="number"
+          inputMode={"numeric" as const}
           min={min}
           max={max}
           step={step}

@@ -12,7 +12,7 @@ interface BreadcrumbItem {
   isCurrentPage?: boolean;
 }
 
-interface BreadcrumbProps extends React.HTMLAttributes<HTMLNav> {
+interface BreadcrumbProps extends React.HTMLAttributes<HTMLElement> {
   items?: BreadcrumbItem[];
 }
 

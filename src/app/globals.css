@@ -16,13 +16,13 @@
        FARBEN – Dezent, minimalistisch, professionell
        ──────────────────────────────────────────────────────── */
     
-    /* Primäre Farbe: Sehr dezentes, dunkles Salbeigrün */
-    --primary: 155 15% 35%;              /* #4b665a - Sehr ruhig, fast grau */
+    /* Primäre Farbe: Naturnahes dunkles Grün */
+    --primary: 140 50% 40%;              /* #2d7a3c - Kräftiges agrarisches Grün */
     --primary-foreground: 210 40% 98%;   /* Weiß */
     
-    /* Sekundäre Farbe: Helles, neutrales Grau */
-    --secondary: 210 10% 92%;            /* #e2e4e7 - Sehr dezent für Hintergründe/Buttons */
-    --secondary-foreground: 210 15% 25%; /* Dunkelgrau für Text */
+    /* Sekundäre Farbe: Erdbraun/Ocker */
+    --secondary: 32 35% 60%;             /* #8b6f47 - Warmes Erdbraun */
+    --secondary-foreground: 210 40% 98%; /* Weiß für Text */
     
     /* Akzentfarbe: Gedämpftes, dunkles Blau-Grau */
     --accent: 215 20% 40%;               /* #52647a - Unaufdringlich */

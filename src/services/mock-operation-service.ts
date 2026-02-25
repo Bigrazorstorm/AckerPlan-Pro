@@ -342,6 +342,7 @@ const MOCK_OPERATIONS: Operation[] = [
         hourlyRate: 22
       } as PersonnelAssignment
     ],
+    materials: [],
     metrics: {
       areaWorked: 10.5,
       averageSpeed: 9,
@@ -447,6 +448,21 @@ export class MockOperationService {
   }
 
   /**
+   * Get all operations as detailed Operation objects (for compliance checking)
+   * @param tenantId - Tenant identifier
+   * @param companyId - Company identifier
+   * @returns Array of full Operation objects
+   */
+  async getAllOperations(
+    tenantId: string,
+    companyId: string
+  ): Promise<Operation[]> {
+    return MOCK_OPERATIONS.filter(
+      op => op.tenantId === tenantId && op.companyId === companyId
+    );
+  }
+
+  /**
    * Get single operation by ID
    * @param tenantId - Tenant identifier
    * @param operationId - Operation identifier
@@ -490,7 +506,7 @@ export class MockOperationService {
       plannedEndDate: data.plannedEndDate,
       estimatedDurationHours: data.estimatedDurationHours,
       machinery: data.machinery || [],
-      personnel: data.personnel || [],
+      personnel: [],
       materials: [],
       createdAt: new Date(),
       updatedAt: new Date(),

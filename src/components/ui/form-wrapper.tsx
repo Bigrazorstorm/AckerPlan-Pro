@@ -3,10 +3,13 @@
 import * as React from 'react';
 import {
   Controller,
+  ControllerRenderProps,
   FieldPath,
   FieldValues,
   FormProvider,
   UseFormReturn,
+  UseFormStateReturn,
+  ControllerFieldState,
 } from 'react-hook-form';
 import { cn } from '@/lib/utils';
 import { Label } from '@/components/ui/label';
@@ -57,9 +60,9 @@ interface FormFieldProps<
 > {
   name: TName;
   render: (props: {
-    field: any;
-    fieldState: any;
-    formState: any;
+    field: ControllerRenderProps<TFieldValues, TName>;
+    fieldState: ControllerFieldState;
+    formState: UseFormStateReturn<TFieldValues>;
   }) => React.ReactElement;
 }
 
@@ -72,10 +75,14 @@ const FormField = <
 }: FormFieldProps<TFieldValues, TName>) => {
   const { form } = useFormContext();
   return (
-    <Controller
+    <Controller<TFieldValues, TName>
       name={name}
       control={form.control}
-      render={({ field, fieldState, formState }) =>
+      render={({ field, fieldState, formState }: {
+        field: ControllerRenderProps<TFieldValues, TName>;
+        fieldState: ControllerFieldState;
+        formState: UseFormStateReturn<TFieldValues>;
+      }) =>
         render({ field, fieldState, formState })
       }
     />

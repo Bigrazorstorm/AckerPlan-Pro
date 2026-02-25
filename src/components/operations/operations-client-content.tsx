@@ -9,324 +9,102 @@
  * @component
  */
 
-import { useEffect, useState, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
-import { useSession } from 'next-auth/react';
-import { Loader2, Search, MoreVertical, Eye, Edit2, Trash2 } from 'lucide-react';
-
-import {
-  OperationListItem,
-  OperationStatus,
-  OperationType,
-  OperationFilters
-} from '@/services/operation-types';
-import { mockOperationService } from '@/services/mock-operation-service';
+import { useEffect, useState, useCallback, useMemo, useActionState } from 'react';
+import { useParams } from 'next/navigation';
+import { useSession } from '@/context/session-context';
+import { PlusCircle, ChevronsUpDown, Trash2, MoreHorizontal, CalendarIcon } from 'lucide-react';
+import { useTranslations } from 'next-intl';
+import { format, parseISO } from 'date-fns';
+import { de, enUS } from 'date-fns/locale';
+import { useFormStatus } from 'react-dom';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { StatusBadge } from '@/components/ui/status-badge';
-import { EmptyState } from '@/components/ui/empty-state';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Wrench } from 'lucide-react';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui/table';
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuLabel, DropdownMenuItem, DropdownMenuCheckboxItem, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
+import { Badge } from '@/components/ui/badge';
+import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@/components/ui/alert-dialog';
+import { Label } from '@/components/ui/label';
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
+import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
+import { Calendar } from '@/components/ui/calendar';
+import { useToast } from '@/hooks/use-toast';
+import { cn } from '@/lib/utils';
 
-/**
- * Status badge styling map
- */
-const STATUS_VARIANTS: Record<OperationStatus, 'success' | 'warning' | 'info' | 'neutral' | 'destructive'> = {
-  [OperationStatus.PLANNED]: 'info',
-  [OperationStatus.IN_PROGRESS]: 'warning',
-  [OperationStatus.COMPLETED]: 'success',
-  [OperationStatus.CANCELLED]: 'destructive',
-  [OperationStatus.POSTPONED]: 'neutral'
+import dataService from '@/services';
+import { Operation, Field, Machinery, User, WarehouseItem, OperationMaterialInput } from '@/services/types';
+import { addOperation, updateOperation, deleteOperation } from '@/app/operations/actions';
+
+const initialState = {
+  message: '',
+  errors: {},
 };
 
-/**
- * Operation type display names
- */
-const OPERATION_TYPE_LABELS: Record<OperationType, string> = {
-  [OperationType.PLOWING]: 'Pflügen',
-  [OperationType.SOWING]: 'Aussaat',
-  [OperationType.FERTILIZING]: 'Düngung',
-  [OperationType.SPRAYING]: 'Spritzen',
-  [OperationType.MOWING]: 'Mahd',
-  [OperationType.HARVESTING]: 'Ernte',
-  [OperationType.WINDROWING]: 'Schwaden',
-  [OperationType.THRESHING]: 'Drusch',
-  [OperationType.BALING]: 'Ballenpressung',
-  [OperationType.DISKING]: 'Eggen',
-  [OperationType.ROLLING]: 'Walzen',
-  [OperationType.CULTIVATING]: 'Anbau',
-  [OperationType.WEEDING]: 'Unkrautbekämpfung',
-  [OperationType.MAINTENANCE]: 'Wartung',
-  [OperationType.OTHER]: 'Sonstige'
+const isUserQualifiedForPsm = (user: User) => {
+    if (!user.pesticideLicenseExpiry) return false;
+    try {
+        const expiryDate = parseISO(user.pesticideLicenseExpiry);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        return expiryDate >= today;
+    } catch (e) {
+        return false;
+    }
 };
 
-/**
- * Status display names
- */
-const STATUS_LABELS: Record<OperationStatus, string> = {
-  [OperationStatus.PLANNED]: 'Geplant',
-  [OperationStatus.IN_PROGRESS]: 'In Arbeit',
-  [OperationStatus.COMPLETED]: 'Fertig',
-  [OperationStatus.CANCELLED]: 'Abgebrochen',
-  [OperationStatus.POSTPONED]: 'Verschoben'
-};
-
-/**
- * Loading skeleton for operations
- */
-function OperationsSkeleton() {
+function SubmitButton({ tKey, isEdit }: { tKey: string; isEdit?: boolean }) {
+  const { pending } = useFormStatus();
+  const t = useTranslations('OperationsPage.addOperationForm');
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-      {Array.from({ length: 6 }).map((_, i) => (
-        <div key={i} className="space-y-3">
-          <Skeleton className="h-32 rounded-lg" />
-        </div>
-      ))}
-    </div>
+    <Button type="submit" aria-disabled={pending} className="w-full">
+      {pending ? t('submitting') : t(tKey)}
+    </Button>
   );
 }
 
-/**
- * Operations List Client Component
- */
-export function OperationsClientContent() {
-  const router = useRouter();
-  const { data: session } = useSession();
-  
-  const [operations, setOperations] = useState<OperationListItem[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [ statusFilter, setStatusFilter] = useState<OperationStatus | 'ALL'>('ALL');
+function EditOperationForm({ closeSheet, tenantId, companyId, fields, machinery, operation, personnel, warehouseItems }: { closeSheet: () => void; tenantId: string; companyId: string; fields: Field[], machinery: Machinery[], operation: Operation, personnel: User[], warehouseItems: WarehouseItem[] }) {
+  const [state, formAction] = useActionState(updateOperation, initialState);
+  const { toast} = useToast();
+  const t = useTranslations('OperationsPage.addOperationForm');
+  const tShared = useTranslations('OperationsPage');
+  const tOperationTypes = useTranslations('OperationTypes');
+  const [date, setDate] = useState<Date | undefined>(operation.date ? parseISO(operation.date) : undefined);
+  const [selectedPersonnel, setSelectedPersonnel] = useState<string[]>(operation.personnel?.map(p => p.id) || []);
+  const [operationType, setOperationType] = useState<string>(operation.type);
+  const [materials, setMaterials] = useState<OperationMaterialInput[]>(operation.materials || []);
+  const { locale } = useParams<{ locale: string }>();
 
-  const activeCompany = (session?.user as any)?.activeCompany;
-
-  /**
-   * Fetch operations with debounced search
-   */
-  const fetchOperations = useCallback(
-    async (search: string, status: OperationStatus | 'ALL') => {
-      if (!activeCompany) return;
-
-      setLoading(true);
-      try {
-        const filters: OperationFilters = {
-          searchTerm: search || undefined,
-          status: status === 'ALL' ? undefined : status,
-          sortBy: 'date'
-        };
-
-        const data = await mockOperationService.getOperations(
-          activeCompany.tenantId,
-          activeCompany.id,
-          filters
-        );
-
-        setOperations(data);
-      } catch (error) {
-        console.error('Failed to fetch operations:', error);
-        setOperations([]);
-      } finally {
-        setLoading(false);
-      }
-    },
-    [activeCompany]
-  );
-
-  /**
-   * Debounce search
-   */
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      fetchOperations(searchTerm, statusFilter);
-    }, 300);
-
-    return () => clearTimeout(timer);
-  }, [searchTerm, statusFilter, fetchOperations]);
-
-  /**
-   * Handle navigation to detail page
-   */
-  const handleOperationClick = (operationId: string) => {
-    router.push(`./operations/${operationId}`);
+  const handleMaterialChange = (index: number, field: 'itemId' | 'quantity', value: string | number) => {
+    const newMaterials = [...materials];
+    if (field === 'quantity') {
+      newMaterials[index] = { ...newMaterials[index], [field]: Number(value) };
+    } else {
+      newMaterials[index] = { ...newMaterials[index], [field]: String(value) };
+    }
+    setMaterials(newMaterials);
   };
 
-  /**
-   * Format date for display
-   */
-  const formatDate = (date: Date) => {
-    return new Date(date).toLocaleDateString('de-DE', {
-      month: 'short',
-      day: 'numeric'
+  const addMaterial = () => {
+    setMaterials([...materials, { itemId: '', quantity: 0 }]);
+  };
+
+  const removeMaterial = (index: number) => {
+    setMaterials(materials.filter((_, i) => i !== index));
+  };
+
+  const anySelectedPersonnelIsUnqualified = useMemo(() => {
+    if (operationType !== 'PestControl') return false;
+    return selectedPersonnel.some(id => {
+        const user = personnel.find(p => p.id === id);
+        return user && !isUserQualifiedForPsm(user);
     });
-  };
+  }, [operationType, selectedPersonnel, personnel]);
 
-  /**
-   * Render filter buttons
-   */
-  const renderFilterButtons = () => {
-    const statuses: Array<{ key: OperationStatus | 'ALL'; label: string }> = [
-      { key: 'ALL', label: 'Alle' },
-      { key: OperationStatus.PLANNED, label: 'Geplant' },
-      { key: OperationStatus.IN_PROGRESS, label: 'In Arbeit' },
-      { key: OperationStatus.COMPLETED, label: 'Fertig' }
-    ];
-
-    return (
-      <div className="flex flex-wrap gap-2">
-        {statuses.map(status => (
-          <Button
-            key={status.key}
-            variant={statusFilter === status.key ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setStatusFilter(status.key)}
-            className="h-10 px-4"
-          >
-            {status.label}
-          </Button>
-        ))}
-      </div>
-    );
-  };
-
-  if (!activeCompany) {
-    return (
-      <EmptyState
-        icon={Wrench}
-        title="Keine Betriebsstätte"
-        description="Bitte wählen Sie eine Betriebsstätte aus"
-      />
-    );
-  }
-
-  return (
-    <div className="space-y-6">
-      {/* Header mit Suchoptionen */}
-      <div className="space-y-4">
-        {/* Suchleiste */}
-        <div className="relative">
-          <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Nach Auftrag suchen..."
-            value={searchTerm}
-            onChange={e => setSearchTerm(e.target.value)}
-            className="pl-10"
-          />
-        </div>
-
-        {/* Status-Filter */}
-        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-          <div className="flex flex-wrap gap-2">{renderFilterButtons()}</div>
-
-          {/* Create Button */}
-          <Button
-            onClick={() => router.push('./operations/new')}
-            className="h-12 px-4 md:h-10"
-          >
-            + Neuer Auftrag
-          </Button>
-        </div>
-      </div>
-
-      {/* Loading State */}
-      {loading ? (
-        <OperationsSkeleton />
-      ) : operations.length === 0 ? (
-        /* Empty State */
-        <EmptyState
-          icon={Wrench}
-          title="Keine Aufträge"
-          description={
-            searchTerm || statusFilter !== 'ALL'
-              ? 'Keine Aufträge entsprechen den Filterkriterien'
-              : 'Erstellen Sie Ihren ersten Arbeitsauftrag'
-          }
-          action={
-            <Button
-              onClick={() => router.push('./operations/new')}
-              className="h-12 px-6 md:h-10"
-            >
-              Auftrag erstellen
-            </Button>
-          }
-        />
-      ) : (
-        /* Operations Grid */
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {operations.map(operation => (
-            <Card
-              key={operation.id}
-              className="cursor-pointer transition-all hover:shadow-lg active:scale-95"
-              onClick={() => handleOperationClick(operation.id)}
-            >
-              <CardHeader className="pb-3">
-                <div className="flex items-start justify-between gap-2">
-                  <div className="flex-1 space-y-1">
-                    <CardTitle className="text-base">{operation.title}</CardTitle>
-                    <p className="text-xs text-muted-foreground">
-                      {OPERATION_TYPE_LABELS[operation.operationType]}
-                    </p>
-                  </div>
-                  <StatusBadge
-                    variant={STATUS_VARIANTS[operation.status]}
-                    size="sm"
-                  >
-                    {STATUS_LABELS[operation.status]}
-                  </StatusBadge>
-                </div>
-              </CardHeader>
-
-              <CardContent className="space-y-3">
-                {/* Feld & Zeitraum */}
-                <div className="grid grid-cols-2 gap-3 text-sm">
-                  <div>
-                    <p className="text-xs text-muted-foreground">Feld</p>
-                    <p className="font-medium">{operation.fieldId}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-muted-foreground">Start</p>
-                    <p className="font-medium">{formatDate(operation.plannedStartDate)}</p>
-                  </div>
-                </div>
-
-                {/* Area & Priority */}
-                <div className="grid grid-cols-2 gap-3 text-sm">
-                  {operation.areaWorked && (
-                    <div>
-                      <p className="text-xs text-muted-foreground">Fläche</p>
-                      <p className="font-medium">{operation.areaWorked.toFixed(1)} ha</p>
-                    </div>
-                  )}
-                  {operation.priority && (
-                    <div>
-                      <p className="text-xs text-muted-foreground">Priorität</p>
-                      <p className="font-medium">
-                        {'⭐'.repeat(operation.priority)}
-                      </p>
-                    </div>
-                  )}
-                </div>
-
-                {/* Last Updated */}
-                <p className="text-xs text-muted-foreground/70">
-                  Aktualisiert: {formatDate(operation.updatedAt)}
-                </p>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      )}
-
-      {/* Summary Stats */}
-      {operations.length > 0 && (
-        <div className="rounded-lg border p-4 text-sm text-muted-foreground">
-          {operations.length} Aufträge angezeigt
-        </div>
-      )}
-    </div>
-  );
-}
+  useEffect(() => {
+    if (state.message && !state.errors) {
       toast({
         title: t('successToastTitle'),
         description: state.message,

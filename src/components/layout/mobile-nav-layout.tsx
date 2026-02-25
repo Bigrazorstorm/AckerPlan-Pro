@@ -69,7 +69,7 @@ export function MobileNavLayout({ children }: { children: React.ReactNode }) {
       <div className="pb-20 md:pb-0">{children}</div>
 
       {/* Mobile Bottom Navigation */}
-      <BottomNav items={navItems} className="hidden md:hidden" />
+      <BottomNav items={navItems} className="md:hidden" />
     </>
   );
 }

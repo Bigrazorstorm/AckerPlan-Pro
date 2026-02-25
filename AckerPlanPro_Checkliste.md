@@ -855,25 +855,36 @@ Gehe dann diese Checkliste Punkt für Punkt durch. Verweise bei jedem Punkt auf 
 
 ### 16.1 GLÖZ-Überwachung
 
-- [ ] Route: `/foerderung/gloez` oder im Dashboard-Widget
-- [ ] Alle 9 GLÖZ-Standards sind gelistet
-- [ ] Jeder Standard: Ampel-Status + Erklärung + Link zur Datengrundlage
-- [ ] GLÖZ 8: Berechnung nicht-produktive Flächen (% von Gesamtfläche) automatisch
-- [ ] GLÖZ 7: Fruchtwechsel-Warnung aus Anbauhistorie automatisch
-- [ ] GLÖZ 4: Pufferstreifen-Status aus Geodaten automatisch
+- [x] Route: `/foerderwesen/gloez/[standard]` mit dynamischem Routing für alle 9 Standards ✅
+- [x] Alle 9 GLÖZ-Standards sind implementiert und gelistet (GLOEZ_1 bis GLOEZ_9) ✅
+- [x] Jeder Standard: Ampel-Status + Erklärung + Automtische Compliance-Prüfung ✅
+- [x] GLÖZ 1: Dauergrünland-Schutz mit Umbruch-Detektion ✅
+- [x] GLÖZ 2: Feuchtgebiet- und Moorboden-Schutz ✅
+- [x] GLÖZ 3: Stoppelbrand-Verbot automatisch prüfbar ✅
+- [x] GLÖZ 4: Pufferstreifen-Status aus Feldgeometrie automatisch ✅
+- [x] GLÖZ 5: Erosionsschutz-Maßnahmen auf Hangflächen ✅
+- [x] GLÖZ 6: Winterbegrünung und Mindestbodenbedeckung ✅
+- [x] GLÖZ 7: Fruchtwechsel-Analyse aus Anbauhistorie automatisch ✅
+- [x] GLÖZ 8: Berechnung nicht-produktive Flächen (% von Gesamtfläche) automatisch ✅
+- [x] GLÖZ 9: Natura 2000 Habitat-Schutz und Bodenorganismen ✅
+- [x] Detail-UI mit betroffenen Feldern und Handlungsempfehlungen ✅
 
 ### 16.2 Sammelantrag-Assistent
 
-- [ ] Route: `/foerderung/sammelantrag`
-- [ ] Schritt-für-Schritt-Wizard (5 Schritte)
-- [ ] Schritt 1: Flächenabgleich (eigene Schläge vs. FLIK)
-- [ ] Schritt 2: Nutzungsartenzuordnung (NC-Codes)
-- [ ] Schritt 3: Maßnahmenauswahl (Öko-Regelungen + AUKM)
-- [ ] Schritt 4: Plausibilitätsprüfung
-- [ ] Schritt 5: Export (XML für DIANA Thüringen)
+- [x] Route: `/foerderwesen/sammelantrag` erstellt ✅
+- [x] Typsystem (SammelantragApplication, SammelantragFormState) definiert ✅
+- [ ] Schritt-für-Schritt-Wizard UI-Komponente (7 Schritte)
+- [ ] Schritt 1: Feldauswahl mit Gesamtflächenberechnung
+- [ ] Schritt 2: Flächenabgleich (eigene Schläge vs. FLIK)
+- [ ] Schritt 3: GLÖZ-Compliance-Prüfung vor Submission
+- [ ] Schritt 4: Öko-Regelungen-Auswahl mit Prämien-Kalkulation
+- [ ] Schritt 5: Dokumentation hochladen (Flächennachweise, Pachtverträge)
+- [ ] Schritt 6: Plausibilitätsprüfung
+- [ ] Schritt 7: Zahlungsvorschau und Antrag-Review
 - [ ] Fortschrittsbalken über dem Wizard
 - [ ] Zwischenspeicherung (kann in mehreren Sessions ausgefüllt werden)
 - [ ] Frist-Countdown prominent angezeigt (Tage bis 15. Mai)
+- [ ] PDF-Export für Behörden-Einreichung
 
 ### 16.3 Öko-Regelungen-Potenzialanalyse
 

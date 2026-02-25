@@ -3,6 +3,35 @@
     "title": "AgroTrack",
     "description": "GIS-gestütztes, Mobile-First Produktions- und Wirtschaftlichkeits-Controlling für Ackerbau"
   },
+  "Common": {
+    "close": "Schließen",
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "delete": "Löschen",
+    "edit": "Bearbeiten",
+    "add": "Hinzufügen",
+    "loading": "Lädt...",
+    "error": "Fehler",
+    "success": "Erfolgreich"
+  },
+  "PWA": {
+    "installTitle": "App installieren",
+    "installDescription": "Installieren Sie AckerPlan Pro für schnelleren Zugriff und Offline-Nutzung",
+    "install": "Installieren",
+    "later": "Später",
+    "updateTitle": "Update verfügbar",
+    "updateDescription": "Eine neue Version ist verfügbar. Jetzt aktualisieren?",
+    "update": "Aktualisieren",
+    "offline": "Offline-Modus",
+    "offlineDescription": "Sie arbeiten im Offline-Modus. Einige Funktionen sind eingeschränkt.",
+    "online": "Verbindung wiederhergestellt",
+    "syncing": "Synchronisiere...",
+    "syncComplete": "Synchronisierung abgeschlossen",
+    "syncError": "Synchronisierungsfehler",
+    "syncPending": "{count} Änderungen warten auf Synchronisierung",
+    "offlineChanges": "Offline-Änderungen gespeichert",
+    "manualSync": "Manuell synchronisieren"
+  },
   "Navigation": {
     "dashboard": "Dashboard",
     "fields": "Schläge",
@@ -86,6 +115,18 @@
   "MapDebug": {
     "layerErrorTitle": "Karten-Layer Fehler",
     "layerErrorDescription": "Layer '{layerName}' konnte nicht geladen werden. Bitte prüfen Sie die Server-URL und Ihre Verbindung."
+  },
+  "Fields": {
+    "searchPlaceholder": "Feld suchen...",
+    "filterAll": "Alle",
+    "filterActive": "Aktiv",
+    "filterFallow": "Brache",
+    "newField": "Neues Feld",
+    "emptyTitle": "Keine Felder vorhanden",
+    "emptyDescription": "Erstelle dein erstes Feld um zu starten",
+    "noCompany": "Kein Betrieb ausgewählt",
+    "cropLabel": "Kultur",
+    "updatedLabel": "Aktualisiert:"
   },
   "FieldsPage": {
     "title": "Schläge",

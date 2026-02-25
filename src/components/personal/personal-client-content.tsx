@@ -276,8 +276,11 @@ export function PersonalClientContent() {
               ? 'Versuchen Sie es mit anderen Suchkriterien'
               : 'Fügen Sie Ihren ersten Mitarbeiter hinzu, um zu beginnen'
           }
-          actionLabel="Mitarbeiter hinzufügen"
-          onAction={() => router.push('./personal/new')}
+          action={
+            <Button onClick={() => router.push('./personal/new')}>
+              Mitarbeiter hinzufügen
+            </Button>
+          }
         />
       )}
     </div>

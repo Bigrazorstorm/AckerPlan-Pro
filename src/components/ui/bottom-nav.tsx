@@ -65,7 +65,7 @@ const BottomNav = React.forwardRef<HTMLElement, BottomNavProps>(
                     ? "text-primary"
                     : "text-muted-foreground hover:text-foreground active:text-primary"
                 )}
-                aria-current={item.isActive ? "page" : undefined}
+                aria-current={item.isActive ? ("page" as const) : undefined}
               >
                 <div className="relative">
                   <Icon
@@ -79,7 +79,7 @@ const BottomNav = React.forwardRef<HTMLElement, BottomNavProps>(
                   {/* Badge für Benachrichtigungen */}
                   {item.badge && (
                     <span className="absolute -right-2 -top-2 inline-flex min-w-5 items-center justify-center rounded-full bg-destructive px-1.5 text-xs font-semibold text-destructive-foreground">
-                      {item.badge > 99 ? "99+" : item.badge}
+                      {typeof item.badge === 'number' && item.badge > 99 ? "99+" : item.badge}
                     </span>
                   )}
                 </div>
