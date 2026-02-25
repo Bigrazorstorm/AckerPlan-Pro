@@ -267,6 +267,8 @@ export interface WarehouseItem {
   quantity: number;
   unit: string; // e.g., 'kg', 'l', 'Sack'
   costPerUnit: number;
+  registrationNumber?: string; // Zulassungsnummer
+  waitingPeriodDays?: number; // Wartezeit in Tagen
   createdAt: string;
   updatedAt: string;
 }
@@ -277,4 +279,6 @@ export interface AddWarehouseItemInput {
   quantity: number;
   unit: string;
   costPerUnit: number;
+  registrationNumber?: string;
+  waitingPeriodDays?: number;
 }

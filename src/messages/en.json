@@ -69,7 +69,9 @@
   "MapPage": {
     "title": "Interactive Map",
     "description": "Overview of your fields, observations, and official geodata.",
-    "importButton": "Import GIS Data"
+    "importButton": "Import GIS Data",
+    "fieldsLayer": "Fields",
+    "observationsLayer": "Observations"
   },
   "MapDebug": {
     "layerErrorTitle": "Map Layer Error",
@@ -482,6 +484,9 @@
     "tableHeaderQuantity": "Quantity",
     "tableHeaderUnit": "Unit",
     "tableHeaderValue": "Total Value",
+    "tableHeaderRegNr": "Reg. No.",
+    "tableHeaderWaitingPeriod": "Waiting Period",
+    "daysSuffix": "days",
     "actions": "Actions",
     "edit": "Edit",
     "delete": "Delete",
@@ -496,6 +501,10 @@
       "unitLabel": "Unit",
       "unitPlaceholder": "e.g., kg, l, bag",
       "costPerUnitLabel": "Cost per Unit (€)",
+      "registrationNumberLabel": "Registration Number",
+      "registrationNumberPlaceholder": "e.g. 005717-00",
+      "waitingPeriodDaysLabel": "Waiting Period (Days)",
+      "waitingPeriodDaysPlaceholder": "e.g. 21",
       "submit": "Add Item",
       "submitting": "Adding...",
       "successToastTitle": "Item Added",

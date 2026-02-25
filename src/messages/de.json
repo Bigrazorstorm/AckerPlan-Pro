@@ -69,7 +69,9 @@
   "MapPage": {
     "title": "Interaktive Karte",
     "description": "Übersicht Ihrer Schläge, Beobachtungen und amtlicher Geodaten.",
-    "importButton": "GIS-Daten importieren"
+    "importButton": "GIS-Daten importieren",
+    "fieldsLayer": "Schläge",
+    "observationsLayer": "Beobachtungen"
   },
   "MapDebug": {
     "layerErrorTitle": "Karten-Layer Fehler",
@@ -482,6 +484,9 @@
     "tableHeaderQuantity": "Menge",
     "tableHeaderUnit": "Einheit",
     "tableHeaderValue": "Gesamtwert",
+    "tableHeaderRegNr": "Zul.-Nr.",
+    "tableHeaderWaitingPeriod": "Wartezeit",
+    "daysSuffix": "Tage",
     "actions": "Aktionen",
     "edit": "Bearbeiten",
     "delete": "Löschen",
@@ -496,6 +501,10 @@
       "unitLabel": "Einheit",
       "unitPlaceholder": "z.B. kg, l, Sack",
       "costPerUnitLabel": "Kosten pro Einheit (€)",
+      "registrationNumberLabel": "Zulassungsnummer",
+      "registrationNumberPlaceholder": "z.B. 005717-00",
+      "waitingPeriodDaysLabel": "Wartezeit (Tage)",
+      "waitingPeriodDaysPlaceholder": "z.B. 21",
       "submit": "Artikel hinzufügen",
       "submitting": "Wird hinzugefügt...",
       "successToastTitle": "Artikel hinzugefügt",

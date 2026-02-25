@@ -11,6 +11,11 @@ const AddWarehouseItemSchema = z.object({
   quantity: z.coerce.number().min(0, { message: 'Quantity must be a positive number' }),
   unit: z.string().min(1, { message: 'Unit is required' }),
   costPerUnit: z.coerce.number().min(0, { message: 'Cost must be a positive number' }),
+  registrationNumber: z.string().optional().or(z.literal('')),
+  waitingPeriodDays: z.preprocess(
+    (val) => (val === '' ? undefined : val),
+    z.coerce.number().positive({ message: 'Waiting period must be a positive number' }).optional()
+  ),
   tenantId: z.string().min(1, { message: 'Tenant ID is required' }),
   companyId: z.string().min(1, { message: 'Company ID is required' }),
 })
@@ -22,6 +27,8 @@ export async function addWarehouseItem(prevState: any, formData: FormData) {
     quantity: formData.get('quantity'),
     unit: formData.get('unit'),
     costPerUnit: formData.get('costPerUnit'),
+    registrationNumber: formData.get('registrationNumber'),
+    waitingPeriodDays: formData.get('waitingPeriodDays'),
     tenantId: formData.get('tenantId'),
     companyId: formData.get('companyId'),
   })
@@ -38,6 +45,7 @@ export async function addWarehouseItem(prevState: any, formData: FormData) {
     await dataService.addWarehouseItem(tenantId, companyId, {
       ...itemData,
       itemType: itemData.itemType as WarehouseItemType,
+      registrationNumber: itemData.registrationNumber || undefined,
     })
     revalidatePath('/lager')
     return { message: 'Warehouse item added successfully.', errors: {} }

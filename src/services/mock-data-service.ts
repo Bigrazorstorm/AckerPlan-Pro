@@ -203,7 +203,7 @@ let auditLogEvents: AuditLogEvent[] = [
 let warehouseItems: WarehouseItem[] = [
     { id: 'item-1', tenantId: 'tenant-123', companyId: 'company-456', name: 'Winterweizen "Akteur"', itemType: 'Seed', quantity: 2500, unit: 'kg', costPerUnit: 0.85, createdAt: '2023-08-15T10:00:00Z', updatedAt: '2024-03-01T11:00:00Z' },
     { id: 'item-2', tenantId: 'tenant-123', companyId: 'company-456', name: 'Kalkammonsalpeter (KAS)', itemType: 'Fertilizer', quantity: 15000, unit: 'kg', costPerUnit: 0.42, createdAt: '2023-09-01T09:00:00Z', updatedAt: '2024-04-10T14:00:00Z' },
-    { id: 'item-3', tenantId: 'tenant-123', companyId: 'company-456', name: 'Herbizid "Broadway"', itemType: 'Pesticide', quantity: 50, unit: 'l', costPerUnit: 35.50, createdAt: '2023-10-02T13:00:00Z', updatedAt: '2024-05-15T08:30:00Z' },
+    { id: 'item-3', tenantId: 'tenant-123', companyId: 'company-456', name: 'Herbizid "Broadway"', itemType: 'Pesticide', quantity: 50, unit: 'l', costPerUnit: 35.50, registrationNumber: '005717-00', waitingPeriodDays: 28, createdAt: '2023-10-02T13:00:00Z', updatedAt: '2024-05-15T08:30:00Z' },
     { id: 'item-4', tenantId: 'tenant-123', companyId: 'company-456', name: 'Raps "DK Exquisite"', itemType: 'Seed', quantity: 50, unit: 'Sack', costPerUnit: 180.00, createdAt: '2023-07-20T16:00:00Z', updatedAt: '2023-07-20T16:00:00Z' },
     { id: 'item-5', tenantId: 'tenant-123', companyId: 'company-789', name: 'Weidegras-Mischung "Robust"', itemType: 'Seed', quantity: 800, unit: 'kg', costPerUnit: 3.20, createdAt: '2023-03-10T11:00:00Z', updatedAt: '2024-04-05T09:00:00Z' },
 ];

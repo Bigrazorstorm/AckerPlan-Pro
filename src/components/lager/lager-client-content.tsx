@@ -14,7 +14,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { MoreHorizontal, PlusCircle, Archive } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -41,6 +41,7 @@ function AddItemForm({ closeSheet, tenantId, companyId }: { closeSheet: () => vo
   const { toast } = useToast();
   const t = useTranslations('LagerPage.addItemForm');
   const tItemTypes = useTranslations('WarehouseItemTypes');
+  const [itemType, setItemType] = useState<WarehouseItemType | ''>('');
   
   const itemTypes: WarehouseItemType[] = ['Seed', 'Fertilizer', 'Pesticide', 'Other'];
 
@@ -73,7 +74,7 @@ function AddItemForm({ closeSheet, tenantId, companyId }: { closeSheet: () => vo
 
       <div className="space-y-2">
         <Label htmlFor="itemType">{t('typeLabel')}</Label>
-        <Select name="itemType" required>
+        <Select name="itemType" required onValueChange={(value) => setItemType(value as WarehouseItemType)}>
           <SelectTrigger>
             <SelectValue placeholder={t('typePlaceholder')} />
           </SelectTrigger>
@@ -107,6 +108,21 @@ function AddItemForm({ closeSheet, tenantId, companyId }: { closeSheet: () => vo
         </div>
         {state.errors?.costPerUnit && <p className="text-sm text-destructive">{state.errors.costPerUnit.join(', ')}</p>}
       </div>
+
+      {itemType === 'Pesticide' && (
+        <>
+          <div className="space-y-2">
+            <Label htmlFor="registrationNumber">{t('registrationNumberLabel')}</Label>
+            <Input id="registrationNumber" name="registrationNumber" placeholder={t('registrationNumberPlaceholder')} />
+            {state.errors?.registrationNumber && <p className="text-sm text-destructive">{state.errors.registrationNumber.join(', ')}</p>}
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="waitingPeriodDays">{t('waitingPeriodDaysLabel')}</Label>
+            <Input id="waitingPeriodDays" name="waitingPeriodDays" type="number" step="1" placeholder={t('waitingPeriodDaysPlaceholder')} />
+            {state.errors?.waitingPeriodDays && <p className="text-sm text-destructive">{state.errors.waitingPeriodDays.join(', ')}</p>}
+          </div>
+        </>
+      )}
 
       <SubmitButton />
     </form>
@@ -217,6 +233,8 @@ export function LagerClientContent() {
                             <TableRow>
                                 <TableHead>{t('tableHeaderName')}</TableHead>
                                 <TableHead>{t('tableHeaderType')}</TableHead>
+                                <TableHead className="hidden md:table-cell">{t('tableHeaderRegNr')}</TableHead>
+                                <TableHead className="hidden md:table-cell text-right">{t('tableHeaderWaitingPeriod')}</TableHead>
                                 <TableHead className="text-right">{t('tableHeaderQuantity')}</TableHead>
                                 <TableHead className="text-right">{t('tableHeaderValue')}</TableHead>
                                 {canManageWarehouse && <TableHead><span className="sr-only">{t('actions')}</span></TableHead>}
@@ -227,6 +245,8 @@ export function LagerClientContent() {
                                 <TableRow key={item.id}>
                                     <TableCell className="font-medium">{item.name}</TableCell>
                                     <TableCell>{tItemTypes(item.itemType)}</TableCell>
+                                    <TableCell className="hidden md:table-cell font-mono text-xs">{item.registrationNumber || '-'}</TableCell>
+                                    <TableCell className="hidden md:table-cell text-right">{item.waitingPeriodDays ? `${item.waitingPeriodDays} ${t('daysSuffix')}` : '-'}</TableCell>
                                     <TableCell className="text-right">{item.quantity.toLocaleString(locale)} {item.unit}</TableCell>
                                     <TableCell className="text-right">{currencyFormatter.format(item.quantity * item.costPerUnit)}</TableCell>
                                     {canManageWarehouse && (
