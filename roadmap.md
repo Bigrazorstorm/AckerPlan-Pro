@@ -1,6 +1,6 @@
 # AgroTrack Roadmap
 
-Diese Roadmap skizziert die geplante Entwicklung von AgroTrack, aufgeteilt in vier Hauptphasen.
+Diese Roadmap skizziert die geplante Entwicklung von AgroTrack, aufgeteilt in vier Hauptphasen. Abgeschlossene Punkte sind mit `[x]` markiert, teilweise implementierte mit `[~]`.
 
 ---
 
@@ -11,13 +11,13 @@ Diese Roadmap skizziert die geplante Entwicklung von AgroTrack, aufgeteilt in vi
 **Erfolgskriterium:** Mindestens 80% der Arbeitstage werden im System erfasst.
 
 ### Kernfunktionen:
--   **Zeiterfassung & Arbeitsaufträge:** Schnelle Erfassung von Tätigkeiten im Feld.
--   **Schlagkartei:** Digitale Akte für jeden Schlag mit Anbauhistorie.
--   **Fuhrparkverwaltung:** Übersicht aller Maschinen und Geräte.
--   **Personalverwaltung:** Stammdaten und Qualifikationen der Mitarbeiter.
--   **Kartenmodul:** Einzeichnen und Visualisieren von Schlägen und Kulturen.
--   **Einfaches Controlling:** Erste Kostenübersicht pro Schlag.
--   **PDF-Exporte:** Grundlegende Exportfunktionen für erfasste Daten.
+-   [x] **Zeiterfassung & Arbeitsaufträge:** Schnelle Erfassung von Tätigkeiten im Feld.
+-   [x] **Schlagkartei:** Digitale Akte für jeden Schlag mit Anbauhistorie.
+-   [x] **Fuhrparkverwaltung:** Übersicht aller Maschinen und Geräte.
+-   [x] **Personalverwaltung:** Stammdaten und Qualifikationen der Mitarbeiter.
+-   [x] **Kartenmodul:** Einzeichnen und Visualisieren von Schlägen und Kulturen.
+-   [~] **Einfaches Controlling:** Erste Kostenübersicht pro Schlag. (Grundfunktionen vorhanden, CSV-Export statt PDF).
+-   [ ] **PDF-Exporte:** Grundlegende Exportfunktionen für erfasste Daten.
 
 ---
 
@@ -28,12 +28,12 @@ Diese Roadmap skizziert die geplante Entwicklung von AgroTrack, aufgeteilt in vi
 **Startpunkt:** PSM-Dokumentation zuerst (höchster gesetzlicher Druck, sofort sichtbarer Nutzen).
 
 ### Kernfunktionen:
--   **Lagerverwaltung:** Verwaltung von Betriebsmitteln (Saatgut, Dünger, PSM).
--   **PSM-Dokumentation:** Lückenlose und gesetzeskonforme Protokollierung.
--   **Düngedokumentation:** Düngebedarfsermittlung und Nährstoffbilanz gemäß DüV.
--   **GLÖZ-Überwachung:** Automatische Checks der Cross-Compliance-Standards.
--   **Kontrollbereitschafts-Check:** Dashboard zur Überprüfung der Konformität.
--   **Sachkundenachweise:** Verwaltung und Überwachung von Qualifikationen.
+-   [x] **Lagerverwaltung:** Verwaltung von Betriebsmitteln (Saatgut, Dünger, PSM).
+-   [x] **PSM-Dokumentation:** Lückenlose und gesetzeskonforme Protokollierung.
+-   [x] **Düngedokumentation:** Düngebedarfsermittlung und Nährstoffbilanz gemäß DüV.
+-   [ ] **GLÖZ-Überwachung:** Automatische Checks der Cross-Compliance-Standards.
+-   [x] **Kontrollbereitschafts-Check:** Dashboard zur Überprüfung der Konformität.
+-   [x] **Sachkundenachweise:** Verwaltung und Überwachung von Qualifikationen.
 
 ---
 
@@ -42,11 +42,11 @@ Diese Roadmap skizziert die geplante Entwicklung von AgroTrack, aufgeteilt in vi
 **Ziel:** Volle Deckungsbeitragsrechnung und strategische Auswertungen ermöglichen.
 
 ### Kernfunktionen:
--   **Vermarktungsmodul:** Erfassung von Ernten, Kontrakten und Erlösen.
--   **Wirtschaftlichkeitsanalyse:** Detaillierte Deckungsbeitragsrechnung pro Schlag, Kultur und Jahr.
--   **Schlag- & Sortenvergleiche:** Benchmarking von Flächen und Saatgut.
--   **Wildschadensdokumentation:** Detaillierte Erfassung mit Jäger-Portalzugang.
--   **Wachstumsdokumentation:** Erweiterte Bonitur- und BBCH-Kalender.
+-   [ ] **Vermarktungsmodul:** Erfassung von Ernten, Kontrakten und Erlösen.
+-   [x] **Wirtschaftlichkeitsanalyse:** Detaillierte Deckungsbeitragsrechnung pro Schlag, Kultur und Jahr.
+-   [~] **Schlag- & Sortenvergleiche:** Benchmarking von Flächen und Saatgut. (Grundlage durch Berichte geschaffen).
+-   [x] **Wildschadensdokumentation:** Detaillierte Erfassung mit Jäger-Portalzugang. (Erfassung implementiert, Portal fehlt).
+-   [~] **Wachstumsdokumentation:** Erweiterte Bonitur- und BBCH-Kalender. (BBCH kann erfasst werden, aber keine Kalender).
 
 ---
 
@@ -55,9 +55,9 @@ Diese Roadmap skizziert die geplante Entwicklung von AgroTrack, aufgeteilt in vi
 **Ziel:** Manuelle Dateneingabe auf ein Minimum reduzieren.
 
 ### Kernfunktionen:
--   **DATEV-Schnittstelle:** Export von Buchungs- und Lohndaten.
--   **Wetter-API-Integration:** Automatische Wetterdaten für jeden Arbeitsauftrag.
--   **Sammelantrag-Assistent:** Unterstützung bei der Erstellung von Förderanträgen.
--   **Telematik-Anbindung:** Direkte Datenübernahme von Maschinen (z.B. John Deere, CLAAS).
--   **NDVI-Satellitenbilder:** Integration von Vegetationsdaten.
--   **Öko-Regelungen-Analyse:** Automatische Analyse des Prämienpotenzials.
+-   [ ] **DATEV-Schnittstelle:** Export von Buchungs- und Lohndaten.
+-   [ ] **Wetter-API-Integration:** Automatische Wetterdaten für jeden Arbeitsauftrag.
+-   [ ] **Sammelantrag-Assistent:** Unterstützung bei der Erstellung von Förderanträgen.
+-   [ ] **Telematik-Anbindung:** Direkte Datenübernahme von Maschinen (z.B. John Deere, CLAAS).
+-   [ ] **NDVI-Satellitenbilder:** Integration von Vegetationsdaten.
+-   [ ] **Öko-Regelungen-Analyse:** Automatische Analyse des Prämienpotenzials.
