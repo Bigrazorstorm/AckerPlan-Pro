@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useSession } from '@/context/session-context';
 import dataService from '@/services';
-import { LaborHoursByCropReportData, ProfitabilityByCropReportData } from '@/services/types';
+import { LaborHoursByCropReportData, ProfitabilityByCropReportData, ProfitabilityByFieldReportData } from '@/services/types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useTranslations } from 'next-intl';
@@ -14,7 +14,8 @@ import { useParams } from 'next/navigation';
 import { Button } from '../ui/button';
 import { Download } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { exportProfitabilityReport } from '@/app/reports/actions';
+import { exportProfitabilityByCropReport, exportProfitabilityByFieldReport } from '@/app/reports/actions';
+import Link from 'next/link';
 
 
 function ReportChartSkeleton() {
@@ -35,8 +36,13 @@ function ReportTableSkeleton() {
   return (
     <Card>
       <CardHeader>
-        <Skeleton className="h-6 w-1/3 mb-2" />
-        <Skeleton className="h-4 w-2/3" />
+         <div className="flex justify-between items-start">
+            <div>
+              <Skeleton className="h-6 w-1/3 mb-2" />
+              <Skeleton className="h-4 w-2/3" />
+            </div>
+            <Skeleton className="h-9 w-28" />
+          </div>
       </CardHeader>
       <CardContent>
         <Table>
@@ -61,9 +67,11 @@ function ReportTableSkeleton() {
 export function ReportsClientContent() {
   const { activeCompany, loading: sessionLoading } = useSession();
   const [laborReportData, setLaborReportData] = useState<LaborHoursByCropReportData[]>([]);
-  const [profitabilityReportData, setProfitabilityReportData] = useState<ProfitabilityByCropReportData[]>([]);
+  const [profitabilityByCropData, setProfitabilityByCropData] = useState<ProfitabilityByCropReportData[]>([]);
+  const [profitabilityByFieldData, setProfitabilityByFieldData] = useState<ProfitabilityByFieldReportData[]>([]);
   const [loading, setLoading] = useState(true);
-  const [isExporting, setIsExporting] = useState(false);
+  const [isCropExporting, setIsCropExporting] = useState(false);
+  const [isFieldExporting, setIsFieldExporting] = useState(false);
   const t = useTranslations('ReportsPage');
   const { locale } = useParams<{ locale: string }>();
   const { toast } = useToast();
@@ -72,12 +80,14 @@ export function ReportsClientContent() {
     if (activeCompany) {
       const fetchReportData = async () => {
         setLoading(true);
-        const [laborData, profitabilityData] = await Promise.all([
+        const [laborData, profitabilityCropData, profitabilityFieldData] = await Promise.all([
           dataService.getLaborHoursByCropReport(activeCompany.tenantId, activeCompany.id),
           dataService.getProfitabilityByCropReport(activeCompany.tenantId, activeCompany.id),
+          dataService.getProfitabilityByFieldReport(activeCompany.tenantId, activeCompany.id),
         ]);
         setLaborReportData(laborData);
-        setProfitabilityReportData(profitabilityData);
+        setProfitabilityByCropData(profitabilityCropData);
+        setProfitabilityByFieldData(profitabilityFieldData);
         setLoading(false);
       };
       fetchReportData();
@@ -96,9 +106,9 @@ export function ReportsClientContent() {
     currency: 'EUR',
   });
 
-  const handleProfitabilityExport = async () => {
+  const handleProfitabilityByCropExport = async () => {
     if (!activeCompany) return;
-    setIsExporting(true);
+    setIsCropExporting(true);
 
     const headers = {
         crop: t('tableHeaderCrop'),
@@ -109,7 +119,7 @@ export function ReportsClientContent() {
         contributionMargin: t('tableHeaderContributionMargin'),
     };
 
-    const result = await exportProfitabilityReport(activeCompany.tenantId, activeCompany.id, headers);
+    const result = await exportProfitabilityByCropReport(activeCompany.tenantId, activeCompany.id, headers);
 
     if (result.error) {
         toast({
@@ -122,20 +132,60 @@ export function ReportsClientContent() {
         const link = document.createElement('a');
         const url = URL.createObjectURL(blob);
         link.setAttribute('href', url);
-        link.setAttribute('download', `profitability_report_${activeCompany.id}.csv`);
+        link.setAttribute('download', `profitability_by_crop_report_${activeCompany.id}.csv`);
         link.style.visibility = 'hidden';
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
         URL.revokeObjectURL(url);
     }
-    setIsExporting(false);
+    setIsCropExporting(false);
+  };
+  
+  const handleProfitabilityByFieldExport = async () => {
+    if (!activeCompany) return;
+    setIsFieldExporting(true);
+
+    const headers = {
+        fieldName: t('tableHeaderField'),
+        crop: t('tableHeaderCrop'),
+        area: t('tableHeaderArea'),
+        revenue: t('tableHeaderRevenue'),
+        laborCost: t('tableHeaderLaborCosts'),
+        fuelCost: t('tableHeaderFuelCosts'),
+        materialCost: t('tableHeaderMaterialCosts'),
+        contributionMargin: t('tableHeaderContributionMargin'),
+        contributionMarginPerHa: t('tableHeaderContributionMarginPerHa'),
+    };
+    
+    const result = await exportProfitabilityByFieldReport(activeCompany.tenantId, activeCompany.id, headers);
+
+    if (result.error) {
+        toast({
+            variant: 'destructive',
+            title: t('exportErrorTitle'),
+            description: result.error,
+        });
+    } else if (result.csv) {
+        const blob = new Blob([result.csv], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        link.setAttribute('href', url);
+        link.setAttribute('download', `profitability_by_field_report_${activeCompany.id}.csv`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+    }
+    setIsFieldExporting(false);
   };
 
 
   if (sessionLoading || loading) {
     return (
         <div className="grid gap-6">
+            <ReportTableSkeleton />
             <ReportTableSkeleton />
             <ReportChartSkeleton />
         </div>
@@ -151,9 +201,9 @@ export function ReportsClientContent() {
               <CardTitle>{t('profitabilityByCropTitle')}</CardTitle>
               <CardDescription>{t('profitabilityByCropDescription')}</CardDescription>
             </div>
-             <Button variant="outline" size="sm" onClick={handleProfitabilityExport} disabled={isExporting} className="gap-1 ml-4 whitespace-nowrap">
+             <Button variant="outline" size="sm" onClick={handleProfitabilityByCropExport} disabled={isCropExporting} className="gap-1 ml-4 whitespace-nowrap">
                 <Download className="h-4 w-4" />
-                {isExporting ? t('General.submitting') : t('exportButton')}
+                {isCropExporting ? t('General.submitting') : t('exportButton')}
             </Button>
           </div>
         </CardHeader>
@@ -170,7 +220,7 @@ export function ReportsClientContent() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {profitabilityReportData.map((row) => (
+              {profitabilityByCropData.map((row) => (
                 <TableRow key={row.crop}>
                   <TableCell className="font-medium">{row.crop}</TableCell>
                   <TableCell className="text-right">{currencyFormatter.format(row.revenue)}</TableCell>
@@ -178,6 +228,56 @@ export function ReportsClientContent() {
                   <TableCell className="text-right text-red-600">{currencyFormatter.format(row.fuelCost)}</TableCell>
                   <TableCell className="text-right text-red-600">{currencyFormatter.format(row.materialCost)}</TableCell>
                   <TableCell className={`text-right font-bold ${row.contributionMargin >= 0 ? 'text-green-600' : 'text-red-600'}`}>{currencyFormatter.format(row.contributionMargin)}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+       <Card>
+        <CardHeader>
+           <div className="flex justify-between items-start">
+            <div>
+              <CardTitle>{t('profitabilityByFieldTitle')}</CardTitle>
+              <CardDescription>{t('profitabilityByFieldDescription')}</CardDescription>
+            </div>
+             <Button variant="outline" size="sm" onClick={handleProfitabilityByFieldExport} disabled={isFieldExporting} className="gap-1 ml-4 whitespace-nowrap">
+                <Download className="h-4 w-4" />
+                {isFieldExporting ? t('General.submitting') : t('exportButton')}
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>{t('tableHeaderField')}</TableHead>
+                <TableHead>{t('tableHeaderCrop')}</TableHead>
+                <TableHead className="text-right">{t('tableHeaderArea')}</TableHead>
+                <TableHead className="text-right">{t('tableHeaderRevenue')}</TableHead>
+                <TableHead className="text-right">{t('tableHeaderCosts')}</TableHead>
+                <TableHead className="text-right">{t('tableHeaderContributionMargin')}</TableHead>
+                <TableHead className="text-right">{t('tableHeaderContributionMarginPerHa')}</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {profitabilityByFieldData.map((row) => (
+                <TableRow key={row.fieldId}>
+                  <TableCell className="font-medium">
+                     <Link href={`/${locale}/fields/${row.fieldId}`} className="hover:underline">
+                        {row.fieldName}
+                     </Link>
+                  </TableCell>
+                  <TableCell>{row.crop}</TableCell>
+                  <TableCell className="text-right">{row.area.toLocaleString(locale)} ha</TableCell>
+                  <TableCell className="text-right">{currencyFormatter.format(row.revenue)}</TableCell>
+                  <TableCell className="text-right text-red-600">{currencyFormatter.format(row.laborCost + row.fuelCost + row.materialCost)}</TableCell>
+                  <TableCell className={`text-right font-semibold ${row.contributionMargin >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                    {currencyFormatter.format(row.contributionMargin)}
+                  </TableCell>
+                  <TableCell className={`text-right font-bold ${row.area > 0 && row.contributionMargin / row.area >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                    {row.area > 0 ? currencyFormatter.format(row.contributionMargin / row.area) : '-'}
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>

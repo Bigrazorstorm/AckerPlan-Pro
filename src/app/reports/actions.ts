@@ -30,13 +30,13 @@ function convertToCSV(data: any[], headers: Record<string, string>): string {
 }
 
 /**
- * Generates a CSV string for the profitability report.
+ * Generates a CSV string for the profitability by crop report.
  * @param tenantId The ID of the tenant.
  * @param companyId The ID of the company.
  * @param headers A record mapping data keys to translated header names.
  * @returns An object with the CSV string or an error message.
  */
-export async function exportProfitabilityReport(
+export async function exportProfitabilityByCropReport(
     tenantId: string,
     companyId: string,
     headers: Record<string, string>
@@ -48,6 +48,39 @@ export async function exportProfitabilityReport(
         }
         
         const csv = convertToCSV(reportData, headers);
+        return { csv };
+    } catch (error) {
+        console.error('Failed to export report:', error);
+        const message = error instanceof Error ? error.message : 'An unknown error occurred.';
+        return { error: `Failed to generate the report: ${message}` };
+    }
+}
+
+/**
+ * Generates a CSV string for the profitability by field report.
+ * @param tenantId The ID of the tenant.
+ * @param companyId The ID of the company.
+ * @param headers A record mapping data keys to translated header names.
+ * @returns An object with the CSV string or an error message.
+ */
+export async function exportProfitabilityByFieldReport(
+    tenantId: string,
+    companyId: string,
+    headers: Record<string, string>
+): Promise<{ csv?: string; error?: string }> {
+    try {
+        const reportData = await dataService.getProfitabilityByFieldReport(tenantId, companyId);
+        if (!reportData || reportData.length === 0) {
+            return { error: 'No data available to export.' };
+        }
+        
+        // Add calculated column for contribution margin per hectare
+        const dataWithPerHa = reportData.map(row => ({
+            ...row,
+            contributionMarginPerHa: row.area > 0 ? row.contributionMargin / row.area : 0,
+        }));
+
+        const csv = convertToCSV(dataWithPerHa, headers);
         return { csv };
     } catch (error) {
         console.error('Failed to export report:', error);

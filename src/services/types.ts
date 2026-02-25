@@ -299,6 +299,19 @@ export interface ProfitabilityByCropReportData {
   contributionMargin: number;
 }
 
+// Represents data for the profitability by field report.
+export interface ProfitabilityByFieldReportData {
+  fieldId: string;
+  fieldName: string;
+  crop: string;
+  area: number;
+  revenue: number;
+  laborCost: number;
+  fuelCost: number;
+  materialCost: number;
+  contributionMargin: number;
+}
+
 export type WarehouseItemType = 'Seed' | 'Fertilizer' | 'Pesticide' | 'Other';
 
 export interface WarehouseItem {

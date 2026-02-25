@@ -1,7 +1,7 @@
 
 
 import { DataService } from './data-service';
-import { Kpi, ChartDataPoint, Operation, Machinery, Session, Field, MaintenanceEvent, AddMaintenanceEventInput, AuditLogEvent, RepairEvent, AddRepairEventInput, AddOperationInput, LaborHoursByCropReportData, Observation, AddObservationInput, ProfitabilityByCropReportData, UpdateMachineInput, FieldEconomics, User, AddUserInput, Role, UpdateOperationInput, ObservationType, WarehouseItem, AddWarehouseItemInput, UpdateObservationInput, UpdateWarehouseItemInput, UpdateUserData } from './types';
+import { Kpi, ChartDataPoint, Operation, Machinery, Session, Field, MaintenanceEvent, AddMaintenanceEventInput, AuditLogEvent, RepairEvent, AddRepairEventInput, AddOperationInput, LaborHoursByCropReportData, Observation, AddObservationInput, ProfitabilityByCropReportData, UpdateMachineInput, FieldEconomics, User, AddUserInput, Role, UpdateOperationInput, ObservationType, WarehouseItem, AddWarehouseItemInput, UpdateObservationInput, UpdateWarehouseItemInput, UpdateUserData, ProfitabilityByFieldReportData, OperationMaterial } from './types';
 
 let users: User[] = [
     {
@@ -644,7 +644,7 @@ export class MockDataService implements DataService {
 
     return Promise.resolve(reportData);
   }
-
+  
   async getProfitabilityByCropReport(tenantId: string, companyId: string): Promise<ProfitabilityByCropReportData[]> {
     console.log(`Fetching Profitability by Crop Report for tenant ${tenantId} and company ${companyId}.`);
     
@@ -697,6 +697,59 @@ export class MockDataService implements DataService {
     }));
     
     return Promise.resolve(reportData.sort((a,b) => b.contributionMargin - a.contributionMargin));
+  }
+
+  async getProfitabilityByFieldReport(tenantId: string, companyId: string): Promise<ProfitabilityByFieldReportData[]> {
+    console.log(`Fetching Profitability by Field Report for tenant ${tenantId} and company ${companyId}.`);
+    
+    const DIESEL_PRICE_PER_LITER = 1.50;
+    const LABOR_COST_PER_HOUR = 25.00;
+
+    const companyOps = operations.filter(op => op.tenantId === tenantId && op.companyId === companyId);
+    const companyFields = fields.filter(f => f.tenantId === tenantId && f.companyId === companyId);
+
+    const reportData: ProfitabilityByFieldReportData[] = [];
+
+    for (const field of companyFields) {
+        let revenue = 0;
+        let laborCost = 0;
+        let fuelCost = 0;
+        let materialCost = 0;
+
+        const fieldOps = companyOps.filter(op => op.field === field.name);
+
+        for (const op of fieldOps) {
+            laborCost += op.laborHours * LABOR_COST_PER_HOUR;
+            if (op.fuelConsumed) {
+                fuelCost += op.fuelConsumed * DIESEL_PRICE_PER_LITER;
+            }
+            if (op.revenue) {
+                revenue += op.revenue;
+            }
+            if (op.materials) {
+                for (const material of op.materials) {
+                    const item = warehouseItems.find(i => i.id === material.itemId);
+                    if (item) {
+                        materialCost += material.quantity * item.costPerUnit;
+                    }
+                }
+            }
+        }
+
+        reportData.push({
+            fieldId: field.id,
+            fieldName: field.name,
+            crop: field.crop,
+            area: field.area,
+            revenue,
+            laborCost,
+            fuelCost,
+            materialCost,
+            contributionMargin: revenue - laborCost - fuelCost - materialCost,
+        });
+    }
+    
+    return Promise.resolve(reportData.sort((a,b) => (b.contributionMargin / b.area) - (a.contributionMargin / a.area)));
   }
 
   async getFieldEconomics(tenantId: string, companyId: string, fieldId: string): Promise<FieldEconomics> {
