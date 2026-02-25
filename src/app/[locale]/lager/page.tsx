@@ -1,11 +1,9 @@
+import { LagerClientContent } from '@/components/lager/lager-client-content';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Archive } from 'lucide-react';
 
 export default async function LagerPage({params: {locale}}: {params: {locale: string}}) {
   setRequestLocale(locale);
   const t = await getTranslations({locale, namespace: 'LagerPage'});
-  const tGeneral = await getTranslations({locale, namespace: 'General'});
   
   return (
     <div className="space-y-6">
@@ -15,19 +13,7 @@ export default async function LagerPage({params: {locale}}: {params: {locale: st
           {t('description')}
         </p>
       </div>
-      <Card>
-        <CardHeader>
-            <CardTitle>{tGeneral('comingSoonTitle')}</CardTitle>
-        </CardHeader>
-        <CardContent>
-            <div className="flex flex-col items-center justify-center text-center gap-4 py-24 border-2 border-dashed rounded-lg">
-                <Archive className="w-16 h-16 text-muted-foreground" />
-                <p className="text-muted-foreground max-w-md">
-                    {tGeneral('comingSoonDescription')}
-                </p>
-            </div>
-        </CardContent>
-      </Card>
+      <LagerClientContent />
     </div>
   );
 }

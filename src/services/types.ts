@@ -240,3 +240,18 @@ export interface ProfitabilityByCropReportData {
   fuelCost: number;
   contributionMargin: number;
 }
+
+export type WarehouseItemType = 'Seed' | 'Fertilizer' | 'Pesticide' | 'Other';
+
+export interface WarehouseItem {
+  id: string;
+  tenantId: string;
+  companyId: string;
+  name: string;
+  itemType: WarehouseItemType;
+  quantity: number;
+  unit: string; // e.g., 'kg', 'l', 'Sack'
+  costPerUnit: number;
+  createdAt: string;
+  updatedAt: string;
+}

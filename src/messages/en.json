@@ -464,8 +464,25 @@
     }
   },
   "LagerPage": {
-    "title": "Warehouse",
-    "description": "Manage your stock levels for seeds, fertilizers, pesticides, and more."
+    "title": "Warehouse Management",
+    "description": "Manage your stock levels for seeds, fertilizers, pesticides, and more.",
+    "addItemButton": "Add Item",
+    "tableHeaderName": "Name",
+    "tableHeaderType": "Type",
+    "tableHeaderQuantity": "Quantity",
+    "tableHeaderUnit": "Unit",
+    "tableHeaderValue": "Total Value",
+    "actions": "Actions",
+    "edit": "Edit",
+    "delete": "Delete",
+    "noItemsTitle": "No Items in Warehouse",
+    "noItemsDescription": "Add your first item to start tracking inventory."
+  },
+  "WarehouseItemTypes": {
+    "Seed": "Seed",
+    "Fertilizer": "Fertilizer",
+    "Pesticide": "Pesticide",
+    "Other": "Other"
   },
   "DokumentationPage": {
     "title": "Documentation",

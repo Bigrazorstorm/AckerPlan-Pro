@@ -464,8 +464,25 @@
     }
   },
   "LagerPage": {
-    "title": "Lager",
-    "description": "Verwalten Sie Ihre Lagerbestände für Saatgut, Dünger, Pflanzenschutzmittel und mehr."
+    "title": "Lagerverwaltung",
+    "description": "Verwalten Sie Ihre Lagerbestände für Saatgut, Dünger, Pflanzenschutzmittel und mehr.",
+    "addItemButton": "Artikel hinzufügen",
+    "tableHeaderName": "Bezeichnung",
+    "tableHeaderType": "Typ",
+    "tableHeaderQuantity": "Menge",
+    "tableHeaderUnit": "Einheit",
+    "tableHeaderValue": "Gesamtwert",
+    "actions": "Aktionen",
+    "edit": "Bearbeiten",
+    "delete": "Löschen",
+    "noItemsTitle": "Keine Artikel im Lager",
+    "noItemsDescription": "Fügen Sie Ihren ersten Artikel hinzu, um Lagerbestände zu verfolgen."
+  },
+  "WarehouseItemTypes": {
+    "Seed": "Saatgut",
+    "Fertilizer": "Düngemittel",
+    "Pesticide": "Pflanzenschutzmittel",
+    "Other": "Sonstiges"
   },
   "DokumentationPage": {
     "title": "Dokumentation",

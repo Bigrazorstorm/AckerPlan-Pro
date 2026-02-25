@@ -1,5 +1,5 @@
 import { DataService } from './data-service';
-import { Kpi, ChartDataPoint, Operation, Machinery, Session, Field, MaintenanceEvent, AddMaintenanceEventInput, AuditLogEvent, RepairEvent, AddRepairEventInput, AddOperationInput, LaborHoursByCropReportData, Observation, AddObservationInput, ProfitabilityByCropReportData, UpdateMachineInput, FieldEconomics, User, AddUserInput, Role, UpdateOperationInput, ObservationType } from './types';
+import { Kpi, ChartDataPoint, Operation, Machinery, Session, Field, MaintenanceEvent, AddMaintenanceEventInput, AuditLogEvent, RepairEvent, AddRepairEventInput, AddOperationInput, LaborHoursByCropReportData, Observation, AddObservationInput, ProfitabilityByCropReportData, UpdateMachineInput, FieldEconomics, User, AddUserInput, Role, UpdateOperationInput, ObservationType, WarehouseItem } from './types';
 
 let users: User[] = [
     {
@@ -198,6 +198,14 @@ let auditLogEvents: AuditLogEvent[] = [
     { id: 'log-3', tenantId: 'tenant-123', companyId: 'company-456', date: '2024-07-21T14:00:00Z', user: { id: 'user-2', name: 'Max Mustermann' }, action: 'operation.create', details: 'Maßnahme "Ernte" auf Fläche "Acker-Nord 1" erstellt.' },
     { id: 'log-4', tenantId: 'tenant-123', companyId: 'company-456', date: '2024-07-21T11:20:00Z', user: { id: 'user-1', name: 'John Doe' }, action: 'machine.update.status', details: 'Status von "Horsch Maestro 12.50 SW" auf "In Werkstatt" geändert.' },
     { id: 'log-5', tenantId: 'tenant-123', companyId: 'company-789', date: '2024-07-22T08:00:00Z', user: { id: 'user-1', name: 'John Doe' }, action: 'operation.create', details: 'Maßnahme "Mähen" auf Fläche "Miller\'s Acre" erstellt.' },
+];
+
+let warehouseItems: WarehouseItem[] = [
+    { id: 'item-1', tenantId: 'tenant-123', companyId: 'company-456', name: 'Winterweizen "Akteur"', itemType: 'Seed', quantity: 2500, unit: 'kg', costPerUnit: 0.85, createdAt: '2023-08-15T10:00:00Z', updatedAt: '2024-03-01T11:00:00Z' },
+    { id: 'item-2', tenantId: 'tenant-123', companyId: 'company-456', name: 'Kalkammonsalpeter (KAS)', itemType: 'Fertilizer', quantity: 15000, unit: 'kg', costPerUnit: 0.42, createdAt: '2023-09-01T09:00:00Z', updatedAt: '2024-04-10T14:00:00Z' },
+    { id: 'item-3', tenantId: 'tenant-123', companyId: 'company-456', name: 'Herbizid "Broadway"', itemType: 'Pesticide', quantity: 50, unit: 'l', costPerUnit: 35.50, createdAt: '2023-10-02T13:00:00Z', updatedAt: '2024-05-15T08:30:00Z' },
+    { id: 'item-4', tenantId: 'tenant-123', companyId: 'company-456', name: 'Raps "DK Exquisite"', itemType: 'Seed', quantity: 50, unit: 'Sack', costPerUnit: 180.00, createdAt: '2023-07-20T16:00:00Z', updatedAt: '2023-07-20T16:00:00Z' },
+    { id: 'item-5', tenantId: 'tenant-123', companyId: 'company-789', name: 'Weidegras-Mischung "Robust"', itemType: 'Seed', quantity: 800, unit: 'kg', costPerUnit: 3.20, createdAt: '2023-03-10T11:00:00Z', updatedAt: '2024-04-05T09:00:00Z' },
 ];
 
 let observations: Observation[] = [
@@ -689,5 +697,10 @@ export class MockDataService implements DataService {
     logAuditEvent(tenantId, companyId, 'user.add', `User "${userData.name}" (${userData.email}) was added to the company with role "${userData.role}".`);
     
     return Promise.resolve(user);
+  }
+
+  async getWarehouseItems(tenantId: string, companyId: string): Promise<WarehouseItem[]> {
+    console.log(`Fetching Warehouse Items for tenant ${tenantId} and company ${companyId}.`);
+    return Promise.resolve(warehouseItems.filter(i => i.tenantId === tenantId && i.companyId === companyId));
   }
 }
