@@ -3,6 +3,11 @@
 import dataService from '@/services'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
+
+const MaterialInputSchema = z.object({
+  itemId: z.string().min(1, { message: "Item ID is required" }),
+  quantity: z.coerce.number().min(0.01, { message: "Quantity must be greater than 0" }),
+});
  
 const AddOperationSchema = z.object({
   type: z.string().min(1, { message: 'Type is required' }),
@@ -20,6 +25,16 @@ const AddOperationSchema = z.object({
     (val) => (val === '' ? undefined : val),
     z.coerce.number().positive({ message: 'Revenue must be a positive number' }).optional()
   ),
+  materials: z.preprocess((val) => {
+    if (!val || typeof val !== 'string') return undefined;
+    try {
+      const parsed = JSON.parse(val);
+      if (Array.isArray(parsed)) return parsed;
+      return undefined;
+    } catch (e) {
+      return undefined;
+    }
+  }, z.array(MaterialInputSchema).optional()),
   tenantId: z.string().min(1, { message: 'Tenant ID is required' }),
   companyId: z.string().min(1, { message: 'Company ID is required' }),
 })
@@ -40,6 +55,7 @@ export async function addOperation(prevState: any, formData: FormData) {
     personnelIds: formData.getAll('personnelIds'),
     yieldAmount: formData.get('yieldAmount'),
     revenue: formData.get('revenue'),
+    materials: formData.get('materials'),
     tenantId: formData.get('tenantId'),
     companyId: formData.get('companyId'),
   })
@@ -75,6 +91,7 @@ export async function updateOperation(prevState: any, formData: FormData) {
         personnelIds: formData.getAll('personnelIds'),
         yieldAmount: formData.get('yieldAmount'),
         revenue: formData.get('revenue'),
+        materials: formData.get('materials'),
         tenantId: formData.get('tenantId'),
         companyId: formData.get('companyId'),
     });

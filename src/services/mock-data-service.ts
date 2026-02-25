@@ -1,5 +1,5 @@
 import { DataService } from './data-service';
-import { Kpi, ChartDataPoint, Operation, Machinery, Session, Field, MaintenanceEvent, AddMaintenanceEventInput, AuditLogEvent, RepairEvent, AddRepairEventInput, AddOperationInput, LaborHoursByCropReportData, Observation, AddObservationInput, ProfitabilityByCropReportData, UpdateMachineInput, FieldEconomics, User, AddUserInput, Role, UpdateOperationInput, ObservationType, WarehouseItem, AddWarehouseItemInput } from './types';
+import { Kpi, ChartDataPoint, Operation, Machinery, Session, Field, MaintenanceEvent, AddMaintenanceEventInput, AuditLogEvent, RepairEvent, AddRepairEventInput, AddOperationInput, LaborHoursByCropReportData, Observation, AddObservationInput, ProfitabilityByCropReportData, UpdateMachineInput, FieldEconomics, User, AddUserInput, Role, UpdateOperationInput, ObservationType, WarehouseItem, AddWarehouseItemInput, OperationMaterial } from './types';
 
 let users: User[] = [
     {
@@ -351,6 +351,22 @@ export class MockDataService implements DataService {
         .map(id => users.find(u => u.id === id))
         .filter((u): u is User => !!u)
         .map(u => ({ id: u.id, name: u.name }));
+    
+    const consumedMaterials: OperationMaterial[] = (operationData.materials || []).map(mat => {
+        const item = warehouseItems.find(i => i.id === mat.itemId);
+        if (!item) {
+            throw new Error(`Warehouse item with id ${mat.itemId} not found.`);
+        }
+        // In a real app, you would decrease warehouse stock here.
+        // For mock, we just record the consumption.
+        return {
+            itemId: item.id,
+            itemName: item.name,
+            quantity: mat.quantity,
+            unit: item.unit
+        };
+    });
+
 
     const createdOps: Operation[] = [];
     const numFields = operationData.fields.length;
@@ -368,6 +384,8 @@ export class MockDataService implements DataService {
         }
     }
     const fuelConsumedPerField = (machine.standardFuelConsumption * operationData.laborHours) / numFields;
+
+    const materialsPerField = consumedMaterials.map(m => ({ ...m, quantity: m.quantity / numFields }));
 
 
     for (const fieldName of operationData.fields) {
@@ -388,6 +406,7 @@ export class MockDataService implements DataService {
           fuelConsumed: parseFloat(fuelConsumedPerField.toFixed(1)),
           yieldAmount: operationData.yieldAmount ? parseFloat((operationData.yieldAmount / numFields).toFixed(2)) : undefined,
           revenue: operationData.revenue ? parseFloat((operationData.revenue / numFields).toFixed(2)) : undefined,
+          materials: materialsPerField,
         };
         createdOps.push(newOperation);
     }
@@ -402,6 +421,9 @@ export class MockDataService implements DataService {
     }
     if (operationData.type === 'Harvesting' && operationData.yieldAmount) {
       logDetails += ` Gesamtertrag: ${operationData.yieldAmount}t.`
+    }
+    if (consumedMaterials.length > 0) {
+      logDetails += ` Materialverbrauch erfasst.`
     }
     logAuditEvent(tenantId, companyId, 'operation.create', logDetails);
     return Promise.resolve(createdOps);
@@ -435,6 +457,19 @@ export class MockDataService implements DataService {
         .map(id => users.find(u => u.id === id))
         .filter((u): u is User => !!u)
         .map(u => ({ id: u.id, name: u.name }));
+    
+    const consumedMaterials: OperationMaterial[] = (operationData.materials || []).map(mat => {
+        const item = warehouseItems.find(i => i.id === mat.itemId);
+        if (!item) {
+            throw new Error(`Warehouse item with id ${mat.itemId} not found.`);
+        }
+        return {
+            itemId: item.id,
+            itemName: item.name,
+            quantity: mat.quantity,
+            unit: item.unit
+        };
+    });
 
     const updatedOperation: Operation = {
         ...oldOperation,
@@ -442,6 +477,7 @@ export class MockDataService implements DataService {
         machine: { id: newMachine.id, name: newMachine.name },
         personnel: personnel,
         fuelConsumed: parseFloat(fuelConsumed.toFixed(1)),
+        materials: consumedMaterials,
     };
 
     operations[opIndex] = updatedOperation;

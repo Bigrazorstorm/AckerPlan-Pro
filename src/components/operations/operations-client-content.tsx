@@ -4,7 +4,7 @@ import { useEffect, useState, useMemo, useActionState } from 'react'
 import { useFormStatus } from 'react-dom'
 import { useTranslations } from "next-intl"
 import { useToast } from '@/hooks/use-toast'
-import { Operation, Field, Machinery, User } from '@/services/types'
+import { Operation, Field, Machinery, User, WarehouseItem, OperationMaterialInput } from '@/services/types'
 import { addOperation, deleteOperation, updateOperation } from '@/app/operations/actions'
 import { useSession } from '@/context/session-context'
 import dataService from '@/services'
@@ -17,7 +17,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuCheckboxItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { MoreHorizontal, PlusCircle, Calendar as CalendarIcon, ChevronsUpDown, Pencil } from "lucide-react"
+import { MoreHorizontal, PlusCircle, Calendar as CalendarIcon, ChevronsUpDown, Pencil, Trash2 } from "lucide-react"
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -50,7 +50,7 @@ function SubmitButton({tKey, isEdit}: {tKey: string, isEdit?: boolean}) {
   )
 }
 
-function EditOperationForm({ closeSheet, tenantId, companyId, fields, machinery, operation, personnel }: { closeSheet: () => void; tenantId: string; companyId: string; fields: Field[], machinery: Machinery[], operation: Operation, personnel: User[] }) {
+function EditOperationForm({ closeSheet, tenantId, companyId, fields, machinery, operation, personnel, warehouseItems }: { closeSheet: () => void; tenantId: string; companyId: string; fields: Field[], machinery: Machinery[], operation: Operation, personnel: User[], warehouseItems: WarehouseItem[] }) {
   const [state, formAction] = useActionState(updateOperation, initialState)
   const { toast } = useToast()
   const t = useTranslations('OperationsPage.editOperationForm');
@@ -59,6 +59,26 @@ function EditOperationForm({ closeSheet, tenantId, companyId, fields, machinery,
   const [operationType, setOperationType] = useState<string>(operation.type);
   const { locale } = useParams<{ locale: string }>();
   const [selectedPersonnel, setSelectedPersonnel] = useState<string[]>(operation.personnel?.map(p => p.id) || []);
+  const [materials, setMaterials] = useState<OperationMaterialInput[]>(operation.materials?.map(m => ({ itemId: m.itemId, quantity: m.quantity })) || []);
+
+  const handleMaterialChange = (index: number, field: 'itemId' | 'quantity', value: string | number) => {
+    const newMaterials = [...materials];
+    if (field === 'quantity') {
+      newMaterials[index] = { ...newMaterials[index], [field]: value };
+    } else {
+      newMaterials[index] = { ...newMaterials[index], [field]: value };
+    }
+    setMaterials(newMaterials);
+  };
+
+  const addMaterial = () => {
+    setMaterials([...materials, { itemId: '', quantity: 0 }]);
+  };
+
+  const removeMaterial = (index: number) => {
+    setMaterials(materials.filter((_, i) => i !== index));
+  };
+
 
   useEffect(() => {
     if (state.message && Object.keys(state.errors).length === 0) {
@@ -85,6 +105,8 @@ function EditOperationForm({ closeSheet, tenantId, companyId, fields, machinery,
       <input type="hidden" name="id" value={operation.id} />
       <input type="hidden" name="date" value={date ? format(date, "yyyy-MM-dd") : ""} />
       {selectedPersonnel.map(p => <input key={p} type="hidden" name="personnelIds" value={p} />)}
+      <input type="hidden" name="materials" value={JSON.stringify(materials.filter(m => m.itemId && m.quantity > 0))} />
+
       
       <div className="space-y-2">
         <Label htmlFor="field">{t('fieldLabel')}</Label>
@@ -175,6 +197,61 @@ function EditOperationForm({ closeSheet, tenantId, companyId, fields, machinery,
         </div>
       )}
 
+      <div className="space-y-2">
+        <Label>{t('materialsLabel')}</Label>
+        <div className="space-y-2 rounded-md border p-2">
+          {materials.map((material, index) => (
+            <div key={index} className="flex items-end gap-2">
+              <div className="flex-1">
+                <Label htmlFor={`material-item-${index}`} className="sr-only">Item</Label>
+                <Select
+                  value={material.itemId}
+                  onValueChange={(value) => handleMaterialChange(index, 'itemId', value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder={t('materialPlaceholder')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {warehouseItems.map((item) => (
+                      <SelectItem key={item.id} value={item.id}>{item.name} ({item.unit})</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="w-24">
+                <Label htmlFor={`material-qty-${index}`} className="sr-only">Quantity</Label>
+                <Input
+                  id={`material-qty-${index}`}
+                  type="number"
+                  placeholder={t('quantityPlaceholder')}
+                  value={material.quantity}
+                  onChange={(e) => handleMaterialChange(index, 'quantity', e.target.value)}
+                />
+              </div>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                onClick={() => removeMaterial(index)}
+              >
+                <Trash2 className="h-4 w-4 text-destructive" />
+              </Button>
+            </div>
+          ))}
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="w-full"
+            onClick={addMaterial}
+          >
+            <PlusCircle className="mr-2 h-4 w-4" />
+            {t('addMaterialButton')}
+          </Button>
+        </div>
+        {state.errors?.materials && <p className="text-sm text-destructive">{state.errors.materials.join(', ')}</p>}
+      </div>
+
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
             <Label htmlFor="date">{t('dateLabel')}</Label>
@@ -228,7 +305,7 @@ function EditOperationForm({ closeSheet, tenantId, companyId, fields, machinery,
   )
 }
 
-function AddOperationForm({ closeSheet, tenantId, companyId, fields, machinery, personnel }: { closeSheet: () => void; tenantId: string; companyId: string; fields: Field[], machinery: Machinery[], personnel: User[] }) {
+function AddOperationForm({ closeSheet, tenantId, companyId, fields, machinery, personnel, warehouseItems }: { closeSheet: () => void; tenantId: string; companyId: string; fields: Field[], machinery: Machinery[], personnel: User[], warehouseItems: WarehouseItem[] }) {
   const [state, formAction] = useActionState(addOperation, initialState)
   const { toast } = useToast()
   const t = useTranslations('OperationsPage.addOperationForm');
@@ -237,7 +314,27 @@ function AddOperationForm({ closeSheet, tenantId, companyId, fields, machinery, 
   const [selectedFields, setSelectedFields] = useState<string[]>([]);
   const [selectedPersonnel, setSelectedPersonnel] = useState<string[]>([]);
   const [operationType, setOperationType] = useState<string>('');
+  const [materials, setMaterials] = useState<OperationMaterialInput[]>([]);
   const { locale } = useParams<{ locale: string }>();
+
+  const handleMaterialChange = (index: number, field: 'itemId' | 'quantity', value: string | number) => {
+    const newMaterials = [...materials];
+    if (field === 'quantity') {
+      newMaterials[index] = { ...newMaterials[index], [field]: Number(value) };
+    } else {
+      newMaterials[index] = { ...newMaterials[index], [field]: String(value) };
+    }
+    setMaterials(newMaterials);
+  };
+
+  const addMaterial = () => {
+    setMaterials([...materials, { itemId: '', quantity: 0 }]);
+  };
+
+  const removeMaterial = (index: number) => {
+    setMaterials(materials.filter((_, i) => i !== index));
+  };
+
 
   useEffect(() => {
     if (state.message && !state.errors) {
@@ -264,6 +361,8 @@ function AddOperationForm({ closeSheet, tenantId, companyId, fields, machinery, 
       <input type="hidden" name="date" value={date ? format(date, "yyyy-MM-dd") : ""} />
       {selectedFields.map(field => <input key={field} type="hidden" name="fields" value={field} />)}
       {selectedPersonnel.map(p => <input key={p} type="hidden" name="personnelIds" value={p} />)}
+      <input type="hidden" name="materials" value={JSON.stringify(materials.filter(m => m.itemId && m.quantity > 0))} />
+
 
       <div className="space-y-2">
         <Label htmlFor="type">{t('typeLabel')}</Label>
@@ -384,6 +483,61 @@ function AddOperationForm({ closeSheet, tenantId, companyId, fields, machinery, 
           </div>
         </div>
       )}
+
+       <div className="space-y-2">
+        <Label>{t('materialsLabel')}</Label>
+        <div className="space-y-2 rounded-md border p-2">
+          {materials.map((material, index) => (
+            <div key={index} className="flex items-end gap-2">
+              <div className="flex-1">
+                <Label htmlFor={`material-item-${index}`} className="sr-only">Item</Label>
+                <Select
+                  value={material.itemId}
+                  onValueChange={(value) => handleMaterialChange(index, 'itemId', value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder={t('materialPlaceholder')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {warehouseItems.map((item) => (
+                      <SelectItem key={item.id} value={item.id}>{item.name} ({item.unit})</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="w-24">
+                <Label htmlFor={`material-qty-${index}`} className="sr-only">Quantity</Label>
+                <Input
+                  id={`material-qty-${index}`}
+                  type="number"
+                  placeholder={t('quantityPlaceholder')}
+                  value={material.quantity || ''}
+                  onChange={(e) => handleMaterialChange(index, 'quantity', e.target.value)}
+                />
+              </div>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                onClick={() => removeMaterial(index)}
+              >
+                <Trash2 className="h-4 w-4 text-destructive" />
+              </Button>
+            </div>
+          ))}
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="w-full"
+            onClick={addMaterial}
+          >
+            <PlusCircle className="mr-2 h-4 w-4" />
+            {t('addMaterialButton')}
+          </Button>
+        </div>
+        {state.errors?.materials && <p className="text-sm text-destructive">{state.errors.materials.join(', ')}</p>}
+      </div>
 
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
@@ -523,6 +677,7 @@ export function OperationsClientContent() {
   const [fields, setFields] = useState<Field[]>([]);
   const [machinery, setMachinery] = useState<Machinery[]>([]);
   const [personnel, setPersonnel] = useState<User[]>([]);
+  const [warehouseItems, setWarehouseItems] = useState<WarehouseItem[]>([]);
   const [loading, setLoading] = useState(true);
   const { locale } = useParams<{ locale: string }>();
   const [operationToDelete, setOperationToDelete] = useState<Operation | null>(null);
@@ -534,16 +689,18 @@ export function OperationsClientContent() {
     if (activeCompany) {
       const fetchData = async () => {
         setLoading(true);
-        const [operationsData, fieldsData, machineryData, personnelData] = await Promise.all([
+        const [operationsData, fieldsData, machineryData, personnelData, warehouseData] = await Promise.all([
             dataService.getOperations(activeCompany.tenantId, activeCompany.id),
             dataService.getFields(activeCompany.tenantId, activeCompany.id),
             dataService.getMachinery(activeCompany.tenantId, activeCompany.id),
-            dataService.getUsersForCompany(activeCompany.tenantId, activeCompany.id)
+            dataService.getUsersForCompany(activeCompany.tenantId, activeCompany.id),
+            dataService.getWarehouseItems(activeCompany.tenantId, activeCompany.id),
         ]);
         setOperations(operationsData);
         setFields(fieldsData);
         setMachinery(machineryData);
         setPersonnel(personnelData);
+        setWarehouseItems(warehouseData);
         setLoading(false);
       }
       fetchData();
@@ -558,6 +715,7 @@ export function OperationsClientContent() {
           title: t('deleteSuccessToastTitle'),
           description: result.message,
         });
+        setOperations(ops => ops.filter(op => op.id !== operationToDelete.id));
       } else {
         toast({
           variant: 'destructive',
@@ -598,12 +756,12 @@ export function OperationsClientContent() {
                 {t('addOperation')}
               </Button>
             </SheetTrigger>
-            <SheetContent>
+            <SheetContent className="w-full sm:max-w-2xl overflow-y-auto">
               <SheetHeader>
                 <SheetTitle>{t('addOperationSheetTitle')}</SheetTitle>
               </SheetHeader>
               <div className="py-4">
-                {activeCompany && <AddOperationForm closeSheet={() => setAddSheetOpen(false)} tenantId={activeCompany.tenantId} companyId={activeCompany.id} fields={fields} machinery={machinery} personnel={personnel} />}
+                {activeCompany && <AddOperationForm closeSheet={() => setAddSheetOpen(false)} tenantId={activeCompany.tenantId} companyId={activeCompany.id} fields={fields} machinery={machinery} personnel={personnel} warehouseItems={warehouseItems} />}
               </div>
             </SheetContent>
           </Sheet>
@@ -669,6 +827,16 @@ export function OperationsClientContent() {
                         <span className="font-medium">{op.yieldAmount.toLocaleString(locale)} t</span>
                     </div>
                   )}
+                  {op.materials && op.materials.length > 0 && (
+                    <div className="flex justify-between items-start pt-3 mt-3 border-t">
+                        <span className="text-muted-foreground font-medium">{t('tableHeaderMaterials')}</span>
+                        <div className="text-right">
+                            {op.materials.map(mat => (
+                                <div key={mat.itemId} className="text-sm">{mat.itemName}: {mat.quantity.toLocaleString(locale)} {mat.unit}</div>
+                            ))}
+                        </div>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             ))}
@@ -683,9 +851,9 @@ export function OperationsClientContent() {
                   <TableHead>{t('tableHeaderField')}</TableHead>
                   <TableHead>{t('tableHeaderMachine')}</TableHead>
                   <TableHead>{t('tableHeaderPersonnel')}</TableHead>
+                  <TableHead>{t('tableHeaderMaterials')}</TableHead>
                   <TableHead>{t('tableHeaderDate')}</TableHead>
                   <TableHead className="text-right">{t('tableHeaderLaborHours')}</TableHead>
-                  <TableHead className="text-right">{t('tableHeaderFuel')}</TableHead>
                   <TableHead className="text-right">{t('tableHeaderYield')}</TableHead>
                   <TableHead>{t('tableHeaderStatus')}</TableHead>
                   <TableHead><span className="sr-only">{t('actions')}</span></TableHead>
@@ -697,10 +865,18 @@ export function OperationsClientContent() {
                       <TableCell className="font-medium">{tOperationTypes(op.type)}</TableCell>
                       <TableCell>{op.field}</TableCell>
                       <TableCell>{op.machine?.name || '-'}</TableCell>
-                      <TableCell className="truncate max-w-xs">{op.personnel?.map(p => p.name).join(', ') || '-'}</TableCell>
+                      <TableCell className="truncate max-w-[200px]">{op.personnel?.map(p => p.name).join(', ') || '-'}</TableCell>
+                      <TableCell className="max-w-[200px]">
+                        {op.materials && op.materials.length > 0 ? (
+                            <ul className="text-xs space-y-1">
+                                {op.materials.map(mat => (
+                                    <li key={mat.itemId} className="truncate">{mat.itemName}: {mat.quantity.toLocaleString(locale)} {mat.unit}</li>
+                                ))}
+                            </ul>
+                        ) : '-'}
+                      </TableCell>
                       <TableCell>{dateFormatter(op.date)}</TableCell>
                       <TableCell className="text-right">{op.laborHours.toLocaleString(locale)} h</TableCell>
-                      <TableCell className="text-right">{op.fuelConsumed?.toLocaleString(locale)} l</TableCell>
                       <TableCell className="text-right">{op.yieldAmount ? `${op.yieldAmount.toLocaleString(locale)} t` : '-'}</TableCell>
                       <TableCell>
                         <Badge variant={op.status === 'Completed' ? 'default' : 'secondary'} className={op.status === 'Completed' ? 'bg-green-100 text-green-800' : ''}>{tOperationStatuses(op.status)}</Badge>
@@ -747,12 +923,12 @@ export function OperationsClientContent() {
         </AlertDialogContent>
       </AlertDialog>
       <Sheet open={isEditSheetOpen} onOpenChange={setEditSheetOpen}>
-        <SheetContent>
+        <SheetContent className="w-full sm:max-w-2xl overflow-y-auto">
           <SheetHeader>
             <SheetTitle>{t('editOperationSheetTitle')}</SheetTitle>
           </SheetHeader>
           <div className="py-4">
-            {activeCompany && operationToEdit && <EditOperationForm closeSheet={() => setEditSheetOpen(false)} tenantId={activeCompany.tenantId} companyId={activeCompany.id} fields={fields} machinery={machinery} operation={operationToEdit} personnel={personnel} />}
+            {activeCompany && operationToEdit && <EditOperationForm closeSheet={() => setEditSheetOpen(false)} tenantId={activeCompany.tenantId} companyId={activeCompany.id} fields={fields} machinery={machinery} operation={operationToEdit} personnel={personnel} warehouseItems={warehouseItems} />}
           </div>
         </SheetContent>
       </Sheet>

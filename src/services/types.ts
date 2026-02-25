@@ -11,6 +11,18 @@ export interface ChartDataPoint {
   cost: number;
 };
 
+export interface OperationMaterial {
+  itemId: string;
+  itemName: string;
+  quantity: number;
+  unit: string;
+}
+
+export interface OperationMaterialInput {
+  itemId: string;
+  quantity: number;
+}
+
 // Represents a summary of an operation.
 export interface Operation {
   id: string; // Using string for UUID consistency
@@ -32,6 +44,7 @@ export interface Operation {
   fuelConsumed?: number; // in liters
   yieldAmount?: number; // in tons
   revenue?: number; // in EUR
+  materials?: OperationMaterial[];
 };
 
 // Input type for adding a new operation
@@ -45,6 +58,7 @@ export interface AddOperationInput {
   personnelIds?: string[];
   yieldAmount?: number;
   revenue?: number;
+  materials?: OperationMaterialInput[];
 }
 
 // Input type for updating an existing operation
@@ -57,6 +71,7 @@ export interface UpdateOperationInput {
   personnelIds?: string[];
   yieldAmount?: number;
   revenue?: number;
+  materials?: OperationMaterialInput[];
 }
 
 
