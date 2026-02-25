@@ -124,7 +124,7 @@
     "viewDetails": "View Details",
     "delete": "Delete",
     "deleteConfirmationTitle": "Are you sure you want to delete this machine?",
-    "deleteConfirmationDescription": "This action cannot be undone. This will permanently delete the machine and all associated data (maintenance, repairs).",
+    "deleteConfirmationDescription": "This action cannot be undone. This will permanently delete the machine and all associated data (maintenance, repairs). A machine cannot be deleted if it is used in any work orders.",
     "deleteConfirmationCancel": "Cancel",
     "deleteConfirmationConfirm": "Delete",
     "deleteSuccessToastTitle": "Success",
@@ -581,6 +581,7 @@
     "description": "Generate and export all documents required for compliance.",
     "psmTab": "Pesticides",
     "fertilizationTab": "Fertilization",
+    "complianceTab": "Compliance",
     "psmReportTitle": "Pesticide Applications",
     "psmReportDescription": "A detailed record of all pesticide control measures performed.",
     "tableHeaderDate": "Date",
@@ -598,7 +599,13 @@
     "tableHeaderFertilizer": "Fertilizer",
     "tableHeaderNutrientsPerHa": "{nutrient} (kg/ha)",
     "noFertilizationApplications": "No fertilization measures have been logged yet.",
-    "noFertilizationApplicationsDescription": "Log a 'Fertilizing' work order to see it here."
+    "noFertilizationApplicationsDescription": "Log a 'Fertilizing' work order to see it here.",
+    "complianceReportTitle": "Compliance Check (Pesticides)",
+    "complianceReportDescription": "Shows pesticide applications performed by personnel without a valid license.",
+    "tableHeaderPsmUsed": "Products Used",
+    "tableHeaderUnqualifiedPersonnel": "Unqualified Personnel",
+    "noComplianceIssues": "No compliance issues found.",
+    "noComplianceIssuesDescription": "All logged pesticide applications were performed by qualified personnel."
   },
   "FoerderwesenPage": {
     "title": "Subsidies",

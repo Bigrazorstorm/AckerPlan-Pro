@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { useSession } from '@/context/session-context';
 import dataService from '@/services';
-import { Operation, WarehouseItem, Field } from '@/services/types';
+import { Operation, WarehouseItem, Field, User } from '@/services/types';
 import { useTranslations } from 'next-intl';
 import { format, parseISO } from 'date-fns';
 import { de, enUS } from 'date-fns/locale';
@@ -13,7 +13,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { FileText, Wheat } from 'lucide-react';
+import { FileText, Wheat, ShieldAlert } from 'lucide-react';
 
 
 interface PsmApplication {
@@ -43,6 +43,27 @@ interface FertilizationApplication {
         k: number;
     };
 }
+
+interface ComplianceIssue {
+    operationId: string;
+    date: string;
+    fieldName: string;
+    crop: string;
+    psmUsed: string;
+    unqualifiedPersonnel: string;
+}
+
+const isUserQualifiedForPsm = (user: User) => {
+    if (!user.pesticideLicenseExpiry) return false;
+    try {
+        const expiryDate = parseISO(user.pesticideLicenseExpiry);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0); // Compare dates only
+        return expiryDate >= today;
+    } catch (e) {
+        return false;
+    }
+};
 
 
 function ReportSkeleton() {
@@ -80,6 +101,7 @@ export function DocumentationClientContent() {
     const { activeCompany, loading: sessionLoading } = useSession();
     const [psmApplications, setPsmApplications] = useState<PsmApplication[]>([]);
     const [fertilizationApplications, setFertilizationApplications] = useState<FertilizationApplication[]>([]);
+    const [complianceIssues, setComplianceIssues] = useState<ComplianceIssue[]>([]);
     const [loading, setLoading] = useState(true);
 
     const t = useTranslations('DokumentationPage');
@@ -89,10 +111,11 @@ export function DocumentationClientContent() {
         if (activeCompany) {
             const fetchData = async () => {
                 setLoading(true);
-                const [ops, items, allFields] = await Promise.all([
+                const [ops, items, allFields, allUsers] = await Promise.all([
                     dataService.getOperations(activeCompany.tenantId, activeCompany.id),
                     dataService.getWarehouseItems(activeCompany.tenantId, activeCompany.id),
                     dataService.getFields(activeCompany.tenantId, activeCompany.id),
+                    dataService.getUsersForCompany(activeCompany.tenantId, activeCompany.id),
                 ]);
 
                 // PSM Applications
@@ -157,12 +180,37 @@ export function DocumentationClientContent() {
                     }
                 }
                 setFertilizationApplications(fertApps.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
+                
+                // Compliance Issues
+                const issues: ComplianceIssue[] = [];
+                for (const op of psmOps) {
+                    if (op.personnel && op.personnel.length > 0) {
+                        const unqualified = op.personnel.filter(p => {
+                            const user = allUsers.find(u => u.id === p.id);
+                            return user ? !isUserQualifiedForPsm(user) : true;
+                        });
+
+                        if (unqualified.length > 0) {
+                            const field = allFields.find(f => f.name === op.field);
+                            issues.push({
+                                operationId: op.id,
+                                date: op.date,
+                                fieldName: op.field,
+                                crop: field?.crop || '-',
+                                psmUsed: op.materials?.map(m => m.itemName).join(', ') || t('unknownProduct'),
+                                unqualifiedPersonnel: unqualified.map(p => p.name).join(', '),
+                            });
+                        }
+                    }
+                }
+                setComplianceIssues(issues.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
+
 
                 setLoading(false);
             };
             fetchData();
         }
-    }, [activeCompany]);
+    }, [activeCompany, t]);
 
     const dateFormatter = (dateString: string) => {
         try {
@@ -178,11 +226,15 @@ export function DocumentationClientContent() {
                 <TabsList>
                     <TabsTrigger value="psm">{t('psmTab')}</TabsTrigger>
                     <TabsTrigger value="fertilization">{t('fertilizationTab')}</TabsTrigger>
+                    <TabsTrigger value="compliance">{t('complianceTab')}</TabsTrigger>
                 </TabsList>
                 <TabsContent value="psm" className="mt-4">
                     <ReportSkeleton />
                 </TabsContent>
                  <TabsContent value="fertilization" className="mt-4">
+                    <ReportSkeleton />
+                </TabsContent>
+                <TabsContent value="compliance" className="mt-4">
                     <ReportSkeleton />
                 </TabsContent>
             </Tabs>
@@ -194,6 +246,7 @@ export function DocumentationClientContent() {
             <TabsList>
                 <TabsTrigger value="psm">{t('psmTab')}</TabsTrigger>
                 <TabsTrigger value="fertilization">{t('fertilizationTab')}</TabsTrigger>
+                <TabsTrigger value="compliance">{t('complianceTab')}</TabsTrigger>
             </TabsList>
             <TabsContent value="psm" className="mt-4">
                 <Card>
@@ -285,6 +338,48 @@ export function DocumentationClientContent() {
                                 <h3 className="text-lg font-semibold">{t('noFertilizationApplications')}</h3>
                                 <p className="text-muted-foreground max-w-md">
                                     {t('noFertilizationApplicationsDescription')}
+                                </p>
+                            </div>
+                         )}
+                    </CardContent>
+                </Card>
+            </TabsContent>
+            <TabsContent value="compliance" className="mt-4">
+                <Card>
+                    <CardHeader>
+                        <CardTitle>{t('complianceReportTitle')}</CardTitle>
+                        <CardDescription>{t('complianceReportDescription')}</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                         {complianceIssues.length > 0 ? (
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead>{t('tableHeaderDate')}</TableHead>
+                                        <TableHead>{t('tableHeaderField')}</TableHead>
+                                        <TableHead>{t('tableHeaderCrop')}</TableHead>
+                                        <TableHead>{t('tableHeaderPsmUsed')}</TableHead>
+                                        <TableHead>{t('tableHeaderUnqualifiedPersonnel')}</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {complianceIssues.map((issue) => (
+                                        <TableRow key={issue.operationId} className="bg-destructive/10">
+                                            <TableCell>{dateFormatter(issue.date)}</TableCell>
+                                            <TableCell>{issue.fieldName}</TableCell>
+                                            <TableCell>{issue.crop}</TableCell>
+                                            <TableCell className="font-medium">{issue.psmUsed}</TableCell>
+                                            <TableCell className="text-destructive font-semibold">{issue.unqualifiedPersonnel}</TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                         ) : (
+                            <div className="flex flex-col items-center justify-center text-center gap-4 py-24 border-2 border-dashed rounded-lg">
+                                <ShieldAlert className="w-16 h-16 text-muted-foreground" />
+                                <h3 className="text-lg font-semibold">{t('noComplianceIssues')}</h3>
+                                <p className="text-muted-foreground max-w-md">
+                                    {t('noComplianceIssuesDescription')}
                                 </p>
                             </div>
                          )}

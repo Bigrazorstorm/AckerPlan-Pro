@@ -124,7 +124,7 @@
     "viewDetails": "Details anzeigen",
     "delete": "Löschen",
     "deleteConfirmationTitle": "Maschine wirklich löschen?",
-    "deleteConfirmationDescription": "Diese Aktion kann nicht rückgängig gemacht werden. Dadurch wird die Maschine und alle zugehörigen Daten (Wartung, Reparaturen) endgültig gelöscht.",
+    "deleteConfirmationDescription": "Diese Aktion kann nicht rückgängig gemacht werden. Dadurch wird die Maschine und alle zugehörigen Daten (Wartung, Reparaturen) endgültig gelöscht. Eine Maschine kann nicht gelöscht werden, wenn sie in Arbeitsaufträgen verwendet wird.",
     "deleteConfirmationCancel": "Abbrechen",
     "deleteConfirmationConfirm": "Löschen",
     "deleteSuccessToastTitle": "Erfolg",
@@ -582,6 +582,7 @@
     "description": "Erzeugen und exportieren Sie alle für die Einhaltung der Vorschriften erforderlichen Dokumente.",
     "psmTab": "Pflanzenschutz",
     "fertilizationTab": "Düngung",
+    "complianceTab": "Konformität",
     "psmReportTitle": "Pflanzenschutzmittel-Anwendungen",
     "psmReportDescription": "Eine detaillierte Aufzeichnung aller durchgeführten Pflanzenschutzmaßnahmen.",
     "tableHeaderDate": "Datum",
@@ -599,7 +600,13 @@
     "tableHeaderFertilizer": "Düngemittel",
     "tableHeaderNutrientsPerHa": "{nutrient} (kg/ha)",
     "noFertilizationApplications": "Bisher wurden keine Düngemaßnahmen protokolliert.",
-    "noFertilizationApplicationsDescription": "Erfassen Sie eine Maßnahme vom Typ 'Düngung', um sie hier zu sehen."
+    "noFertilizationApplicationsDescription": "Erfassen Sie eine Maßnahme vom Typ 'Düngung', um sie hier zu sehen.",
+    "complianceReportTitle": "Konformitätsprüfung (Pflanzenschutz)",
+    "complianceReportDescription": "Zeigt Pflanzenschutzmaßnahmen, die von Personal ohne gültigen Sachkundenachweis durchgeführt wurden.",
+    "tableHeaderPsmUsed": "Verwendete Mittel",
+    "tableHeaderUnqualifiedPersonnel": "Personal ohne Sachkunde",
+    "noComplianceIssues": "Keine Konformitätsverstöße gefunden.",
+    "noComplianceIssuesDescription": "Alle protokollierten Pflanzenschutzmaßnahmen wurden von qualifiziertem Personal durchgeführt."
   },
   "FoerderwesenPage": {
     "title": "Förderwesen",
