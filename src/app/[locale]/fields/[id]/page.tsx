@@ -8,7 +8,7 @@ import { Field, Operation, FieldEconomics, Observation } from '@/services/types'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Tractor } from 'lucide-react';
+import { ArrowLeft, Tractor, Pencil } from 'lucide-react';
 import Link from 'next/link';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -17,6 +17,7 @@ import { format } from 'date-fns';
 import { de, enUS } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
 import { GrowthChart } from '@/components/fields/growth-chart';
+import { EditFieldForm } from '@/components/fields/edit-field-form';
 
 function FieldDetailSkeleton() {
   return (
@@ -94,6 +95,7 @@ export default function FieldDetailPage() {
   const [fieldObservations, setFieldObservations] = useState<Observation[]>([]);
   const [economics, setEconomics] = useState<FieldEconomics | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isEditing, setIsEditing] = useState(false);
 
   const t = useTranslations('FieldDetailPage');
   const tOperationTypes = useTranslations('OperationTypes');
@@ -136,6 +138,17 @@ export default function FieldDetailPage() {
     currency: 'EUR',
   });
 
+  const handleSave = async (updatedField: Field) => {
+    // Here you would typically call a service to save the data to the backend.
+    // For this example, we'll just update the local state.
+    if (activeCompany) {
+        // Note: The mock data service does not actually update the data on the backend
+        await dataService.updateField(activeCompany.tenantId, activeCompany.id, updatedField);
+        setField(updatedField);
+        setIsEditing(false);
+    }
+  };
+
   if (sessionLoading || loading) {
     return <FieldDetailSkeleton />;
   }
@@ -170,105 +183,115 @@ export default function FieldDetailPage() {
         </Button>
       </div>
 
-      <div className="flex justify-between items-start">
-        <div>
-          <h1 className="text-2xl md:text-3xl font-bold tracking-tight">{field.name}</h1>
-          <p className="text-muted-foreground">{t('description', { crop: field.crop, area: field.area.toLocaleString(locale) })}</p>
-        </div>
-      </div>
+      {isEditing ? (
+        <EditFieldForm field={field} onSave={handleSave} onCancel={() => setIsEditing(false)} />
+      ) : (
+        <>
+          <div className="flex justify-between items-start">
+            <div>
+              <h1 className="text-2xl md:text-3xl font-bold tracking-tight">{field.name}</h1>
+              <p className="text-muted-foreground">{t('description', { crop: field.crop, area: field.area.toLocaleString(locale) })}</p>
+            </div>
+            <Button onClick={() => setIsEditing(true)}>
+              <Pencil className="mr-2 h-4 w-4" />
+              {t('editButton')}
+            </Button>
+          </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-1 space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>{t('detailsTitle')}</CardTitle>
-            </CardHeader>
-            <CardContent className="grid gap-4">
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">{t('cropLabel')}</span>
-                <span className="font-medium">{field.crop}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">{t('areaLabel')}</span>
-                <span className="font-medium">{field.area.toLocaleString(locale)} ha</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">{t('idLabel')}</span>
-                <span className="font-mono text-xs bg-muted text-muted-foreground rounded-md px-2 py-1">{field.id}</span>
-              </div>
-            </CardContent>
-          </Card>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-1 space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>{t('detailsTitle')}</CardTitle>
+                </CardHeader>
+                <CardContent className="grid gap-4">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">{t('cropLabel')}</span>
+                    <span className="font-medium">{field.crop}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">{t('areaLabel')}</span>
+                    <span className="font-medium">{field.area.toLocaleString(locale)} ha</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">{t('idLabel')}</span>
+                    <span className="font-mono text-xs bg-muted text-muted-foreground rounded-md px-2 py-1">{field.id}</span>
+                  </div>
+                </CardContent>
+              </Card>
 
-          {economics && (
-             <Card>
-              <CardHeader>
-                <CardTitle>{t('economicsTitle')}</CardTitle>
-              </CardHeader>
-              <CardContent className="grid gap-4">
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">{t('revenueLabel')}</span>
-                  <span className="font-medium text-green-600">{currencyFormatter.format(economics.revenue)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">{t('costsLabel')}</span>
-                  <span className="font-medium text-red-600">{currencyFormatter.format(economics.costs)}</span>
-                </div>
-                <div className="flex justify-between font-bold">
-                  <span className="text-foreground">{t('marginLabel')}</span>
-                  <span className={cn(economics.contributionMargin >= 0 ? 'text-green-600' : 'text-red-600' )}>
-                    {currencyFormatter.format(economics.contributionMargin)}
-                  </span>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-        </div>
-
-        <div className="lg:col-span-2">
-          <Card>
-            <CardHeader>
-              <CardTitle>{t('recentOperationsTitle')}</CardTitle>
-              <CardDescription>{t('recentOperationsDescription')}</CardDescription>
-            </CardHeader>
-            <CardContent>
-              {operations.length > 0 ? (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>{t('tableHeaderType')}</TableHead>
-                      <TableHead>{t('tableHeaderDate')}</TableHead>
-                      <TableHead>{t('tableHeaderMachine')}</TableHead>
-                      <TableHead>{t('tableHeaderStatus')}</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {operations.map((op) => (
-                      <TableRow key={op.id}>
-                        <TableCell className="font-medium">{tOperationTypes(op.type)}</TableCell>
-                        <TableCell>{dateFormatter(op.date)}</TableCell>
-                        <TableCell>{op.machine?.name || '-'}</TableCell>
-                        <TableCell>
-                          <Badge variant={op.status === 'Completed' ? 'default' : 'secondary'} className={op.status === 'Completed' ? 'bg-green-100 text-green-800' : ''}>{tOperationStatuses(op.status)}</Badge>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              ) : (
-                <div className="flex flex-col items-center justify-center text-center gap-4 py-16 border-2 border-dashed rounded-lg">
-                  <Tractor className="w-12 h-12 text-muted-foreground" />
-                  <h3 className="text-lg font-semibold">{t('noOperationsTitle')}</h3>
-                  <p className="text-muted-foreground max-w-sm">
-                    {t('noOperationsDescription')}
-                  </p>
-                </div>
+              {economics && (
+                 <Card>
+                  <CardHeader>
+                    <CardTitle>{t('economicsTitle')}</CardTitle>
+                  </CardHeader>
+                  <CardContent className="grid gap-4">
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">{t('revenueLabel')}</span>
+                      <span className="font-medium text-green-600">{currencyFormatter.format(economics.revenue)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">{t('costsLabel')}</span>
+                      <span className="font-medium text-red-600">{currencyFormatter.format(economics.costs)}</span>
+                    </div>
+                    <div className="flex justify-between font-bold">
+                      <span className="text-foreground">{t('marginLabel')}</span>
+                      <span className={cn(economics.contributionMargin >= 0 ? 'text-green-600' : 'text-red-600' )}>
+                        {currencyFormatter.format(economics.contributionMargin)}
+                      </span>
+                    </div>
+                  </CardContent>
+                </Card>
               )}
-            </CardContent>
-          </Card>
-        </div>
-      </div>
+            </div>
 
-      <GrowthChart observations={fieldObservations} />
+            <div className="lg:col-span-2">
+              <Card>
+                <CardHeader>
+                  <CardTitle>{t('recentOperationsTitle')}</CardTitle>
+                  <CardDescription>{t('recentOperationsDescription')}</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {operations.length > 0 ? (
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>{t('tableHeaderType')}</TableHead>
+                          <TableHead>{t('tableHeaderDate')}</TableHead>
+                          <TableHead>{t('tableHeaderMachine')}</TableHead>
+                          <TableHead>{t('tableHeaderStatus')}</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {operations.map((op) => (
+                          <TableRow key={op.id}>
+                            <TableCell className="font-medium">{tOperationTypes(op.type)}</TableCell>
+                            <TableCell>{dateFormatter(op.date)}</TableCell>
+                            <TableCell>{op.machine?.name || '-'}</TableCell>
+                            <TableCell>
+                              <Badge variant={op.status === 'Completed' ? 'default' : 'secondary'} className={op.status === 'Completed' ? 'bg-green-100 text-green-800' : ''}>{tOperationStatuses(op.status)}</Badge>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  ) : (
+                    <div className="flex flex-col items-center justify-center text-center gap-4 py-16 border-2 border-dashed rounded-lg">
+                      <Tractor className="w-12 h-12 text-muted-foreground" />
+                      <h3 className="text-lg font-semibold">{t('noOperationsTitle')}</h3>
+                      <p className="text-muted-foreground max-w-sm">
+                        {t('noOperationsDescription')}
+                      </p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+
+          <GrowthChart observations={fieldObservations} />
+        </>
+      )}
     </div>
   );
 }

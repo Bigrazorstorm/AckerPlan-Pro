@@ -115,7 +115,16 @@
     "noGrowthDataTitle": "Keine Wachstumsdaten",
     "noGrowthDataDescription": "Es wurden keine Beobachtungen mit BBCH-Stadien für diesen Schlag erfasst.",
     "bbchAxisLabel": "BBCH-Stadium",
-    "dateAxisLabel": "Datum"
+    "dateAxisLabel": "Datum",
+    "editButton": "Schlag bearbeiten"
+  },
+  "EditFieldForm": {
+    "title": "Schlag bearbeiten",
+    "nameLabel": "Schlagname",
+    "cropLabel": "Kultur",
+    "areaLabel": "Fläche (ha)",
+    "cancelButton": "Abbrechen",
+    "saveButton": "Änderungen speichern"
   },
   "MachineryPage": {
     "title": "Fuhrpark",

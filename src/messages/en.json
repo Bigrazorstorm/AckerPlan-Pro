@@ -115,7 +115,16 @@
     "noGrowthDataTitle": "No Growth Data",
     "noGrowthDataDescription": "No observations with BBCH stages have been recorded for this field.",
     "bbchAxisLabel": "BBCH Stage",
-    "dateAxisLabel": "Date"
+    "dateAxisLabel": "Date",
+    "editButton": "Edit Field"
+  },
+  "EditFieldForm": {
+    "title": "Edit Field",
+    "nameLabel": "Field Name",
+    "cropLabel": "Crop",
+    "areaLabel": "Area (ha)",
+    "cancelButton": "Cancel",
+    "saveButton": "Save Changes"
   },
   "MachineryPage": {
     "title": "Fleet",

@@ -148,6 +148,14 @@ export interface DataService {
   getFieldById(tenantId: string, companyId: string, fieldId: string): Promise<Field | null>;
 
   /**
+   * Updates an existing field in the data store.
+   * @param tenantId The ID of the tenant.
+   * @param companyId The ID of the company.
+   * @param field The field data to update.
+   */
+  updateField(tenantId: string, companyId: string, field: Field): Promise<Field>;
+
+  /**
    * Retrieves operations for a specific field.
    * @param tenantId - The ID of the tenant.
    * @param companyId - The ID of the company.
