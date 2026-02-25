@@ -4,6 +4,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { SidebarProvider, Sidebar } from '@/components/ui/sidebar';
 import { Header } from '@/components/layout/header';
 import { SidebarNav } from '@/components/layout/sidebar-nav';
+import { MobileNavLayout } from '@/components/layout/mobile-nav-layout';
 import {NextIntlClientProvider} from 'next-intl';
 import {getMessages, getTranslations, setRequestLocale} from 'next-intl/server';
 import { SessionProvider } from '@/context/session-context';
@@ -58,7 +59,9 @@ export default async function RootLayout({
                     <div className="flex flex-col w-full">
                       <Header />
                       <main className="flex-1 bg-background p-4 sm:p-6 lg:p-8">
-                        {children}
+                        <MobileNavLayout>
+                          {children}
+                        </MobileNavLayout>
                       </main>
                     </div>
                 </SidebarProvider>

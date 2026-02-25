@@ -1,74 +1,403 @@
+/* ============================================================================
+   AGROTRACK DESIGN SYSTEM – PHASE 0
+   Moderne Agrar-App für deutsche Landwirte
+   ============================================================================ */
+
+/* Schriftarten-Import von Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap&subset=latin-ext');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    --background: 130 24% 95%;
-    --foreground: 222.2 84% 4.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 134 62% 39%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 85 76% 52%;
-    --accent-foreground: 85 76% 10%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 134 62% 39%;
-    --radius: 0.5rem;
-    --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 222.2 47.4% 11.2%;
-    --sidebar-primary: 134 62% 39%;
-    --sidebar-primary-foreground: 210 40% 98%;
-    --sidebar-accent: 210 40% 96.1%;
-    --sidebar-accent-foreground: 222.2 47.4% 11.2%;
-    --sidebar-border: 214.3 31.8% 91.4%;
-    --sidebar-ring: 134 62% 39%;
-  }
-  .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 134 62% 45%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 85 76% 48%;
-    --accent-foreground: 85 76% 5%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 134 62% 45%;
-    --sidebar-background: 222.2 84% 4.9%;
-    --sidebar-foreground: 210 40% 98%;
-    --sidebar-primary: 134 62% 45%;
-    --sidebar-primary-foreground: 210 40% 98%;
-    --sidebar-accent: 217.2 32.6% 17.5%;
+    /* ────────────────────────────────────────────────────────
+       FARBEN – Agrarisch authentisch
+       ──────────────────────────────────────────────────────── */
+    
+    /* Primäre Farbe: Modernes Agrar-Grün */
+    --primary: 140 52% 37%;              /* #2d7a3c */
+    --primary-foreground: 210 40% 98%;   /* Weiß */
+    
+    /* Sekundäre Farbe: Warmes Erdbraun */
+    --secondary: 32 35% 45%;             /* #8b6f47 */
+    --secondary-foreground: 210 40% 98%; /* Weiß */
+    
+    /* Akzentfarbe: Energisches Gelb-Grün für Handlungen */
+    --accent: 87 62% 56%;                /* #a8d968 */
+    --accent-foreground: 210 40% 4%;     /* Sehr dunkel */
+    
+    /* Status-Farben */
+    --success: 142 65% 48%;              /* Frisches Grün #27ae60 */
+    --success-foreground: 210 40% 98%;   /* Weiß */
+    --warning: 38 89% 57%;               /* Warmes Orange #f39c12 */
+    --warning-foreground: 210 40% 4%;    /* Sehr dunkel */
+    --info: 204 70% 53%;                 /* Sanftes Blau #3498db */
+    --info-foreground: 210 40% 98%;      /* Weiß */
+    --destructive: 9 84% 60%;            /* Klares Rot #e74c3c */
+    --destructive-foreground: 210 40% 98%; /* Weiß */
+    
+    /* Neutrale Farben */
+    --neutral: 210 8% 58%;               /* Warmer Grau #95a5a6 */
+    --neutral-foreground: 210 40% 98%;   /* Weiß */
+    
+    /* Hintergrund & Text: Hell und lesbar */
+    --background: 210 17% 98%;           /* Sehr helles Blaugrau */
+    --foreground: 210 40% 12%;           /* Sehr dunkles Blaugrau */
+    
+    /* Cards & Container */
+    --card: 0 0% 100%;                   /* Rein Weiß */
+    --card-foreground: 210 40% 12%;      /* Sehr dunkel */
+    
+    /* Popover & Modals */
+    --popover: 0 0% 100%;                /* Rein Weiß */
+    --popover-foreground: 210 40% 12%;   /* Sehr dunkel */
+    
+    /* Muted: für inaktive, sekundäre Elemente */
+    --muted: 210 13% 90%;                /* Helles Grau */
+    --muted-foreground: 210 13% 45%;     /* Mittleres Grau */
+    
+    /* Borders & Input */
+    --border: 210 13% 85%;               /* Hellgrau */
+    --input: 210 13% 90%;                /* Für Input-Hintergründe */
+    --ring: 140 52% 37%;                 /* Primary für Focus-Ring */
+    
+    /* Sidebar (für Betriebsleiter-Seiten) */
+    --sidebar-background: 140 52% 7%;    /* Sehr dunkles Grün */
+    --sidebar-foreground: 210 40% 98%;   /* Weiß */
+    --sidebar-primary: 87 62% 56%;       /* Gelb-Grün Akzent */
+    --sidebar-primary-foreground: 210 40% 4%;
+    --sidebar-accent: 32 35% 45%;        /* Erdbraun */
     --sidebar-accent-foreground: 210 40% 98%;
-    --sidebar-border: 217.2 32.6% 17.5%;
-    --sidebar-ring: 134 62% 45%;
+    --sidebar-border: 140 52% 15%;       /* Dunkelgrün */
+    --sidebar-ring: 87 62% 56%;          /* Akzent */
+    
+    /* Chart-Farben */
+    --chart-1: 140 52% 37%;              /* Primäres Grün */
+    --chart-2: 32 35% 45%;               /* Erdbraun */
+    --chart-3: 87 62% 56%;               /* Akzent-Grün */
+    --chart-4: 142 65% 48%;              /* Success-Grün */
+    --chart-5: 38 89% 57%;               /* Warning-Orange */
+    
+    /* Layout & Spacing */
+    --radius: 0.75rem;                   /* Moderne Rundung */
+  }
+
+  /* ────────────────────────────────────────────────────────
+     DARK MODE – Agrar-freundlich für Feldeinsatz (Sonnenlicht)
+     ──────────────────────────────────────────────────────── */
+  .dark {
+    --background: 210 40% 10%;           /* Sehr dunkel, aber nicht pure black */
+    --foreground: 210 40% 97%;           /* Fast weiß */
+    
+    --card: 210 40% 16%;                 /* Etwas heller als bg */
+    --card-foreground: 210 40% 97%;
+    
+    --popover: 210 40% 16%;
+    --popover-foreground: 210 40% 97%;
+    
+    --primary: 140 52% 55%;              /* Heller Grün für sichtbar */
+    --primary-foreground: 210 40% 10%;
+    
+    --secondary: 32 35% 60%;             /* Helleres Erdbraun */
+    --secondary-foreground: 210 40% 10%;
+    
+    --accent: 87 62% 65%;                /* Helleres Akzent-Grün */
+    --accent-foreground: 210 40% 10%;
+    
+    --success: 142 65% 60%;
+    --success-foreground: 210 40% 10%;
+    
+    --warning: 38 89% 65%;
+    --warning-foreground: 210 40% 10%;
+    
+    --info: 204 70% 63%;
+    --info-foreground: 210 40% 10%;
+    
+    --destructive: 9 84% 68%;
+    --destructive-foreground: 210 40% 10%;
+    
+    --neutral: 210 8% 65%;
+    --neutral-foreground: 210 40% 10%;
+    
+    --muted: 210 40% 25%;
+    --muted-foreground: 210 40% 70%;
+    
+    --border: 210 40% 20%;
+    --input: 210 40% 20%;
+    --ring: 140 52% 55%;                 /* Primary hell */
+    
+    --sidebar-background: 210 40% 8%;    /* Farben bleiben dunkel */
+    --sidebar-foreground: 210 40% 97%;
+    --sidebar-primary: 87 62% 65%;
+    --sidebar-primary-foreground: 210 40% 8%;
+    --sidebar-accent: 32 35% 60%;
+    --sidebar-accent-foreground: 210 40% 8%;
+    --sidebar-border: 210 40% 20%;
+    --sidebar-ring: 87 62% 65%;
+    
+    --chart-1: 140 52% 55%;
+    --chart-2: 32 35% 60%;
+    --chart-3: 87 62% 65%;
+    --chart-4: 142 65% 60%;
+    --chart-5: 38 89% 65%;
   }
 }
 
 @layer base {
+  /* ────────────────────────────────────────────────────────
+     TYPO & SCHRIFTARTEN
+     ──────────────────────────────────────────────────────── */
+  
+  html {
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  }
+
+  /* Zahlen-Font mit tabular-lining für Euro, Hektar, kg */
+  .font-tabular {
+    font-family: 'JetBrains Mono', monospace;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ────────────────────────────────────────────────────────
+     GLOBALE ELEMENT-STILE
+     ──────────────────────────────────────────────────────── */
+  
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Überschriften: Starke Gewichte */
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold;
+    letter-spacing: -0.02em; /* Optische Anpassung */
+  }
+
+  h1 {
+    @apply text-4xl md:text-5xl;
+    font-weight: 700;
+  }
+
+  h2 {
+    @apply text-3xl md:text-4xl;
+    font-weight: 700;
+  }
+
+  h3 {
+    @apply text-2xl md:text-3xl;
+    font-weight: 600;
+  }
+
+  h4 {
+    @apply text-xl md:text-2xl;
+    font-weight: 600;
+  }
+
+  /* Fließtext: Optimale Lesbarkeit */
+  p, span, li {
+    @apply leading-relaxed;
+    line-height: 1.6;
+  }
+
+  /* Links: Mit Akzentfarbe */
+  a {
+    @apply text-primary hover:underline focus:outline-offset-2 focus:outline-offset-primary;
+  }
+
+  /* Inputs: Moderne Border-Radius */
+  input, textarea, select {
+    @apply rounded-md border border-input bg-input px-3 py-2 text-base;
+    font-family: inherit;
+  }
+
+  input:focus, textarea:focus, select:focus {
+    @apply ring-2 ring-ring border-primary;
+    outline: none;
+  }
+
+  /* ────────────────────────────────────────────────────────
+     MOBILE & TOUCH-OPTIMIERUNGEN
+     ──────────────────────────────────────────────────────── */
+  
+  /* Touch-Scroll flüssig auf iOS */
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    -webkit-user-select: text;
+    user-select: text;
+  }
+
+  /* Sicherer Bereich für iPhone mit Notch */
+  @supports (padding: max(0px)) {
+    body {
+      padding-left: max(0px, env(safe-area-inset-left));
+      padding-right: max(0px, env(safe-area-inset-right));
+    }
+  }
+
+  /* ────────────────────────────────────────────────────────
+     BARRIEREFREIHEIT
+     ──────────────────────────────────────────────────────── */
+  
+  /* Animationen respektieren prefers-reduced-motion */
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
+  /* Focus-Indicator für Tastatur-Navigation */
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-primary;
+  }
+}
+
+/* ════════════════════════════════════════════════════════════
+   ANIMATIONEN & KEYFRAMES
+   ════════════════════════════════════════════════════════════ */
+
+@layer utilities {
+  /* Spin-Animation für Loader */
+  @keyframes spin-smooth {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  .animate-spin-smooth {
+    animation: spin-smooth 0.8s linear infinite;
+  }
+
+  /* Fade In Animation */
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  .animate-fade-in {
+    animation: fade-in 0.3s ease-in-out;
+  }
+
+  /* Slide Up Animation (für Modals) */
+  @keyframes slide-up {
+    from {
+      transform: translateY(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  .animate-slide-up {
+    animation: slide-up 0.3s ease-out;
+  }
+
+  /* Slide Down Animation */
+  @keyframes slide-down {
+    from {
+      transform: translateY(-100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  .animate-slide-down {
+    animation: slide-down 0.3s ease-out;
+  }
+
+  /* Stagger Animation für Listen */
+  @keyframes stagger-in {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Pulse Animation (für Loading States) */
+  @keyframes pulse-soft {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.5;
+    }
+  }
+
+  .animate-pulse-soft {
+    animation: pulse-soft 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  /* Bounce Animation (für Dots Loader) */
+  @keyframes bounce-gentle {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-8px);
+    }
+  }
+
+  .animate-bounce-gentle {
+    animation: bounce-gentle 0.6s ease-in-out infinite;
+  }
+
+  /* Shake Animation (für Fehler) */
+  @keyframes shake {
+    0%, 100% {
+      transform: translateX(0);
+    }
+    25% {
+      transform: translateX(-4px);
+    }
+    75% {
+      transform: translateX(4px);
+    }
+  }
+
+  .animate-shake {
+    animation: shake 0.3s ease-in-out;
+  }
+
+  /* Scale In Animation */
+  @keyframes scale-in {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  .animate-scale-in {
+    animation: scale-in 0.2s ease-out;
   }
 }

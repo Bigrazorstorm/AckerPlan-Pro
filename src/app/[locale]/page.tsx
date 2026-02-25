@@ -5,10 +5,11 @@ import { useSession } from '@/context/session-context';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { PageLayout } from "@/components/layout/page-layout";
 import dataService from "@/services";
 import { DashboardChart } from "@/components/dashboard-chart";
 import { useLocale, useTranslations } from "next-intl";
-import { AreaChart, Bell, Eye, Tractor } from "lucide-react";
+import { AreaChart, Eye, Bell, Tractor } from "lucide-react";
 import { Kpi, Operation, ChartDataPoint } from '@/services/types';
 import { Skeleton } from '@/components/ui/skeleton';
 import { format } from 'date-fns';
@@ -122,12 +123,10 @@ export default function Home() {
   }
 
   return (
-    <div className="space-y-8">
-      <div>
-        <h1 className="text-2xl md:text-3xl font-bold tracking-tight">{t('welcome')}</h1>
-        <p className="text-muted-foreground">{t('description')}</p>
-      </div>
-
+    <PageLayout
+      title={t('welcome')}
+      description={t('description')}
+    >
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {kpis.map((kpi) => {
           const Icon = kpiIcons[kpi.labelKey];
@@ -135,13 +134,13 @@ export default function Home() {
             <Card key={kpi.labelKey}>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">{tKpi(kpi.labelKey)}</CardTitle>
-                {Icon && <Icon className="h-4 w-4 text-muted-foreground" />}
+                {Icon && <Icon className="h-5 w-5 text-muted-foreground" />}
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{kpi.value}</div>
                 {kpi.change && (
                   <p className="text-xs text-muted-foreground">
-                    <span className={kpi.changeType === 'increase' ? 'text-green-600' : 'text-red-600'}>
+                    <span className={kpi.changeType === 'increase' ? 'text-success' : 'text-destructive'}>
                       {kpi.change}
                     </span>
                     {' '}{t('fromLastMonth')}
@@ -188,9 +187,14 @@ export default function Home() {
                       <div className="font-medium">{tOperationTypes(activity.type)}</div>
                       <div className="text-sm text-muted-foreground">{dateFormatter(activity.date)}</div>
                     </TableCell>
-                    <TableCell>{activity.field}</TableCell>
+                    <TableCell className="hidden sm:table-cell">{activity.field}</TableCell>
                     <TableCell>
-                      <Badge variant={activity.status === 'Completed' ? 'default' : 'secondary'} className={activity.status === 'Completed' ? 'bg-green-100 text-green-800' : ''}>{tOperationStatuses(activity.status)}</Badge>
+                      <Badge 
+                        variant={activity.status === 'Completed' ? 'default' : 'secondary'}
+                        className={activity.status === 'Completed' ? 'bg-success text-success-foreground' : ''}
+                      >
+                        {tOperationStatuses(activity.status)}
+                      </Badge>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -199,6 +203,6 @@ export default function Home() {
           </CardContent>
         </Card>
       </div>
-    </div>
+    </PageLayout>
   );
 }
