@@ -1,5 +1,5 @@
 import { DataService } from './data-service';
-import { Kpi, ChartDataPoint, Operation, Machinery, Session, Field, MaintenanceEvent, AddMaintenanceEventInput, AddRepairEventInput, RepairEvent, AuditLogEvent, AddOperationInput, LaborHoursByCropReportData, Observation, AddObservationInput, ProfitabilityByCropReportData, UpdateMachineInput, FieldEconomics, User, AddUserInput, UpdateOperationInput } from './types';
+import { Kpi, ChartDataPoint, Operation, Machinery, Session, Field, MaintenanceEvent, AddMaintenanceEventInput, AddRepairEventInput, RepairEvent, AuditLogEvent, AddOperationInput, LaborHoursByCropReportData, Observation, AddObservationInput, ProfitabilityByCropReportData, UpdateMachineInput, FieldEconomics, User, AddUserInput, UpdateOperationInput, AddWarehouseItemInput, WarehouseItem } from './types';
 
 // Hardcoded session for demonstration purposes, as this is a placeholder service.
 const session: Session = {
@@ -227,5 +227,23 @@ export class SupabaseDataService implements DataService {
       companyRoles: [{ companyId, role: userData.role }],
     };
     return Promise.resolve(newUser);
+  }
+
+  async getWarehouseItems(tenantId: string, companyId: string): Promise<WarehouseItem[]> {
+    this.log('getWarehouseItems', { tenantId, companyId });
+    return Promise.resolve([]);
+  }
+
+  async addWarehouseItem(tenantId: string, companyId: string, itemData: AddWarehouseItemInput): Promise<WarehouseItem> {
+    this.log('addWarehouseItem', { tenantId, companyId, itemData });
+    const newItem: WarehouseItem = {
+      id: `supabase-wh-${Date.now()}`,
+      tenantId,
+      companyId,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      ...itemData,
+    };
+    return Promise.resolve(newItem);
   }
 }

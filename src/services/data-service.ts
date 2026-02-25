@@ -1,4 +1,4 @@
-import { Kpi, ChartDataPoint, Operation, Machinery, Session, Field, MaintenanceEvent, AddMaintenanceEventInput, AuditLogEvent, RepairEvent, AddRepairEventInput, AddOperationInput, LaborHoursByCropReportData, Observation, AddObservationInput, ProfitabilityByCropReportData, UpdateMachineInput, FieldEconomics, User, AddUserInput, UpdateOperationInput, WarehouseItem } from './types';
+import { Kpi, ChartDataPoint, Operation, Machinery, Session, Field, MaintenanceEvent, AddMaintenanceEventInput, AuditLogEvent, RepairEvent, AddRepairEventInput, AddOperationInput, LaborHoursByCropReportData, Observation, AddObservationInput, ProfitabilityByCropReportData, UpdateMachineInput, FieldEconomics, User, AddUserInput, UpdateOperationInput, WarehouseItem, AddWarehouseItemInput } from './types';
 
 /**
  * Defines the contract for data access in the application.
@@ -225,4 +225,12 @@ export interface DataService {
    * @param companyId - The ID of the company.
    */
   getWarehouseItems(tenantId: string, companyId: string): Promise<WarehouseItem[]>;
+
+  /**
+   * Adds a new item to the warehouse.
+   * @param tenantId - The ID of the tenant.
+   * @param companyId - The ID of the company.
+   * @param itemData - The data for the new item.
+   */
+  addWarehouseItem(tenantId: string, companyId: string, itemData: AddWarehouseItemInput): Promise<WarehouseItem>;
 }

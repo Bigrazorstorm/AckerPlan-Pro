@@ -467,6 +467,7 @@
     "title": "Warehouse Management",
     "description": "Manage your stock levels for seeds, fertilizers, pesticides, and more.",
     "addItemButton": "Add Item",
+    "addItemSheetTitle": "Add New Warehouse Item",
     "tableHeaderName": "Name",
     "tableHeaderType": "Type",
     "tableHeaderQuantity": "Quantity",
@@ -476,7 +477,21 @@
     "edit": "Edit",
     "delete": "Delete",
     "noItemsTitle": "No Items in Warehouse",
-    "noItemsDescription": "Add your first item to start tracking inventory."
+    "noItemsDescription": "Add your first item to start tracking inventory.",
+    "addItemForm": {
+      "nameLabel": "Item Name",
+      "namePlaceholder": "e.g., Wheat Seed 'Actor'",
+      "typeLabel": "Item Type",
+      "typePlaceholder": "Select a type",
+      "quantityLabel": "Initial Quantity",
+      "unitLabel": "Unit",
+      "unitPlaceholder": "e.g., kg, l, bag",
+      "costPerUnitLabel": "Cost per Unit (€)",
+      "submit": "Add Item",
+      "submitting": "Adding...",
+      "successToastTitle": "Item Added",
+      "errorToastTitle": "Error"
+    }
   },
   "WarehouseItemTypes": {
     "Seed": "Seed",

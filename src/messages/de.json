@@ -467,6 +467,7 @@
     "title": "Lagerverwaltung",
     "description": "Verwalten Sie Ihre Lagerbestände für Saatgut, Dünger, Pflanzenschutzmittel und mehr.",
     "addItemButton": "Artikel hinzufügen",
+    "addItemSheetTitle": "Neuen Lagerartikel hinzufügen",
     "tableHeaderName": "Bezeichnung",
     "tableHeaderType": "Typ",
     "tableHeaderQuantity": "Menge",
@@ -476,7 +477,21 @@
     "edit": "Bearbeiten",
     "delete": "Löschen",
     "noItemsTitle": "Keine Artikel im Lager",
-    "noItemsDescription": "Fügen Sie Ihren ersten Artikel hinzu, um Lagerbestände zu verfolgen."
+    "noItemsDescription": "Fügen Sie Ihren ersten Artikel hinzu, um Lagerbestände zu verfolgen.",
+    "addItemForm": {
+      "nameLabel": "Name/Bezeichnung",
+      "namePlaceholder": "z.B. Weizensaatgut 'Akteur'",
+      "typeLabel": "Artikel-Typ",
+      "typePlaceholder": "Typ auswählen",
+      "quantityLabel": "Anfangsmenge",
+      "unitLabel": "Einheit",
+      "unitPlaceholder": "z.B. kg, l, Sack",
+      "costPerUnitLabel": "Kosten pro Einheit (€)",
+      "submit": "Artikel hinzufügen",
+      "submitting": "Wird hinzugefügt...",
+      "successToastTitle": "Artikel hinzugefügt",
+      "errorToastTitle": "Fehler"
+    }
   },
   "WarehouseItemTypes": {
     "Seed": "Saatgut",

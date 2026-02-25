@@ -1,5 +1,5 @@
 import { DataService } from './data-service';
-import { Kpi, ChartDataPoint, Operation, Machinery, Session, Field, MaintenanceEvent, AddMaintenanceEventInput, AuditLogEvent, RepairEvent, AddRepairEventInput, AddOperationInput, LaborHoursByCropReportData, Observation, AddObservationInput, ProfitabilityByCropReportData, UpdateMachineInput, FieldEconomics, User, AddUserInput, Role, UpdateOperationInput, ObservationType, WarehouseItem } from './types';
+import { Kpi, ChartDataPoint, Operation, Machinery, Session, Field, MaintenanceEvent, AddMaintenanceEventInput, AuditLogEvent, RepairEvent, AddRepairEventInput, AddOperationInput, LaborHoursByCropReportData, Observation, AddObservationInput, ProfitabilityByCropReportData, UpdateMachineInput, FieldEconomics, User, AddUserInput, Role, UpdateOperationInput, ObservationType, WarehouseItem, AddWarehouseItemInput } from './types';
 
 let users: User[] = [
     {
@@ -702,5 +702,20 @@ export class MockDataService implements DataService {
   async getWarehouseItems(tenantId: string, companyId: string): Promise<WarehouseItem[]> {
     console.log(`Fetching Warehouse Items for tenant ${tenantId} and company ${companyId}.`);
     return Promise.resolve(warehouseItems.filter(i => i.tenantId === tenantId && i.companyId === companyId));
+  }
+
+  async addWarehouseItem(tenantId: string, companyId: string, itemData: AddWarehouseItemInput): Promise<WarehouseItem> {
+    console.log(`Adding Warehouse Item for tenant ${tenantId} and company ${companyId}.`);
+    const newItem: WarehouseItem = {
+      id: `item-${warehouseItems.length + 1}`,
+      tenantId,
+      companyId,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      ...itemData,
+    };
+    warehouseItems.unshift(newItem);
+    logAuditEvent(tenantId, companyId, 'warehouse.item.create', `Lagerartikel "${itemData.name}" wurde hinzugefügt (Menge: ${itemData.quantity} ${itemData.unit}).`);
+    return Promise.resolve(newItem);
   }
 }

@@ -255,3 +255,11 @@ export interface WarehouseItem {
   createdAt: string;
   updatedAt: string;
 }
+
+export interface AddWarehouseItemInput {
+  name: string;
+  itemType: WarehouseItemType;
+  quantity: number;
+  unit: string;
+  costPerUnit: number;
+}

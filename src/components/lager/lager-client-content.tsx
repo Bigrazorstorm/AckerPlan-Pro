@@ -1,18 +1,118 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useActionState } from 'react';
+import { useFormStatus } from 'react-dom';
 import { useSession } from '@/context/session-context';
 import dataService from '@/services';
-import { WarehouseItem } from '@/services/types';
+import { WarehouseItem, WarehouseItemType } from '@/services/types';
 import { useTranslations } from 'next-intl';
 import { useParams } from 'next/navigation';
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { MoreHorizontal, PlusCircle, Archive } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useToast } from '@/hooks/use-toast';
+import { addWarehouseItem } from '@/app/lager/actions';
+
+const addItemInitialState = {
+  message: '',
+  errors: {},
+};
+
+function SubmitButton() {
+  const { pending } = useFormStatus();
+  const t = useTranslations('LagerPage.addItemForm');
+  return (
+    <Button type="submit" aria-disabled={pending}>
+      {pending ? t('submitting') : t('submit')}
+    </Button>
+  );
+}
+
+function AddItemForm({ closeSheet, tenantId, companyId }: { closeSheet: () => void; tenantId: string; companyId: string; }) {
+  const [state, formAction] = useActionState(addWarehouseItem, addItemInitialState);
+  const { toast } = useToast();
+  const t = useTranslations('LagerPage.addItemForm');
+  const tItemTypes = useTranslations('WarehouseItemTypes');
+  
+  const itemTypes: WarehouseItemType[] = ['Seed', 'Fertilizer', 'Pesticide', 'Other'];
+
+  useEffect(() => {
+    if (state.message && Object.keys(state.errors).length === 0) {
+      toast({
+        title: t('successToastTitle'),
+        description: state.message,
+      });
+      closeSheet();
+    } else if (state.message && Object.keys(state.errors).length > 0) {
+      toast({
+        variant: 'destructive',
+        title: t('errorToastTitle'),
+        description: state.message,
+      });
+    }
+  }, [state, toast, closeSheet, t]);
+
+  return (
+    <form action={formAction} className="space-y-4">
+      <input type="hidden" name="tenantId" value={tenantId} />
+      <input type="hidden" name="companyId" value={companyId} />
+      
+      <div className="space-y-2">
+        <Label htmlFor="name">{t('nameLabel')}</Label>
+        <Input id="name" name="name" required placeholder={t('namePlaceholder')} />
+        {state.errors?.name && <p className="text-sm text-destructive">{state.errors.name.join(', ')}</p>}
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="itemType">{t('typeLabel')}</Label>
+        <Select name="itemType" required>
+          <SelectTrigger>
+            <SelectValue placeholder={t('typePlaceholder')} />
+          </SelectTrigger>
+          <SelectContent>
+            {itemTypes.map((type) => (
+              <SelectItem key={type} value={type}>{tItemTypes(type)}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        {state.errors?.itemType && <p className="text-sm text-destructive">{state.errors.itemType.join(', ')}</p>}
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="quantity">{t('quantityLabel')}</Label>
+          <Input id="quantity" name="quantity" type="number" step="any" required placeholder="100" />
+          {state.errors?.quantity && <p className="text-sm text-destructive">{state.errors.quantity.join(', ')}</p>}
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="unit">{t('unitLabel')}</Label>
+          <Input id="unit" name="unit" required placeholder={t('unitPlaceholder')} />
+          {state.errors?.unit && <p className="text-sm text-destructive">{state.errors.unit.join(', ')}</p>}
+        </div>
+      </div>
+      
+      <div className="space-y-2">
+        <Label htmlFor="costPerUnit">{t('costPerUnitLabel')}</Label>
+        <div className="relative">
+            <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-muted-foreground text-sm">€</span>
+            <Input id="costPerUnit" name="costPerUnit" type="number" step="0.01" required placeholder="25.50" className="pl-7"/>
+        </div>
+        {state.errors?.costPerUnit && <p className="text-sm text-destructive">{state.errors.costPerUnit.join(', ')}</p>}
+      </div>
+
+      <SubmitButton />
+    </form>
+  );
+}
+
 
 function LagerSkeleton() {
     const t = useTranslations('LagerPage');
@@ -57,6 +157,7 @@ export function LagerClientContent() {
     const { activeCompany, loading: sessionLoading, activeRole } = useSession();
     const [items, setItems] = useState<WarehouseItem[]>([]);
     const [loading, setLoading] = useState(true);
+    const [isAddSheetOpen, setAddSheetOpen] = useState(false);
     const t = useTranslations('LagerPage');
     const tItemTypes = useTranslations('WarehouseItemTypes');
     const { locale } = useParams<{ locale: string }>();
@@ -75,7 +176,7 @@ export function LagerClientContent() {
         } else if (!sessionLoading) {
             setLoading(false);
         }
-    }, [activeCompany, sessionLoading]);
+    }, [activeCompany, sessionLoading, isAddSheetOpen]);
     
     const currencyFormatter = new Intl.NumberFormat(locale, {
         style: 'currency',
@@ -91,10 +192,22 @@ export function LagerClientContent() {
             <CardHeader className="flex flex-row items-center justify-between">
                 <div/>
                 {canManageWarehouse && (
-                    <Button size="sm" className="gap-1" disabled>
-                        <PlusCircle className="h-4 w-4" />
-                        {t('addItemButton')}
-                    </Button>
+                    <Sheet open={isAddSheetOpen} onOpenChange={setAddSheetOpen}>
+                        <SheetTrigger asChild>
+                             <Button size="sm" className="gap-1">
+                                <PlusCircle className="h-4 w-4" />
+                                {t('addItemButton')}
+                            </Button>
+                        </SheetTrigger>
+                        <SheetContent>
+                            <SheetHeader>
+                                <SheetTitle>{t('addItemSheetTitle')}</SheetTitle>
+                            </SheetHeader>
+                            <div className="py-4">
+                                {activeCompany && <AddItemForm closeSheet={() => setAddSheetOpen(false)} tenantId={activeCompany.tenantId} companyId={activeCompany.id} />}
+                            </div>
+                        </SheetContent>
+                    </Sheet>
                 )}
             </CardHeader>
             <CardContent>
