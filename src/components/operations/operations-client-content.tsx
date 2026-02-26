@@ -67,7 +67,7 @@ function SubmitButton({ tKey, isEdit }: { tKey: string; isEdit?: boolean }) {
 
 function EditOperationForm({ closeSheet, tenantId, companyId, fields, machinery, operation, personnel, warehouseItems }: { closeSheet: () => void; tenantId: string; companyId: string; fields: Field[], machinery: Machinery[], operation: Operation, personnel: User[], warehouseItems: WarehouseItem[] }) {
   const [state, formAction] = useActionState(updateOperation, initialState);
-  const { toast} = useToast();
+  const { toast } = useToast();
   const t = useTranslations('OperationsPage.addOperationForm');
   const tShared = useTranslations('OperationsPage');
   const tOperationTypes = useTranslations('OperationTypes');
@@ -104,18 +104,19 @@ function EditOperationForm({ closeSheet, tenantId, companyId, fields, machinery,
   }, [operationType, selectedPersonnel, personnel]);
 
   useEffect(() => {
-    if (state.message && !state.errors) {
+    const errorsExist = state.errors && Object.keys(state.errors).length > 0;
+    if (state.message && !errorsExist) {
       toast({
         title: t('successToastTitle'),
         description: state.message,
-      })
+      });
       closeSheet();
-    } else if (state.message && Object.keys(state.errors).length > 0) {
+    } else if (state.message && errorsExist) {
       toast({
         variant: 'destructive',
         title: t('errorToastTitle'),
         description: state.message,
-      })
+      });
     }
   }, [state, toast, closeSheet, t]);
   
@@ -380,18 +381,19 @@ function AddOperationForm({ closeSheet, tenantId, companyId, fields, machinery, 
 
 
   useEffect(() => {
-    if (state.message && !state.errors) {
+    const errorsExist = state.errors && Object.keys(state.errors).length > 0;
+    if (state.message && !errorsExist) {
       toast({
         title: t('successToastTitle'),
         description: state.message,
-      })
+      });
       closeSheet();
-    } else if (state.message && state.errors) {
+    } else if (state.message && errorsExist) {
       toast({
         variant: 'destructive',
         title: t('errorToastTitle'),
         description: state.message,
-      })
+      });
     }
   }, [state, toast, closeSheet, t]);
   

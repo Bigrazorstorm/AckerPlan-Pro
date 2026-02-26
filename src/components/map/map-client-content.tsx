@@ -19,7 +19,6 @@ import { AlertTriangle } from 'lucide-react';
 // Static import for Leaflet CSS - must be at top level
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css';
-import 'leaflet-draw/dist/leaflet.draw.css';
 
 // Dynamic imports for Leaflet to avoid SSR issues
 import type { LatLngExpression } from 'leaflet';
@@ -548,7 +547,6 @@ export function MapClientContent() {
       };
 
       // Base layer: DOP20 (Digital Orthophoto 20cm)
-      // Available layers from GetCapabilities: th_dop (RGB), th_dop20pan (Grayscale), th_dop20cir (Infrared)
       const dopLayer = createWmsLayer('DOP20', "https://www.geoproxy.geoportal-th.de/geoproxy/services/DOP20", {
         layers: 'th_dop',
         format: 'image/jpeg',
@@ -560,9 +558,7 @@ export function MapClientContent() {
 
       dopLayer.addTo(map);
 
-      // BKG Basemap.de - Official German basemap by Bundesamt für Kartographie und Geodäsie (BKG)
-      // Service: https://sgx.geodatenzentrum.de/wms_basemapde
-      // Supports EPSG:25832 (UTM32) and EPSG:3857 (Web Mercator)
+      // BKG Basemap.de
       const bkgBaseMapLayer = createWmsLayer('BKG Basemap', "https://sgx.geodatenzentrum.de/wms_basemapde", {
         layers: 'de_basemapde_web_raster_farbe',
         format: 'image/png',
@@ -572,9 +568,7 @@ export function MapClientContent() {
         maxZoom: UTM32_MAX_ZOOM,
       });
 
-      // ALKIS Simplified (ALKISV) - Flurstücke (parcels) with labels combined into single layer
-      // Service endpoint: https://www.geoproxy.geoportal-th.de/geoproxy/services/ALKISV
-      // Layers: FlurstueckGrenzpunkt (boundaries) + AngabenZumFlurstueck (labels) combined
+      // ALKIS Simplified (ALKISV)
       const alkisParcelLayer = createWmsLayer('ALKIS Flurstücke Grenzen', "https://www.geoproxy.geoportal-th.de/geoproxy/services/ALKISV", {
         layers: 'FlurstueckGrenzpunkt',
         format: 'image/png',
@@ -597,7 +591,7 @@ export function MapClientContent() {
       // Combine both Flurstücke layers into a single LayerGroup
       const alkisLayer = L.layerGroup([alkisParcelLayer, alkisLabelsLayer]);
 
-      // ALKIS Vegetation - Land use/vegetation layer
+      // ALKIS Vegetation
       const vegetationLayer = createWmsLayer('Vegetation', "https://www.geoproxy.geoportal-th.de/geoproxy/services/ALKISV", {
         layers: 'Vegetation',
         format: 'image/png',
@@ -607,9 +601,7 @@ export function MapClientContent() {
         maxZoom: UTM32_MAX_ZOOM,
       });
 
-      // Administrative boundaries - Fluren (fields/districts)
-      // Service: https://www.geoproxy.geoportal-th.de/geoproxy/services/GRENZUEB
-      // Layers: gmkueb_flur (boundaries) + gmkueb_flur_name (labels) combined
+      // Administrative boundaries
       const flurenLayer = createWmsLayer('Fluren', "https://www.geoproxy.geoportal-th.de/geoproxy/services/GRENZUEB", {
         layers: 'gmkueb_flur,gmkueb_flur_name',
         format: 'image/png',
@@ -619,9 +611,6 @@ export function MapClientContent() {
         maxZoom: UTM32_MAX_ZOOM,
       });
 
-      // Administrative boundaries - Gemarkungen (municipalities/districts)
-      // Service: https://www.geoproxy.geoportal-th.de/geoproxy/services/GRENZUEB
-      // Layers: gmkueb_gmk (boundaries) + gmkueb_gmk_name (labels) combined
       const gemarkungenLayer = createWmsLayer('Gemarkungen', "https://www.geoproxy.geoportal-th.de/geoproxy/services/GRENZUEB", {
         layers: 'gmkueb_gmk,gmkueb_gmk_name',
         format: 'image/png',
@@ -631,7 +620,7 @@ export function MapClientContent() {
         maxZoom: UTM32_MAX_ZOOM,
       });
 
-      // Agrar WMS layers (Feldblock, Nitrat-, Phosphatkulisse)
+      // Agrar WMS layers
       const feldblockLayer = createWmsLayer('Feldblöcke', "https://www.geoproxy.geoportal-th.de/geoproxy/services/agrar/feldblock", {
         layers: 'Feldblock',
         format: 'image/png',
