@@ -3,7 +3,73 @@
  *
  * Ein Schlag ist die bewirtschaftete Einheit
  * Kann aus einem oder mehreren Flurstücken bestehen
+ * Schläge sind Feldblöcken (Referenzparzellen/DGK-Lw) zugeordnet
  */
+
+/**
+ * Cadastral Parcel (Flurstück) Model
+ * Rechtliche Grundeinheit aus dem Flurstückverzeichnis
+ */
+export interface CadastralParcel {
+  id: string;                    // Eindeutige ID (UUID)
+  tenantId: string;              // Mieter-ID (Betrieb)
+  companyId: string;             // Unternehmen-ID
+  
+  // Identifikation
+  name: string;                  // Anzeigename (z.B. "Flurstück 123/45")
+  county: string;                // Landkreis
+  municipality: string;          // Gemeinde
+  district: string;              // Gemarkung
+  parcelNumber: string;          // Flurstücksnummer (z.B. "123/45")
+  subParcelNumber?: string;      // Unterflurstücksnummer
+  
+  // Fläche & Geometrie
+  area: number;                  // Fläche in ha
+  polygonGeoJSON?: string;       // GeoJSON Polygon für Kartendarstellung
+  
+  // Eigenschaft
+  owner: string;                 // Eigentümer
+  leasingStatus?: 'owned' | 'leased' | 'other'; // Bewirtschaftungsstatus
+  
+  // System
+  createdAt: Date;
+  updatedAt: Date;
+  createdBy?: string;
+}
+
+/**
+ * Field Block / Referenzparzelle (DGK-Lw) Model
+ * Funktionale Einheit für Förderanträge (ELER, GAP, etc.)
+ */
+export interface FieldBlock {
+  id: string;                    // Eindeutige ID (UUID)
+  tenantId: string;              // Mieter-ID (Betrieb)
+  companyId: string;             // Unternehmen-ID
+  
+  // Identifikation
+  name: string;                  // Name (z.B. "Feldblock A")
+  referenceNumber: string;       // Referenznummer (z.B. "DE-123456-001")
+  dgkLwNumber?: string;          // DGK-Lw Identifizierung (für GAP-Compliance)
+  
+  // Fläche
+  totalArea: number;             // Gesamtfläche in ha
+  
+  // Zuordnung
+  fieldIds: string[];            // IDs der Schläge in diesem Feldblock
+  cadastralParcelIds: string[];  // IDs der Flurstücke in diesem Feldblock
+  
+  // Förderung & Auflagen
+  subsidyEligible: boolean;      // Für Direktzahlungen förderfähig?
+  subsidyAmount?: number;        // Geschätzte Förderung in EUR
+  gapCompliant: boolean;         // GAP-konform?
+  environmentalZone?: boolean;   // In Umweltzone?
+  restrictions?: string[];       // Weitere Auflagen (z.B. "3% Brachenbrache")
+  
+  // System
+  createdAt: Date;
+  updatedAt: Date;
+  createdBy?: string;
+}
 
 /**
  * Field Status
@@ -57,6 +123,10 @@ export interface Field {
   description?: string;          // Optionale Beschreibung
   status: FieldStatus;           // Status (aktiv, inaktiv, etc.)
   
+  // Flurstücke & Feldblock
+  cadastralParcelIds: string[];  // IDs der Flurstücke, aus denen dieser Schlag besteht
+  fieldBlockId?: string;         // ID des zugeordneten Feldblocks (Referenzparzelle/DGK-Lw)
+  
   // Lokalisierung
   location?: {
     lat?: number;               // Breitengrad
@@ -65,7 +135,7 @@ export interface Field {
   };
   
   // Fläche & Geometrie
-  totalArea: number;            // Gesamtfläche in ha
+  totalArea: number;            // Gesamtfläche in ha (berechnet aus Flurstücken oder manuell)
   usableArea?: number;          // Nutzbare Fläche (kann von Gesamtfläche abweichen)
   
   // Eigenschaften
@@ -116,6 +186,8 @@ export interface FieldListItem {
 export interface FieldFormData {
   name: string;
   description?: string;
+  cadastralParcelIds: string[];  // Flurstücke, aus denen dieser Schlag besteht
+  fieldBlockId?: string;         // Zugeordneter Feldblock
   totalArea: number;
   usableArea?: number;
   soilType?: SoilType;
@@ -137,4 +209,37 @@ export interface FieldFilters {
   cropType?: CropType;
   sortBy?: 'name' | 'area' | 'lastActivity';
   searchTerm?: string;
+}
+
+/**
+ * Cadastral Parcel Create/Edit Request
+ */
+export interface CadastralParcelFormData {
+  name: string;
+  county: string;
+  municipality: string;
+  district: string;
+  parcelNumber: string;
+  subParcelNumber?: string;
+  area: number;
+  owner: string;
+  leasingStatus?: 'owned' | 'leased' | 'other';
+  polygonGeoJSON?: string;
+}
+
+/**
+ * Field Block Create/Edit Request
+ */
+export interface FieldBlockFormData {
+  name: string;
+  referenceNumber: string;
+  dgkLwNumber?: string;
+  totalArea: number;
+  fieldIds: string[];
+  cadastralParcelIds: string[];
+  subsidyEligible: boolean;
+  subsidyAmount?: number;
+  gapCompliant: boolean;
+  environmentalZone?: boolean;
+  restrictions?: string[];
 }

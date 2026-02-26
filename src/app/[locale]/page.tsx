@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { PageLayout } from "@/components/layout/page-layout";
 import dataService from "@/services";
 import { DashboardChart } from "@/components/dashboard-chart";
+import { WeatherWidget } from "@/components/dashboard/weather-widget";
 import { useLocale, useTranslations } from "next-intl";
 import { AreaChart, Eye, Bell, Tractor } from "lucide-react";
 import { Kpi, Operation, ChartDataPoint } from '@/services/types';
@@ -150,6 +151,16 @@ export default function Home() {
             </Card>
           );
         })}
+      </div>
+
+      {/* Weather Widget */}
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <div className="lg:col-span-1">
+          <WeatherWidget />
+        </div>
+        
+        {/* Remaining space for KPIs if needed */}
+        <div className="lg:col-span-3"></div>
       </div>
 
       <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-7">

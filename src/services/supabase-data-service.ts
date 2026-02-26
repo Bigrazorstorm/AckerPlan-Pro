@@ -2,6 +2,7 @@
 
 import { DataService } from './data-service';
 import { Kpi, ChartDataPoint, Operation, Machinery, Session, Field, MaintenanceEvent, AddMaintenanceEventInput, AddRepairEventInput, RepairEvent, AuditLogEvent, AddOperationInput, LaborHoursByCropReportData, Observation, AddObservationInput, ProfitabilityByCropReportData, UpdateMachineInput, FieldEconomics, User, AddUserInput, UpdateOperationInput, AddWarehouseItemInput, WarehouseItem, UpdateObservationInput, UpdateWarehouseItemInput, ProfitabilityByFieldReportData, UpdateUserData } from './types';
+import { CadastralParcel, FieldBlock, CadastralParcelFormData, FieldBlockFormData } from './field-types';
 
 // Hardcoded session for demonstration purposes, as this is a placeholder service.
 const session: Session = {
@@ -308,6 +309,92 @@ export class SupabaseDataService implements DataService {
 
   async deleteWarehouseItem(tenantId: string, companyId: string, itemId: string): Promise<void> {
     this.log('deleteWarehouseItem', { tenantId, companyId, itemId });
+    return Promise.resolve();
+  }
+
+  // ====== CADASTRAL PARCELS (Flurstücke) ======
+
+  async getCadastralParcels(tenantId: string, companyId: string): Promise<CadastralParcel[]> {
+    this.log('getCadastralParcels', { tenantId, companyId });
+    return Promise.resolve([]);
+  }
+
+  async getCadastralParcelById(tenantId: string, companyId: string, parcelId: string): Promise<CadastralParcel | null> {
+    this.log('getCadastralParcelById', { tenantId, companyId, parcelId });
+    return Promise.resolve(null);
+  }
+
+  async addCadastralParcel(tenantId: string, companyId: string, parcelData: CadastralParcelFormData): Promise<CadastralParcel> {
+    this.log('addCadastralParcel', { tenantId, companyId, parcelData });
+    const newParcel: CadastralParcel = {
+      id: `supabase-parcel-${Date.now()}`,
+      tenantId,
+      companyId,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      ...parcelData,
+    };
+    return Promise.resolve(newParcel);
+  }
+
+  async updateCadastralParcel(tenantId: string, companyId: string, parcelId: string, parcelData: CadastralParcelFormData): Promise<CadastralParcel> {
+    this.log('updateCadastralParcel', { tenantId, companyId, parcelId, parcelData });
+    const updatedParcel: CadastralParcel = {
+      id: parcelId,
+      tenantId,
+      companyId,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      ...parcelData,
+    };
+    return Promise.resolve(updatedParcel);
+  }
+
+  async deleteCadastralParcel(tenantId: string, companyId: string, parcelId: string): Promise<void> {
+    this.log('deleteCadastralParcel', { tenantId, companyId, parcelId });
+    return Promise.resolve();
+  }
+
+  // ====== FIELD BLOCKS (Feldblöcke / Referenzparzellen) ======
+
+  async getFieldBlocks(tenantId: string, companyId: string): Promise<FieldBlock[]> {
+    this.log('getFieldBlocks', { tenantId, companyId });
+    return Promise.resolve([]);
+  }
+
+  async getFieldBlockById(tenantId: string, companyId: string, blockId: string): Promise<FieldBlock | null> {
+    this.log('getFieldBlockById', { tenantId, companyId, blockId });
+    return Promise.resolve(null);
+  }
+
+  async addFieldBlock(tenantId: string, companyId: string, blockData: FieldBlockFormData): Promise<FieldBlock> {
+    this.log('addFieldBlock', { tenantId, companyId, blockData });
+    const newBlock: FieldBlock = {
+      id: `supabase-block-${Date.now()}`,
+      tenantId,
+      companyId,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      ...blockData,
+    };
+    return Promise.resolve(newBlock);
+  }
+
+  async updateFieldBlock(tenantId: string, companyId: string, blockId: string, blockData: FieldBlockFormData): Promise<FieldBlock> {
+    this.log('updateFieldBlock', { tenantId, companyId, blockId, blockData });
+    const updatedBlock: FieldBlock = {
+      id: blockId,
+      tenantId,
+      companyId,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      ...blockData,
+    };
+    return Promise.resolve(updatedBlock);
+  }
+
+  async deleteFieldBlock(tenantId: string, companyId: string, blockId: string): Promise<void> {
+    this.log('deleteFieldBlock', { tenantId, companyId, blockId });
     return Promise.resolve();
   }
 }

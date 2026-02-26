@@ -2,6 +2,7 @@
 
 import { DataService } from './data-service';
 import { Kpi, ChartDataPoint, Operation, Machinery, Session, Field, MaintenanceEvent, AddMaintenanceEventInput, AuditLogEvent, RepairEvent, AddRepairEventInput, AddOperationInput, LaborHoursByCropReportData, Observation, AddObservationInput, ProfitabilityByCropReportData, UpdateMachineInput, FieldEconomics, User, AddUserInput, Role, UpdateOperationInput, ObservationType, WarehouseItem, AddWarehouseItemInput, UpdateObservationInput, UpdateWarehouseItemInput, UpdateUserData, ProfitabilityByFieldReportData, OperationMaterial, Company } from './types';
+import { CadastralParcel, FieldBlock, CadastralParcelFormData, FieldBlockFormData } from './field-types';
 
 let users: User[] = [
     {
@@ -185,14 +186,62 @@ let operations: Operation[] = [
 ];
 
 
+const cadastralParcels: CadastralParcel[] = [
+  { 
+    id: 'parcel-1', tenantId: 'tenant-123', companyId: 'company-456', 
+    name: 'Flurstück 123/45', county: 'Landkreis Thüringen', municipality: 'Erfurt', district: 'Erfurt',
+    parcelNumber: '123/45', area: 8.5, owner: 'Max Mustermann', leasingStatus: 'owned',
+    polygonGeoJSON: '{"type":"Polygon","coordinates":[[[13.35,52.51],[13.35,52.52],[13.37,52.52],[13.37,52.51],[13.35,52.51]]]}',
+    createdAt: new Date(), updatedAt: new Date()
+  },
+  { 
+    id: 'parcel-2', tenantId: 'tenant-123', companyId: 'company-456', 
+    name: 'Flurstück 123/46', county: 'Landkreis Thüringen', municipality: 'Erfurt', district: 'Erfurt',
+    parcelNumber: '123/46', area: 6.7, owner: 'Max Mustermann', leasingStatus: 'owned',
+    polygonGeoJSON: '{"type":"Polygon","coordinates":[[[13.37,52.51],[13.37,52.52],[13.39,52.52],[13.39,52.51],[13.37,52.51]]]}',
+    createdAt: new Date(), updatedAt: new Date()
+  },
+  { 
+    id: 'parcel-3', tenantId: 'tenant-123', companyId: 'company-456', 
+    name: 'Flurstück 124/1', county: 'Landkreis Thüringen', municipality: 'Erfurt', district: 'Erfurt',
+    parcelNumber: '124/1', area: 22.0, owner: 'Agrargenossenschaft eG', leasingStatus: 'leased',
+    polygonGeoJSON: '{"type":"Polygon","coordinates":[[[13.35,52.48],[13.35,52.50],[13.37,52.50],[13.37,52.48],[13.35,52.48]]]}',
+    createdAt: new Date(), updatedAt: new Date()
+  },
+  { 
+    id: 'parcel-4', tenantId: 'tenant-123', companyId: 'company-456', 
+    name: 'Flurstück 150/12', county: 'Landkreis Thüringen', municipality: 'Erfurt', district: 'Erfurt',
+    parcelNumber: '150/12', area: 5.7, owner: 'Max Mustermann', leasingStatus: 'owned',
+    polygonGeoJSON: '{"type":"Polygon","coordinates":[[[13.32,52.49],[13.32,52.50],[13.34,52.50],[13.34,52.49],[13.32,52.49]]]}',
+    createdAt: new Date(), updatedAt: new Date()
+  },
+];
+
+const fieldBlocks: FieldBlock[] = [
+  {
+    id: 'block-1', tenantId: 'tenant-123', companyId: 'company-456',
+    name: 'Feldblock A', referenceNumber: 'DE-123456-001', dgkLwNumber: 'DE-THR-001',
+    totalArea: 37.9, fieldIds: ['field-1', 'field-2', 'field-4'], cadastralParcelIds: ['parcel-1', 'parcel-2', 'parcel-4'],
+    subsidyEligible: true, subsidyAmount: 1900, gapCompliant: true, environmentalZone: false,
+    restrictions: ['3% Brachenbrache'], createdAt: new Date(), updatedAt: new Date()
+  },
+  {
+    id: 'block-2', tenantId: 'tenant-123', companyId: 'company-456',
+    name: 'Feldblock B', referenceNumber: 'DE-123456-002', dgkLwNumber: 'DE-THR-002',
+    totalArea: 22.0, fieldIds: ['field-3'], cadastralParcelIds: ['parcel-3'],
+    subsidyEligible: true, subsidyAmount: 1100, gapCompliant: true, environmentalZone: true,
+    restrictions: ['Pufferstreifen 5m'], createdAt: new Date(), updatedAt: new Date()
+  },
+];
+
 const fields: Field[] = [
-  { id: 'field-1', tenantId: 'tenant-123', companyId: 'company-456', name: 'Acker-Nord 1', area: 15.2, crop: 'Winterweizen', geometry: [[52.51, 13.35], [52.52, 13.35], [52.52, 13.37], [52.51, 13.37]] },
-  { id: 'field-2', tenantId: 'tenant-123', companyId: 'company-456', name: 'Südhang', area: 8.5, crop: 'Zuckerrüben', geometry: [[52.50, 13.38], [52.51, 13.38], [52.51, 13.40], [52.50, 13.40]] },
-  { id: 'field-3', tenantId: 'tenant-123', companyId: 'company-456', name: 'Große Wiese', area: 22.0, crop: 'Gerste', geometry: [[52.48, 13.35], [52.49, 13.35], [52.49, 13.37], [52.48, 13.37]] },
-  { id: 'field-4', tenantId: 'tenant-123', companyId: 'company-456', name: 'An der B2', area: 5.7, crop: 'Raps', geometry: [[52.49, 13.32], [52.50, 13.32], [52.50, 13.34], [52.49, 13.34]] },
+  { id: 'field-1', tenantId: 'tenant-123', companyId: 'company-456', name: 'Acker-Nord 1', area: 15.2, crop: 'Winterweizen', geometry: [[52.51, 13.35], [52.52, 13.35], [52.52, 13.37], [52.51, 13.37]], cadastralParcelIds: ['parcel-1'], fieldBlockId: 'block-1' },
+  { id: 'field-2', tenantId: 'tenant-123', companyId: 'company-456', name: 'Südhang', area: 8.5, crop: 'Zuckerrüben', geometry: [[52.50, 13.38], [52.51, 13.38], [52.51, 13.40], [52.50, 13.40]], cadastralParcelIds: ['parcel-2'], fieldBlockId: 'block-1' },
+  { id: 'field-3', tenantId: 'tenant-123', companyId: 'company-456', name: 'Große Wiese', area: 22.0, crop: 'Gerste', geometry: [[52.48, 13.35], [52.49, 13.35], [52.49, 13.37], [52.48, 13.37]], cadastralParcelIds: ['parcel-3'], fieldBlockId: 'block-2' },
+  { id: 'field-4', tenantId: 'tenant-123', companyId: 'company-456', name: 'An der B2', area: 5.7, crop: 'Raps', geometry: [[52.49, 13.32], [52.50, 13.32], [52.50, 13.34], [52.49, 13.34]], cadastralParcelIds: ['parcel-4'], fieldBlockId: 'block-1' },
   // Fields for company-789
-  { id: 'field-5', tenantId: 'tenant-123', companyId: 'company-789', name: 'Grünland-West', area: 12.0, crop: 'Weidegras', geometry: [[52.46, 13.41], [52.47, 13.41], [52.47, 13.43], [52.46, 13.43]] },
-  { id: 'field-6', tenantId: 'tenant-123', companyId: 'company-789', name: 'Weide am Bach', area: 7.8, crop: 'Klee-Gras-Mischung', geometry: [[52.45, 13.38], [52.46, 13.38], [52.46, 13.40], [52.45, 13.40]] },
+  { id: 'field-5', tenantId: 'tenant-123', companyId: 'company-789', name: 'Grünland-West', area: 12.0, crop: 'Weidegras', geometry: [[52.46, 13.41], [52.47, 13.41], [52.47, 13.43], [52.46, 13.43]], cadastralParcelIds: [], fieldBlockId: undefined },
+  { id: 'field-6', tenantId: 'tenant-123', companyId: 'company-789', name: 'Weide am Bach', area: 7.8, crop: 'Klee-Gras-Mischung', geometry: [[52.45, 13.38], [52.46, 13.38], [52.46, 13.40], [52.45, 13.40]], cadastralParcelIds: [], fieldBlockId: undefined },
 ];
 
 let maintenanceEvents: MaintenanceEvent[] = [
@@ -1029,6 +1078,147 @@ export class MockDataService implements DataService {
         return Promise.resolve();
     } else {
         return Promise.reject(new Error('Deletion failed unexpectedly.'));
+    }
+  }
+
+  // ====== CADASTRAL PARCELS (Flurstücke) ======
+
+  async getCadastralParcels(tenantId: string, companyId: string): Promise<CadastralParcel[]> {
+    console.log(`Fetching Cadastral Parcels for tenant ${tenantId} and company ${companyId}.`);
+    return Promise.resolve(cadastralParcels.filter(p => p.tenantId === tenantId && p.companyId === companyId));
+  }
+
+  async getCadastralParcelById(tenantId: string, companyId: string, parcelId: string): Promise<CadastralParcel | null> {
+    console.log(`Fetching Cadastral Parcel ${parcelId} for tenant ${tenantId} and company ${companyId}.`);
+    const parcel = cadastralParcels.find(p => p.id === parcelId && p.tenantId === tenantId && p.companyId === companyId);
+    return Promise.resolve(parcel || null);
+  }
+
+  async addCadastralParcel(tenantId: string, companyId: string, parcelData: CadastralParcelFormData): Promise<CadastralParcel> {
+    console.log(`Adding Cadastral Parcel for tenant ${tenantId} and company ${companyId}.`);
+    const newParcel: CadastralParcel = {
+      id: `parcel-${cadastralParcels.length + 1}`,
+      tenantId,
+      companyId,
+      ...parcelData,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    cadastralParcels.push(newParcel);
+    logAuditEvent(tenantId, companyId, 'cadastral.parcel.create', `Flurstück "${parcelData.name}" (${parcelData.parcelNumber}) wurde hinzugefügt (${parcelData.area}ha).`);
+    return Promise.resolve(newParcel);
+  }
+
+  async updateCadastralParcel(tenantId: string, companyId: string, parcelId: string, parcelData: CadastralParcelFormData): Promise<CadastralParcel> {
+    console.log(`Updating Cadastral Parcel ${parcelId} for tenant ${tenantId} and company ${companyId}.`);
+    const parcelIndex = cadastralParcels.findIndex(p => p.id === parcelId && p.tenantId === tenantId && p.companyId === companyId);
+    if (parcelIndex === -1) {
+      throw new Error("Cadastral Parcel not found or not authorized to update.");
+    }
+    const updatedParcel: CadastralParcel = {
+      ...cadastralParcels[parcelIndex],
+      ...parcelData,
+      updatedAt: new Date(),
+    };
+    cadastralParcels[parcelIndex] = updatedParcel;
+    logAuditEvent(tenantId, companyId, 'cadastral.parcel.update', `Flurstück "${parcelData.name}" wurde aktualisiert.`);
+    return Promise.resolve(updatedParcel);
+  }
+
+  async deleteCadastralParcel(tenantId: string, companyId: string, parcelId: string): Promise<void> {
+    console.log(`Deleting Cadastral Parcel ${parcelId} for tenant ${tenantId} and company ${companyId}.`);
+    const parcelToDelete = cadastralParcels.find(p => p.id === parcelId && p.tenantId === tenantId && p.companyId === companyId);
+    
+    if (!parcelToDelete) {
+      return Promise.reject(new Error('Cadastral Parcel not found or not authorized to delete.'));
+    }
+
+    // Check if parcel is used in any field
+    const isUsed = fields.some(f => f.cadastralParcelIds.includes(parcelId));
+    if (isUsed) {
+      return Promise.reject(new Error('Cadastral Parcel cannot be deleted because it is used in one or more fields.'));
+    }
+
+    const initialLength = cadastralParcels.length;
+    const newParcels = cadastralParcels.filter(p => !(p.id === parcelId && p.tenantId === tenantId && p.companyId === companyId));
+    
+    if (newParcels.length < initialLength) {
+      cadastralParcels.length = 0;
+      cadastralParcels.push(...newParcels);
+      logAuditEvent(tenantId, companyId, 'cadastral.parcel.delete', `Flurstück "${parcelToDelete.name}" wurde gelöscht.`);
+      return Promise.resolve();
+    } else {
+      return Promise.reject(new Error('Deletion failed unexpectedly.'));
+    }
+  }
+
+  // ====== FIELD BLOCKS (Feldblöcke / Referenzparzellen) ======
+
+  async getFieldBlocks(tenantId: string, companyId: string): Promise<FieldBlock[]> {
+    console.log(`Fetching Field Blocks for tenant ${tenantId} and company ${companyId}.`);
+    return Promise.resolve(fieldBlocks.filter(b => b.tenantId === tenantId && b.companyId === companyId));
+  }
+
+  async getFieldBlockById(tenantId: string, companyId: string, blockId: string): Promise<FieldBlock | null> {
+    console.log(`Fetching Field Block ${blockId} for tenant ${tenantId} and company ${companyId}.`);
+    const block = fieldBlocks.find(b => b.id === blockId && b.tenantId === tenantId && b.companyId === companyId);
+    return Promise.resolve(block || null);
+  }
+
+  async addFieldBlock(tenantId: string, companyId: string, blockData: FieldBlockFormData): Promise<FieldBlock> {
+    console.log(`Adding Field Block for tenant ${tenantId} and company ${companyId}.`);
+    const newBlock: FieldBlock = {
+      id: `block-${fieldBlocks.length + 1}`,
+      tenantId,
+      companyId,
+      ...blockData,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    fieldBlocks.push(newBlock);
+    logAuditEvent(tenantId, companyId, 'field.block.create', `Feldblock "${blockData.name}" (${blockData.referenceNumber}) wurde hinzugefügt (${blockData.totalArea}ha).`);
+    return Promise.resolve(newBlock);
+  }
+
+  async updateFieldBlock(tenantId: string, companyId: string, blockId: string, blockData: FieldBlockFormData): Promise<FieldBlock> {
+    console.log(`Updating Field Block ${blockId} for tenant ${tenantId} and company ${companyId}.`);
+    const blockIndex = fieldBlocks.findIndex(b => b.id === blockId && b.tenantId === tenantId && b.companyId === companyId);
+    if (blockIndex === -1) {
+      throw new Error("Field Block not found or not authorized to update.");
+    }
+    const updatedBlock: FieldBlock = {
+      ...fieldBlocks[blockIndex],
+      ...blockData,
+      updatedAt: new Date(),
+    };
+    fieldBlocks[blockIndex] = updatedBlock;
+    logAuditEvent(tenantId, companyId, 'field.block.update', `Feldblock "${blockData.name}" wurde aktualisiert.`);
+    return Promise.resolve(updatedBlock);
+  }
+
+  async deleteFieldBlock(tenantId: string, companyId: string, blockId: string): Promise<void> {
+    console.log(`Deleting Field Block ${blockId} for tenant ${tenantId} and company ${companyId}.`);
+    const blockToDelete = fieldBlocks.find(b => b.id === blockId && b.tenantId === tenantId && b.companyId === companyId);
+    
+    if (!blockToDelete) {
+      return Promise.reject(new Error('Field Block not found or not authorized to delete.'));
+    }
+
+    // Check if block has fields assigned
+    if (blockToDelete.fieldIds.length > 0) {
+      return Promise.reject(new Error('Field Block cannot be deleted because it has fields assigned. Please reassign the fields first.'));
+    }
+
+    const initialLength = fieldBlocks.length;
+    const newBlocks = fieldBlocks.filter(b => !(b.id === blockId && b.tenantId === tenantId && b.companyId === companyId));
+    
+    if (newBlocks.length < initialLength) {
+      fieldBlocks.length = 0;
+      fieldBlocks.push(...newBlocks);
+      logAuditEvent(tenantId, companyId, 'field.block.delete', `Feldblock "${blockToDelete.name}" wurde gelöscht.`);
+      return Promise.resolve();
+    } else {
+      return Promise.reject(new Error('Deletion failed unexpectedly.'));
     }
   }
 }

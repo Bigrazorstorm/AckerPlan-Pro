@@ -1,6 +1,7 @@
 
 
 import { Kpi, ChartDataPoint, Operation, Machinery, Session, Field, MaintenanceEvent, AddMaintenanceEventInput, AuditLogEvent, RepairEvent, AddRepairEventInput, AddOperationInput, LaborHoursByCropReportData, Observation, AddObservationInput, ProfitabilityByCropReportData, UpdateMachineInput, FieldEconomics, User, AddUserInput, UpdateOperationInput, WarehouseItem, AddWarehouseItemInput, UpdateObservationInput, UpdateWarehouseItemInput, UpdateUserData, ProfitabilityByFieldReportData } from './types';
+import { CadastralParcel, FieldBlock, CadastralParcelFormData, FieldBlockFormData } from './field-types';
 
 /**
  * Defines the contract for data access in the application.
@@ -317,4 +318,88 @@ export interface DataService {
    * @param itemId The ID of the item to delete.
    */
   deleteWarehouseItem(tenantId: string, companyId: string, itemId: string): Promise<void>;
+
+  // ====== CADASTRAL PARCELS (Flurstücke) ======
+
+  /**
+   * Retrieves all cadastral parcels for a given company and tenant.
+   * @param tenantId - The ID of the tenant.
+   * @param companyId - The ID of the company.
+   */
+  getCadastralParcels(tenantId: string, companyId: string): Promise<CadastralParcel[]>;
+
+  /**
+   * Retrieves a single cadastral parcel by its ID.
+   * @param tenantId - The ID of the tenant.
+   * @param companyId - The ID of the company.
+   * @param parcelId - The ID of the parcel to retrieve.
+   */
+  getCadastralParcelById(tenantId: string, companyId: string, parcelId: string): Promise<CadastralParcel | null>;
+
+  /**
+   * Creates a new cadastral parcel.
+   * @param tenantId - The ID of the tenant.
+   * @param companyId - The ID of the company.
+   * @param parcelData - The data for the new parcel.
+   */
+  addCadastralParcel(tenantId: string, companyId: string, parcelData: CadastralParcelFormData): Promise<CadastralParcel>;
+
+  /**
+   * Updates an existing cadastral parcel.
+   * @param tenantId - The ID of the tenant.
+   * @param companyId - The ID of the company.
+   * @param parcelId - The ID of the parcel to update.
+   * @param parcelData - The updated parcel data.
+   */
+  updateCadastralParcel(tenantId: string, companyId: string, parcelId: string, parcelData: CadastralParcelFormData): Promise<CadastralParcel>;
+
+  /**
+   * Deletes a cadastral parcel.
+   * @param tenantId - The ID of the tenant.
+   * @param companyId - The ID of the company.
+   * @param parcelId - The ID of the parcel to delete.
+   */
+  deleteCadastralParcel(tenantId: string, companyId: string, parcelId: string): Promise<void>;
+
+  // ====== FIELD BLOCKS (Feldblöcke / Referenzparzellen) ======
+
+  /**
+   * Retrieves all field blocks for a given company and tenant.
+   * @param tenantId - The ID of the tenant.
+   * @param companyId - The ID of the company.
+   */
+  getFieldBlocks(tenantId: string, companyId: string): Promise<FieldBlock[]>;
+
+  /**
+   * Retrieves a single field block by its ID.
+   * @param tenantId - The ID of the tenant.
+   * @param companyId - The ID of the company.
+   * @param blockId - The ID of the block to retrieve.
+   */
+  getFieldBlockById(tenantId: string, companyId: string, blockId: string): Promise<FieldBlock | null>;
+
+  /**
+   * Creates a new field block.
+   * @param tenantId - The ID of the tenant.
+   * @param companyId - The ID of the company.
+   * @param blockData - The data for the new block.
+   */
+  addFieldBlock(tenantId: string, companyId: string, blockData: FieldBlockFormData): Promise<FieldBlock>;
+
+  /**
+   * Updates an existing field block.
+   * @param tenantId - The ID of the tenant.
+   * @param companyId - The ID of the company.
+   * @param blockId - The ID of the block to update.
+   * @param blockData - The updated block data.
+   */
+  updateFieldBlock(tenantId: string, companyId: string, blockId: string, blockData: FieldBlockFormData): Promise<FieldBlock>;
+
+  /**
+   * Deletes a field block.
+   * @param tenantId - The ID of the tenant.
+   * @param companyId - The ID of the company.
+   * @param blockId - The ID of the block to delete.
+   */
+  deleteFieldBlock(tenantId: string, companyId: string, blockId: string): Promise<void>;
 }

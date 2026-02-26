@@ -19,7 +19,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { MoreHorizontal, PlusCircle, Calendar as CalendarIcon, Camera, MapPin } from "lucide-react"
+import { MoreHorizontal, PlusCircle, Calendar as CalendarIcon, Camera, MapPin, LocateFixed, X } from "lucide-react"
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetTrigger } from '@/components/ui/sheet'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -43,10 +43,35 @@ const ObservationLocationMap = dynamic(() => import('@/components/observations/o
   loading: () => <Skeleton className="w-full h-48 rounded-lg" />
 });
 
+const ObservationLocationPicker = dynamic(() => import('@/components/observations/observation-location-picker').then(mod => mod.ObservationLocationPicker), {
+  ssr: false,
+  loading: () => <Skeleton className="w-full h-48 rounded-lg" />
+});
+
 const initialState = {
   message: '',
   errors: {},
 }
+
+const getFieldCenter = (field?: Field): { lat: number; lng: number } | undefined => {
+  if (!field?.geometry || field.geometry.length === 0) return undefined;
+
+  const validPoints = field.geometry.filter(
+    (point) => Array.isArray(point) && point.length >= 2 && Number.isFinite(point[0]) && Number.isFinite(point[1])
+  ) as number[][];
+
+  if (validPoints.length === 0) return undefined;
+
+  const sums = validPoints.reduce(
+    (acc, [lat, lng]) => ({ lat: acc.lat + lat, lng: acc.lng + lng }),
+    { lat: 0, lng: 0 }
+  );
+
+  return {
+    lat: sums.lat / validPoints.length,
+    lng: sums.lng / validPoints.length,
+  };
+};
 
 function SubmitButton({isEdit = false}: {isEdit?: boolean}) {
   const { pending } = useFormStatus()
@@ -63,7 +88,7 @@ function SubmitButton({isEdit = false}: {isEdit?: boolean}) {
   )
 }
 
-function EditObservationForm({ closeSheet, tenantId, companyId, observation }: { closeSheet: () => void; tenantId: string; companyId: string; observation: Observation }) {
+function EditObservationForm({ closeSheet, tenantId, companyId, observation, fields }: { closeSheet: () => void; tenantId: string; companyId: string; observation: Observation; fields: Field[] }) {
   const [state, formAction] = useActionState(updateObservation, initialState);
   const { toast } = useToast();
   const t = useTranslations('ObservationsPage.editObservationForm');
@@ -76,6 +101,12 @@ function EditObservationForm({ closeSheet, tenantId, companyId, observation }: {
   const [intensity, setIntensity] = useState(observation.intensity);
   const [observationType, setObservationType] = useState<ObservationType | ''>(observation.observationType);
   const [damageCause, setDamageCause] = useState<'Wildlife' | 'Weather' | 'Other' | ''>(observation.damageCause || '');
+  const [latitude, setLatitude] = useState<number | undefined>(observation.latitude);
+  const [longitude, setLongitude] = useState<number | undefined>(observation.longitude);
+  const [isLocating, setIsLocating] = useState(false);
+  const observationField = fields.find((field) => field.name === observation.field);
+  const fieldCenter = getFieldCenter(observationField);
+  const focusLatLng = latitude == null && longitude == null ? fieldCenter : undefined;
 
   const observationTypes: ObservationType[] = ['Routine', 'Pest', 'NutrientDeficiency', 'Damage', 'Other'];
   const damageCauses: ('Wildlife' | 'Weather' | 'Other')[] = ['Wildlife', 'Weather', 'Other'];
@@ -95,6 +126,43 @@ function EditObservationForm({ closeSheet, tenantId, companyId, observation }: {
       });
     }
   }, [state, toast, closeSheet, t]);
+
+  const handleUseGps = () => {
+    if (!navigator.geolocation) {
+      toast({
+        variant: 'destructive',
+        title: tShared('locationErrorTitle'),
+        description: tShared('locationUnsupported'),
+      });
+      return;
+    }
+
+    setIsLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setLatitude(position.coords.latitude);
+        setLongitude(position.coords.longitude);
+        setIsLocating(false);
+      },
+      (error) => {
+        const description = error.code === error.PERMISSION_DENIED
+          ? tShared('locationPermissionDenied')
+          : tShared('locationErrorDescription');
+        toast({
+          variant: 'destructive',
+          title: tShared('locationErrorTitle'),
+          description,
+        });
+        setIsLocating(false);
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  };
+
+  const handleClearLocation = () => {
+    setLatitude(undefined);
+    setLongitude(undefined);
+  };
   
   return (
     <form action={formAction} className="space-y-4">
@@ -103,6 +171,8 @@ function EditObservationForm({ closeSheet, tenantId, companyId, observation }: {
       <input type="hidden" name="id" value={observation.id} />
       <input type="hidden" name="date" value={date ? format(date, "yyyy-MM-dd") : ""} />
       <input type="hidden" name="intensity" value={intensity} />
+      <input type="hidden" name="latitude" value={latitude ?? ''} />
+      <input type="hidden" name="longitude" value={longitude ?? ''} />
 
       <div className="space-y-2">
         <Label htmlFor="title">{tShared('titleLabel')}</Label>
@@ -180,16 +250,34 @@ function EditObservationForm({ closeSheet, tenantId, companyId, observation }: {
         {state.errors?.photoUrl && <p className="text-sm text-destructive">{state.errors.photoUrl.join(', ')}</p>}
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label htmlFor="latitude">{tShared('latitudeLabel')}</Label>
-          <Input id="latitude" name="latitude" type="number" step="any" placeholder="52.515" defaultValue={observation.latitude} />
-          {state.errors?.latitude && <p className="text-sm text-destructive">{state.errors.latitude.join(', ')}</p>}
+      <div className="space-y-3">
+        <Label>{tShared('locationLabel')}</Label>
+        <div className="flex flex-wrap gap-2">
+          <Button type="button" variant="outline" size="sm" onClick={handleUseGps} disabled={isLocating}>
+            <LocateFixed className="h-4 w-4 mr-2" />
+            {isLocating ? tShared('locationLocating') : tShared('useGpsButton')}
+          </Button>
+          <Button type="button" variant="ghost" size="sm" onClick={handleClearLocation} disabled={latitude == null || longitude == null}>
+            <X className="h-4 w-4 mr-2" />
+            {tShared('clearLocationButton')}
+          </Button>
         </div>
-        <div className="space-y-2">
-          <Label htmlFor="longitude">{tShared('longitudeLabel')}</Label>
-          <Input id="longitude" name="longitude" type="number" step="any" placeholder="13.360" defaultValue={observation.longitude} />
-          {state.errors?.longitude && <p className="text-sm text-destructive">{state.errors.longitude.join(', ')}</p>}
+        <p className="text-sm text-muted-foreground">
+          {latitude != null && longitude != null
+            ? tShared('locationSetLabel', { lat: latitude.toFixed(5), lng: longitude.toFixed(5) })
+            : tShared('locationEmptyHint')}
+        </p>
+        <div className="aspect-video w-full overflow-hidden rounded-md border">
+          <ObservationLocationPicker
+            latitude={latitude}
+            longitude={longitude}
+            focusLatLng={focusLatLng}
+            fieldGeometry={observationField?.geometry}
+            onChange={(lat, lng) => {
+              setLatitude(lat);
+              setLongitude(lng);
+            }}
+          />
         </div>
       </div>
       
@@ -260,6 +348,13 @@ function AddObservationForm({ closeSheet, tenantId, companyId, fields }: { close
   const [intensity, setIntensity] = useState(3);
   const [observationType, setObservationType] = useState<ObservationType | ''>('');
   const [damageCause, setDamageCause] = useState<'Wildlife' | 'Weather' | 'Other' | ''>('');
+  const [latitude, setLatitude] = useState<number | undefined>(undefined);
+  const [longitude, setLongitude] = useState<number | undefined>(undefined);
+  const [isLocating, setIsLocating] = useState(false);
+  const [selectedFieldName, setSelectedFieldName] = useState<string | undefined>(undefined);
+  const selectedField = fields.find((field) => field.name === selectedFieldName);
+  const fieldCenter = getFieldCenter(selectedField);
+  const focusLatLng = latitude == null && longitude == null ? fieldCenter : undefined;
   const { locale } = useParams<{ locale: string }>();
 
   const observationTypes: ObservationType[] = ['Routine', 'Pest', 'NutrientDeficiency', 'Damage', 'Other'];
@@ -280,6 +375,43 @@ function AddObservationForm({ closeSheet, tenantId, companyId, fields }: { close
       })
     }
   }, [state, toast, closeSheet, t]);
+
+  const handleUseGps = () => {
+    if (!navigator.geolocation) {
+      toast({
+        variant: 'destructive',
+        title: t('locationErrorTitle'),
+        description: t('locationUnsupported'),
+      });
+      return;
+    }
+
+    setIsLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setLatitude(position.coords.latitude);
+        setLongitude(position.coords.longitude);
+        setIsLocating(false);
+      },
+      (error) => {
+        const description = error.code === error.PERMISSION_DENIED
+          ? t('locationPermissionDenied')
+          : t('locationErrorDescription');
+        toast({
+          variant: 'destructive',
+          title: t('locationErrorTitle'),
+          description,
+        });
+        setIsLocating(false);
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  };
+
+  const handleClearLocation = () => {
+    setLatitude(undefined);
+    setLongitude(undefined);
+  };
   
   return (
     <form action={formAction} className="space-y-4">
@@ -287,6 +419,8 @@ function AddObservationForm({ closeSheet, tenantId, companyId, fields }: { close
       <input type="hidden" name="companyId" value={companyId} />
       <input type="hidden" name="date" value={date ? format(date, "yyyy-MM-dd") : ""} />
       <input type="hidden" name="intensity" value={intensity} />
+      <input type="hidden" name="latitude" value={latitude ?? ''} />
+      <input type="hidden" name="longitude" value={longitude ?? ''} />
 
       <div className="space-y-2">
         <Label htmlFor="title">{t('titleLabel')}</Label>
@@ -359,16 +493,34 @@ function AddObservationForm({ closeSheet, tenantId, companyId, fields }: { close
         {state.errors?.photoUrl && <p className="text-sm text-destructive">{state.errors.photoUrl.join(', ')}</p>}
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label htmlFor="latitude">{t('latitudeLabel')}</Label>
-          <Input id="latitude" name="latitude" type="number" step="any" placeholder="52.515" />
-          {state.errors?.latitude && <p className="text-sm text-destructive">{state.errors.latitude.join(', ')}</p>}
+      <div className="space-y-3">
+        <Label>{t('locationLabel')}</Label>
+        <div className="flex flex-wrap gap-2">
+          <Button type="button" variant="outline" size="sm" onClick={handleUseGps} disabled={isLocating}>
+            <LocateFixed className="h-4 w-4 mr-2" />
+            {isLocating ? t('locationLocating') : t('useGpsButton')}
+          </Button>
+          <Button type="button" variant="ghost" size="sm" onClick={handleClearLocation} disabled={latitude == null || longitude == null}>
+            <X className="h-4 w-4 mr-2" />
+            {t('clearLocationButton')}
+          </Button>
         </div>
-        <div className="space-y-2">
-          <Label htmlFor="longitude">{t('longitudeLabel')}</Label>
-          <Input id="longitude" name="longitude" type="number" step="any" placeholder="13.360" />
-          {state.errors?.longitude && <p className="text-sm text-destructive">{state.errors.longitude.join(', ')}</p>}
+        <p className="text-sm text-muted-foreground">
+          {latitude != null && longitude != null
+            ? t('locationSetLabel', { lat: latitude.toFixed(5), lng: longitude.toFixed(5) })
+            : t('locationEmptyHint')}
+        </p>
+        <div className="aspect-video w-full overflow-hidden rounded-md border">
+          <ObservationLocationPicker
+            latitude={latitude}
+            longitude={longitude}
+            focusLatLng={focusLatLng}
+            fieldGeometry={selectedField?.geometry}
+            onChange={(lat, lng) => {
+              setLatitude(lat);
+              setLongitude(lng);
+            }}
+          />
         </div>
       </div>
       
@@ -380,7 +532,7 @@ function AddObservationForm({ closeSheet, tenantId, companyId, fields }: { close
         </div>
         <div className="space-y-2">
             <Label htmlFor="field">{t('fieldLabel')}</Label>
-            <Select name="field" required>
+            <Select name="field" required onValueChange={(value) => setSelectedFieldName(value)}>
               <SelectTrigger>
                 <SelectValue placeholder={t('fieldPlaceholder')} />
               </SelectTrigger>
@@ -763,7 +915,15 @@ export function ObservationsClientContent() {
                 <SheetTitle>{t('editObservationSheetTitle')}</SheetTitle>
             </SheetHeader>
             <div className="py-4">
-              {activeCompany && observationToEdit && <EditObservationForm closeSheet={() => setEditSheetOpen(false)} tenantId={activeCompany.tenantId} companyId={activeCompany.id} observation={observationToEdit} />}
+              {activeCompany && observationToEdit && (
+                <EditObservationForm
+                  closeSheet={() => setEditSheetOpen(false)}
+                  tenantId={activeCompany.tenantId}
+                  companyId={activeCompany.id}
+                  observation={observationToEdit}
+                  fields={fields}
+                />
+              )}
             </div>
         </SheetContent>
     </Sheet>
