@@ -17,6 +17,7 @@ import { CircleUser, Settings, LogOut } from "lucide-react"
 import { Link } from "next-intl/navigation"
 import { useTranslations } from "next-intl"
 import { CompanySwitcher } from "./company-switcher"
+import { NotificationBell } from "./notification-bell"
 import { logout } from "@/app/auth/actions"
 
 export function Header() {
@@ -33,6 +34,7 @@ export function Header() {
         </div>
         <div className="flex-1" />
         <CompanySwitcher />
+        <NotificationBell />
         <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button

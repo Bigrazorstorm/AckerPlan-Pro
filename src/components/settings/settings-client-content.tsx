@@ -7,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Settings, Users } from "lucide-react";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
-import Link from 'next-intl/link';
+import Link from 'next/link';
 import { Button } from "../ui/button";
 
 function PlaceholderContent({ titleKey, descriptionKey }: { titleKey: string; descriptionKey: string; }) {

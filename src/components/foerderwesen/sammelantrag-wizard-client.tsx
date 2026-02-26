@@ -81,6 +81,7 @@ export function SammelantragWizardClient() {
   const [selectedFieldIds, setSelectedFieldIds] = useState<Set<string>>(new Set());
   const [selectedEcoSchemes, setSelectedEcoSchemes] = useState<Set<EcoSchemeType>>(new Set());
   const [submitted, setSubmitted] = useState(false);
+  const [refNumber] = useState(() => `SA-2026-${Date.now().toString().slice(-5)}`);
 
   const daysUntilDeadline = differenceInDays(DEADLINE, new Date());
 
@@ -591,7 +592,7 @@ export function SammelantragWizardClient() {
                     Ihr Sammelantrag 2026 wurde am {format(new Date(), 'dd. MMMM yyyy', { locale: de })} eingereicht.
                   </div>
                   <div className="text-sm text-muted-foreground mt-1">
-                    Referenznummer: SA-2026-{Math.floor(Math.random() * 90000) + 10000}
+                    Referenznummer: {refNumber}
                   </div>
                 </div>
                 <div className="text-sm text-muted-foreground">
