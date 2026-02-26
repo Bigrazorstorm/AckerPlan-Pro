@@ -61,7 +61,8 @@ const ECO_SCHEME_INFO: Record<EcoSchemeType, { name: string; description: string
   },
 };
 
-// Simulated farm analysis: which ÖR the farm likely already fulfills
+// Mock farm analysis data: in production this would be derived from actual farm records,
+// field data, and historical operations via a real backend service.
 const FARM_POTENTIAL: Record<EcoSchemeType, { status: 'erfüllt' | 'nicht erfüllt' | 'knapp'; recommendedArea: number }> = {
   [EcoSchemeType.ECO_1A]: { status: 'nicht erfüllt', recommendedArea: 3.0 },
   [EcoSchemeType.ECO_1B]: { status: 'erfüllt', recommendedArea: 2.5 },
