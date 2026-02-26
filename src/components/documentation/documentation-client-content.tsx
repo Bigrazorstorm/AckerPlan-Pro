@@ -13,7 +13,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { FileText, Wheat, ShieldAlert } from 'lucide-react';
+import { FileText, Wheat, ShieldAlert, Download, BookOpen, Scale } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 
 
 interface PsmApplication {
@@ -243,9 +245,11 @@ export function DocumentationClientContent() {
 
     return (
         <Tabs defaultValue="psm">
-            <TabsList>
+            <TabsList className="flex-wrap">
                 <TabsTrigger value="psm">{t('psmTab')}</TabsTrigger>
                 <TabsTrigger value="fertilization">{t('fertilizationTab')}</TabsTrigger>
+                <TabsTrigger value="nbilanz">N-Bilanz</TabsTrigger>
+                <TabsTrigger value="betriebsheft">Betriebsheft</TabsTrigger>
                 <TabsTrigger value="compliance">{t('complianceTab')}</TabsTrigger>
             </TabsList>
             <TabsContent value="psm" className="mt-4">
@@ -344,6 +348,122 @@ export function DocumentationClientContent() {
                     </CardContent>
                 </Card>
             </TabsContent>
+            <TabsContent value="nbilanz" className="mt-4">
+                <Card>
+                    <CardHeader>
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <CardTitle><Scale className="inline mr-2 h-5 w-5" />Stickstoffbilanz (N-Bilanz)</CardTitle>
+                                <CardDescription>Nährstoffvergleich gemäß Düngeverordnung (DüV) § 8</CardDescription>
+                            </div>
+                            <Button variant="outline"><Download className="mr-2 h-4 w-4" />PDF Export</Button>
+                        </div>
+                    </CardHeader>
+                    <CardContent>
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>Schlag</TableHead>
+                                    <TableHead>Kultur</TableHead>
+                                    <TableHead className="text-right">Fläche (ha)</TableHead>
+                                    <TableHead className="text-right">N-Zufuhr (kg/ha)</TableHead>
+                                    <TableHead className="text-right">N-Abfuhr (kg/ha)</TableHead>
+                                    <TableHead className="text-right">N-Saldo (kg/ha)</TableHead>
+                                    <TableHead>Status</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {[
+                                    { schlag: 'Am Waldrand', kultur: 'Winterweizen', ha: 24.5, zufuhr: 180, abfuhr: 195, saldo: -15 },
+                                    { schlag: 'Kirchberg', kultur: 'Wintergerste', ha: 18.2, zufuhr: 150, abfuhr: 140, saldo: 10 },
+                                    { schlag: 'Große Breite', kultur: 'Winterraps', ha: 32.1, zufuhr: 200, abfuhr: 170, saldo: 30 },
+                                    { schlag: 'Talwiese', kultur: 'Silomais', ha: 15.8, zufuhr: 170, abfuhr: 180, saldo: -10 },
+                                    { schlag: 'Hangstück', kultur: 'Sommergerste', ha: 12.3, zufuhr: 120, abfuhr: 110, saldo: 10 },
+                                ].map(r => (
+                                    <TableRow key={r.schlag}>
+                                        <TableCell className="font-medium">{r.schlag}</TableCell>
+                                        <TableCell>{r.kultur}</TableCell>
+                                        <TableCell className="text-right font-tabular">{r.ha.toFixed(1)}</TableCell>
+                                        <TableCell className="text-right font-tabular">{r.zufuhr}</TableCell>
+                                        <TableCell className="text-right font-tabular">{r.abfuhr}</TableCell>
+                                        <TableCell className={`text-right font-tabular font-bold ${r.saldo > 50 ? 'text-destructive' : r.saldo < 0 ? 'text-green-600' : ''}`}>{r.saldo > 0 ? '+' : ''}{r.saldo}</TableCell>
+                                        <TableCell>
+                                            <Badge variant="outline" className={r.saldo <= 50 ? 'border-green-500 text-green-600' : 'border-red-500 text-red-600'}>
+                                                {r.saldo <= 50 ? 'Konform' : 'Überschreitung'}
+                                            </Badge>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                                <TableRow className="bg-muted/50 font-bold">
+                                    <TableCell>Betriebsdurchschnitt</TableCell>
+                                    <TableCell>-</TableCell>
+                                    <TableCell className="text-right font-tabular">102.9</TableCell>
+                                    <TableCell className="text-right font-tabular">168</TableCell>
+                                    <TableCell className="text-right font-tabular">163</TableCell>
+                                    <TableCell className="text-right font-tabular">+5</TableCell>
+                                    <TableCell><Badge variant="outline" className="border-green-500 text-green-600">Konform</Badge></TableCell>
+                                </TableRow>
+                            </TableBody>
+                        </Table>
+                        <div className="mt-4 p-3 bg-info/10 border border-info/20 rounded-lg text-sm">
+                            <p className="font-medium text-info">Hinweis zur DüV:</p>
+                            <p className="text-muted-foreground mt-1">Der N-Saldo darf im Dreijahresmittel maximal 50 kg N/ha betragen. Ihr aktueller Betriebsdurchschnitt beträgt +5 kg N/ha und liegt damit im konformen Bereich.</p>
+                        </div>
+                    </CardContent>
+                </Card>
+            </TabsContent>
+
+            <TabsContent value="betriebsheft" className="mt-4">
+                <Card>
+                    <CardHeader>
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <CardTitle><BookOpen className="inline mr-2 h-5 w-5" />Digitales Betriebsheft</CardTitle>
+                                <CardDescription>Chronologische Aufzeichnung aller Betriebsmaßnahmen gemäß CC-Verpflichtung</CardDescription>
+                            </div>
+                            <Button variant="outline"><Download className="mr-2 h-4 w-4" />Betriebsheft exportieren</Button>
+                        </div>
+                    </CardHeader>
+                    <CardContent>
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>Datum</TableHead>
+                                    <TableHead>Schlag</TableHead>
+                                    <TableHead>Maßnahme</TableHead>
+                                    <TableHead>Mittel/Material</TableHead>
+                                    <TableHead>Aufwandmenge</TableHead>
+                                    <TableHead>Maschine</TableHead>
+                                    <TableHead>Durchführer</TableHead>
+                                    <TableHead>Bemerkungen</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {[
+                                    { datum: '2025-10-12', schlag: 'Am Waldrand', maßnahme: 'Aussaat', mittel: 'WW Informer', menge: '180 kg/ha', maschine: 'Fendt 942 + Amazone', person: 'Gerd W.', bemerkung: 'Guter Saathorizont' },
+                                    { datum: '2025-10-15', schlag: 'Kirchberg', maßnahme: 'Aussaat', mittel: 'WG KWS Flemming', menge: '170 kg/ha', maschine: 'Fendt 942 + Amazone', person: 'Gerd W.', bemerkung: '-' },
+                                    { datum: '2025-11-02', schlag: 'Am Waldrand', maßnahme: 'Herbizid', mittel: 'Atlantis Flex', menge: '330 g/ha', maschine: 'JD 6130R + Amazone', person: 'Hans M.', bemerkung: 'Sachkunde: TH-2024-456' },
+                                    { datum: '2026-03-05', schlag: 'Am Waldrand', maßnahme: 'N-Düngung 1', mittel: 'KAS 27%', menge: '250 kg/ha', maschine: 'Fendt 516 + Rauch Axis', person: 'Gerd W.', bemerkung: '67.5 kg N/ha' },
+                                    { datum: '2026-03-08', schlag: 'Kirchberg', maßnahme: 'N-Düngung 1', mittel: 'KAS 27%', menge: '220 kg/ha', maschine: 'Fendt 516 + Rauch Axis', person: 'Gerd W.', bemerkung: '59.4 kg N/ha' },
+                                    { datum: '2026-04-10', schlag: 'Am Waldrand', maßnahme: 'Fungizid', mittel: 'Osiris', menge: '2.5 l/ha', maschine: 'JD 6130R + Amazone', person: 'Hans M.', bemerkung: 'BBCH 31, Septoria Befall' },
+                                ].map((r, i) => (
+                                    <TableRow key={i}>
+                                        <TableCell className="whitespace-nowrap">{dateFormatter(r.datum)}</TableCell>
+                                        <TableCell>{r.schlag}</TableCell>
+                                        <TableCell><Badge variant="secondary">{r.maßnahme}</Badge></TableCell>
+                                        <TableCell className="font-medium">{r.mittel}</TableCell>
+                                        <TableCell className="font-tabular">{r.menge}</TableCell>
+                                        <TableCell className="text-xs">{r.maschine}</TableCell>
+                                        <TableCell>{r.person}</TableCell>
+                                        <TableCell className="text-xs text-muted-foreground max-w-[200px] truncate">{r.bemerkung}</TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </CardContent>
+                </Card>
+            </TabsContent>
+
             <TabsContent value="compliance" className="mt-4">
                 <Card>
                     <CardHeader>

@@ -21,6 +21,9 @@ import {
   FileText,
   Landmark,
   Truck,
+  CalendarDays,
+  Bug,
+  PieChart,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
@@ -51,11 +54,14 @@ const navItemsList = [
   { href: '/map', icon: Map, labelKey: 'map' },
   { href: '/fields', icon: Layers, labelKey: 'schlaege' },
   { href: '/operations', icon: Combine, labelKey: 'auftraege' },
+  { href: '/planung', icon: CalendarDays, labelKey: 'planung' },
   { href: '/observations', icon: Siren, labelKey: 'observations' },
+  { href: '/schaeden', icon: Bug, labelKey: 'schaeden' },
   { href: '/personal', icon: Users, labelKey: 'personal' },
   { href: '/machinery', icon: Tractor, labelKey: 'fuhrpark' },
   { href: '/lager', icon: Archive, labelKey: 'lager' },
-  { href: '/reports', icon: BarChart3, labelKey: 'controlling' },
+  { href: '/controlling', icon: PieChart, labelKey: 'controlling' },
+  { href: '/reports', icon: BarChart3, labelKey: 'reports' },
   { href: '/vermarktung', icon: Truck, labelKey: 'vermarktung' },
   { href: '/dokumentation', icon: FileText, labelKey: 'dokumentation' },
   { href: '/foerderwesen', icon: Landmark, labelKey: 'foerderwesen' },
