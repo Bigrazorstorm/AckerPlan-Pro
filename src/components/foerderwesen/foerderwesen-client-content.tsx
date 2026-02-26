@@ -161,15 +161,25 @@ export function FoerderwesenClientContent() {
             Gemeinsame Agrarpolitik • GLÖZ • Öko-Regelungen
           </p>
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline">
-            <FileText className="h-4 w-4 mr-2" />
-            Sammelantrag
-          </Button>
-          <Button>
-            <TrendingUp className="h-4 w-4 mr-2" />
-            Analyse starten
-          </Button>
+        <div className="flex gap-2 flex-wrap">
+          <Link href="foerderwesen/fristen">
+            <Button variant="outline">
+              <Calendar className="h-4 w-4 mr-2" />
+              Fristenkalender
+            </Button>
+          </Link>
+          <Link href="foerderwesen/oeko-regelungen">
+            <Button variant="outline">
+              <Leaf className="h-4 w-4 mr-2" />
+              Öko-Regelungen
+            </Button>
+          </Link>
+          <Link href="foerderwesen/sammelantrag">
+            <Button>
+              <FileText className="h-4 w-4 mr-2" />
+              Sammelantrag stellen
+            </Button>
+          </Link>
         </div>
       </div>
 
@@ -393,9 +403,11 @@ export function FoerderwesenClientContent() {
               })}
             </div>
             {deadlines.length > 5 && (
-              <Button variant="ghost" className="w-full mt-4">
-                Alle {deadlines.length} Fristen anzeigen
-              </Button>
+              <Link href="foerderwesen/fristen">
+                <Button variant="ghost" className="w-full mt-4">
+                  Alle {deadlines.length} Fristen anzeigen
+                </Button>
+              </Link>
             )}
           </CardContent>
         </Card>
@@ -439,10 +451,12 @@ export function FoerderwesenClientContent() {
                 </div>
               ))}
             </div>
-            <Button variant="outline" className="w-full mt-4">
-              <Leaf className="h-4 w-4 mr-2" />
-              Weitere Öko-Regelung hinzufügen
-            </Button>
+            <Link href="foerderwesen/oeko-regelungen">
+              <Button variant="outline" className="w-full mt-4">
+                <Leaf className="h-4 w-4 mr-2" />
+                Potenzialanalyse öffnen
+              </Button>
+            </Link>
           </CardContent>
         </Card>
       )}

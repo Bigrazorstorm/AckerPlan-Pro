@@ -873,31 +873,31 @@ Gehe dann diese Checkliste Punkt für Punkt durch. Verweise bei jedem Punkt auf 
 
 - [x] Route: `/foerderwesen/sammelantrag` erstellt ✅
 - [x] Typsystem (SammelantragApplication, SammelantragFormState) definiert ✅
-- [ ] Schritt-für-Schritt-Wizard UI-Komponente (7 Schritte)
-- [ ] Schritt 1: Feldauswahl mit Gesamtflächenberechnung
+- [x] Schritt-für-Schritt-Wizard UI-Komponente (7 Schritte) ✅
+- [x] Schritt 1: Feldauswahl mit Gesamtflächenberechnung ✅
 - [ ] Schritt 2: Flächenabgleich (eigene Schläge vs. FLIK)
-- [ ] Schritt 3: GLÖZ-Compliance-Prüfung vor Submission
-- [ ] Schritt 4: Öko-Regelungen-Auswahl mit Prämien-Kalkulation
+- [x] Schritt 3: GLÖZ-Compliance-Prüfung vor Submission ✅
+- [x] Schritt 4: Öko-Regelungen-Auswahl mit Prämien-Kalkulation ✅
 - [ ] Schritt 5: Dokumentation hochladen (Flächennachweise, Pachtverträge)
-- [ ] Schritt 6: Plausibilitätsprüfung
-- [ ] Schritt 7: Zahlungsvorschau und Antrag-Review
-- [ ] Fortschrittsbalken über dem Wizard
+- [x] Schritt 6: Plausibilitätsprüfung ✅
+- [x] Schritt 7: Zahlungsvorschau und Antrag-Review ✅
+- [x] Fortschrittsbalken über dem Wizard ✅
 - [ ] Zwischenspeicherung (kann in mehreren Sessions ausgefüllt werden)
-- [ ] Frist-Countdown prominent angezeigt (Tage bis 15. Mai)
+- [x] Frist-Countdown prominent angezeigt (Tage bis 15. Mai) ✅
 - [ ] PDF-Export für Behörden-Einreichung
 
 ### 16.3 Öko-Regelungen-Potenzialanalyse
 
-- [ ] Automatische Analyse: Welche ÖR erfüllt der Betrieb bereits?
-- [ ] Pro ÖR: Status (erfüllt/nicht erfüllt/knapp), erreichbare Prämie €, Handlungsempfehlung
-- [ ] Gesamtpotenzial nicht abgerufener Prämien als Highlight-Zahl
+- [x] Automatische Analyse: Welche ÖR erfüllt der Betrieb bereits? ✅
+- [x] Pro ÖR: Status (erfüllt/nicht erfüllt/knapp), erreichbare Prämie €, Handlungsempfehlung ✅
+- [x] Gesamtpotenzial nicht abgerufener Prämien als Highlight-Zahl ✅
 
 ### 16.4 Fristenkalender
 
-- [ ] Route: `/foerderung/fristen` oder im Dashboard-Widget
-- [ ] Kalender-Ansicht aller agrarpolitischen Fristen
-- [ ] Farbkodierung: Rot (überfällig), Orange (< 14 Tage), Gelb (< 30 Tage), Grün (> 30 Tage)
-- [ ] Fristen sind für Thüringen vorausgefüllt und jährlich aktualisierbar
+- [x] Route: `/foerderwesen/fristen` ✅
+- [x] Kalender-Ansicht aller agrarpolitischen Fristen ✅
+- [x] Farbkodierung: Rot (überfällig), Orange (< 14 Tage), Gelb (< 30 Tage), Grün (> 30 Tage) ✅
+- [x] Fristen sind für Thüringen vorausgefüllt und jährlich aktualisierbar ✅
 - [ ] Eigene Fristen können hinzugefügt werden
 - [ ] Push-Erinnerungen konfigurierbar pro Frist
 
@@ -922,10 +922,10 @@ Gehe dann diese Checkliste Punkt für Punkt durch. Verweise bei jedem Punkt auf 
 
 ### 17.2 In-App-Benachrichtigungen
 
-- [ ] Glocken-Icon in der Navigation mit Badge-Zähler
-- [ ] Benachrichtigungs-Panel: Liste aller ungelesenen Alerts
-- [ ] Alert-Eintrag: Icon (nach Kategorie), Kurzbeschreibung, Zeitstempel, Link zur Aktion
-- [ ] Markierung als gelesen (einzeln oder alle)
+- [x] Glocken-Icon in der Navigation mit Badge-Zähler ✅
+- [x] Benachrichtigungs-Panel: Liste aller ungelesenen Alerts ✅
+- [x] Alert-Eintrag: Icon (nach Kategorie), Kurzbeschreibung, Zeitstempel, Link zur Aktion ✅
+- [x] Markierung als gelesen (einzeln oder alle) ✅
 - [ ] Kritische Alerts können nicht ohne Bestätigung ignoriert werden
 
 ### 17.3 Push-Benachrichtigungen
