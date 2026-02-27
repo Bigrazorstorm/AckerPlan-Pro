@@ -13,8 +13,9 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Card } from '@/components/ui/card';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
-import { Search, AlertTriangle, LocateFixed, X, PlusCircle } from 'lucide-react';
+import { Search, AlertTriangle, LocateFixed, X, PlusCircle, MapPin } from 'lucide-react';
 
 // Static import for Leaflet CSS - must be at top level
 import 'leaflet/dist/leaflet.css';
