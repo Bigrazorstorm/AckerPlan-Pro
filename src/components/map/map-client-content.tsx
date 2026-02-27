@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
@@ -326,15 +327,14 @@ export function MapClientContent() {
     clearDrawLayer();
     setParcelEditorMode('draw');
 
-    if (!mapInstanceRef.current) {
-      toast({ variant: 'destructive', title: 'Karte nicht bereit' });
+    const L = (window as any).L;
+    if (!mapInstanceRef.current || !L || !L.Draw) {
+      toast({ variant: 'destructive', title: 'Zeichenwerkzeuge nicht bereit' });
       return;
     }
 
     try {
-      const L = (await import('leaflet')).default;
-      await import('leaflet-draw');
-      const drawer = new (L as any).Draw.Polygon(mapInstanceRef.current, {
+      const drawer = new L.Draw.Polygon(mapInstanceRef.current, {
         shapeOptions: {
           color: '#ff9800',
           weight: 2,
@@ -391,8 +391,8 @@ export function MapClientContent() {
       }));
 
       const drawLayer = drawLayerRef.current;
-      if (drawLayer) {
-        const L = (await import('leaflet')).default;
+      const L = (window as any).L;
+      if (drawLayer && L) {
         drawLayer.clearLayers();
         L.geoJSON(feature.geometry, {
           style: {
@@ -481,7 +481,6 @@ export function MapClientContent() {
 
   // Map initialization
   useEffect(() => {
-    // Dynamic import of Leaflet to avoid SSR issues
     let map: any;
     let initTimer: ReturnType<typeof setTimeout> | null = null;
     
@@ -492,10 +491,12 @@ export function MapClientContent() {
       }
 
       try {
-        const L = (await import('leaflet')).default;
+        const L_module = await import('leaflet');
+        const L = L_module.default;
+        // Make L available globally for plugins loaded via script tags in layout.tsx
+        (window as any).L = L;
+        
         await import('leaflet-defaulticon-compatibility');
-        await import('leaflet-groupedlayercontrol');
-        await import('leaflet-draw');
 
         const proj4 = (await import('proj4')).default;
         (window as unknown as { proj4?: typeof proj4 }).proj4 = proj4;
@@ -695,7 +696,18 @@ export function MapClientContent() {
         },
       };
 
-      (L.control as any).groupedLayers(baseLayers, groupedOverlays, { collapsed: true }).addTo(map);
+      // groupedLayers is loaded from script in layout.tsx
+      if (L.control && (L.control as any).groupedLayers) {
+        (L.control as any).groupedLayers(baseLayers, groupedOverlays, { collapsed: true }).addTo(map);
+      } else {
+        L.control.layers(baseLayers, {
+          'Felder': fieldLayer,
+          'Flurstücke': parcelLayer,
+          'Wirtschaftlichkeit': profitabilityLayer,
+          'Kulturkarte': cultureLayer,
+          'Beobachtungen': observationLayer
+        }, { collapsed: true }).addTo(map);
+      }
 
       map.on('draw:created', (event: any) => {
         try {
@@ -759,7 +771,7 @@ export function MapClientContent() {
         mapInstanceRef.current = null;
       }
     };
-  }, [t]);
+  }, [t, tDebug, toast]);
 
   // Update layers when data changes
   useEffect(() => {
@@ -780,8 +792,9 @@ export function MapClientContent() {
 
     const updateLayers = async () => {
       try {
-        const L = (await import('leaflet')).default;
-        const { latLngBounds } = await import('leaflet');
+        const L = (window as any).L;
+        if (!L) return;
+        const { latLngBounds } = L;
 
         const getProfitabilityColor = (fieldId: string, area: number) => {
           const economics = fieldEconomics[fieldId];
@@ -993,18 +1006,16 @@ export function MapClientContent() {
           }
         });
 
-      // Fit bounds - collect all valid bounds from fields and parcels
-      let bounds = latLngBounds([
-        [50.9778, 11.0289], // Initialize with center point
-        [50.9779, 11.0290]  // Add second point to create valid bounds
+      // Fit bounds
+      let bounds = L.latLngBounds([
+        [50.9778, 11.0289], 
+        [50.9779, 11.0290] 
       ]);
       let hasValidBounds = false;
       
-      // Include fields with parcel geometries
-      fields.forEach((field, index) => {
+      fields.forEach((field) => {
         const geometry = getFieldGeometryFromParcels(field, parcels);
         if (geometry && Array.isArray(geometry) && geometry.length >= 3) {
-          // Validate all coordinates before adding to bounds
           const validCoords = geometry.filter(coord => {
             try {
               if (!Array.isArray(coord) || coord.length < 2) return false;
@@ -1016,25 +1027,14 @@ export function MapClientContent() {
           });
           
           if (validCoords.length >= 3) {
-            // Extend bounds with each validated coordinate
             validCoords.forEach(coord => {
-              try {
-                if (Array.isArray(coord) && coord.length >= 2) {
-                  const [lat, lon] = coord;
-                  if (Number.isFinite(lat) && Number.isFinite(lon)) {
-                    bounds.extend([lat, lon]);
-                    hasValidBounds = true;
-                  }
-                }
-              } catch (e) {
-                console.warn('Failed to extend bounds with coordinate:', coord, e);
-              }
+              bounds.extend(coord as [number, number]);
+              hasValidBounds = true;
             });
           }
         }
       });
 
-      // Also include parcels in bounds calculation
       parcels.forEach((parcel) => {
         const geometry = getParcelGeometry(parcel);
         if (geometry && Array.isArray(geometry) && geometry.length >= 3) {
@@ -1050,24 +1050,14 @@ export function MapClientContent() {
           
           if (validCoords.length >= 3) {
             validCoords.forEach(coord => {
-              try {
-                if (Array.isArray(coord) && coord.length >= 2) {
-                  const [lat, lon] = coord;
-                  if (Number.isFinite(lat) && Number.isFinite(lon)) {
-                    bounds.extend([lat, lon]);
-                    hasValidBounds = true;
-                  }
-                }
-              } catch (e) {
-                console.warn('Failed to extend bounds with parcel coordinate:', coord, e);
-              }
+              bounds.extend(coord as [number, number]);
+              hasValidBounds = true;
             });
           }
         }
       });
 
-      // Only fit bounds if we have valid bounds and the map instance exists
-      if (hasValidBounds && bounds && bounds.isValid()) {
+      if (hasValidBounds && (bounds as any).isValid()) {
         try {
           map.fitBounds(bounds.pad(0.1));
         } catch (e) {
@@ -1086,10 +1076,7 @@ export function MapClientContent() {
     if (!searchQuery.trim()) return;
     const field = fields.find(f => f.name.toLowerCase().includes(searchQuery.toLowerCase()));
     if (field) {
-      // Use parcel geometries if available
       const geometry = getFieldGeometryFromParcels(field, parcels);
-      
-      // Validate geometry before creating bounds
       const validGeometry = geometry.filter(coord => {
         try {
           if (!Array.isArray(coord) || coord.length < 2) return false;
@@ -1106,10 +1093,11 @@ export function MapClientContent() {
       }
 
       try {
-        const { latLngBounds } = await import('leaflet');
-        // Create bounds properly by extending with each coordinate
-        let bounds = latLngBounds(validGeometry as [number, number][]);
-        if (mapInstanceRef.current && bounds.isValid()) {
+        const L = (window as any).L;
+        if (!L) return;
+        
+        let bounds = L.latLngBounds(validGeometry as [number, number][]);
+        if (mapInstanceRef.current && (bounds as any).isValid()) {
           mapInstanceRef.current.fitBounds(bounds.pad(0.1));
           toast({ title: `Schlag: ${field.name}`, description: `${field.totalArea} ha` });
         }
@@ -1126,7 +1114,6 @@ export function MapClientContent() {
     return <MapSkeleton />;
   }
 
-  // Show error state
   if (mapError) {
     return <MapError message={mapError} onRetry={() => setMapError(null)} />;
   }
