@@ -498,9 +498,14 @@ export function MapClientContent() {
         
         await import('leaflet-defaulticon-compatibility');
 
-        const proj4 = (await import('proj4')).default;
-        (window as unknown as { proj4?: typeof proj4 }).proj4 = proj4;
-        await import('proj4leaflet');
+        // Global proj4 is loaded via CDN in layout.tsx
+        const proj4 = (window as any).proj4;
+        
+        if (!proj4) {
+          console.warn('proj4 not found on window, trying to wait...');
+          initTimer = setTimeout(initMap, 100);
+          return;
+        }
 
         const epsg25832 = new (L as any).Proj.CRS(
           'EPSG:25832',
