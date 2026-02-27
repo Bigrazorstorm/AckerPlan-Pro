@@ -21,7 +21,7 @@ import { AlertTriangle } from 'lucide-react';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css';
 
-// Dynamic imports for Leaflet to avoid SSR issues
+// Import types only
 import type { LatLngExpression } from 'leaflet';
 
 const UTM32_RESOLUTIONS = [
@@ -73,44 +73,24 @@ const isValidCoordinate = (coord: unknown): boolean => {
 
 /**
  * Generate sample rectangular polygon for field visualization
- * TODO: Replace with real GeoJSON geometry data from database
  */
 const generateFieldGeometry = (fieldIndex: number, area: number): LatLngExpression[] => {
-  // Ensure area is valid; use default if not
   const validArea = Number.isFinite(area) && area > 0 ? area : 10;
-  
   const baseLat = 50.9778 + (fieldIndex % 5) * 0.15;
   const baseLon = 11.0289 + Math.floor(fieldIndex / 5) * 0.15;
   
-  // Validate base coordinates
   if (!Number.isFinite(baseLat) || !Number.isFinite(baseLon)) {
-    console.warn(`Invalid base coordinates for field ${fieldIndex}: [${baseLat}, ${baseLon}]`);
-    // Fallback to default location
     return [
       [50.9778, 11.0289],
       [50.9779, 11.0289],
       [50.9779, 11.0290],
       [50.9778, 11.0290],
       [50.9778, 11.0289],
-    ];
+    ] as LatLngExpression[];
   }
 
-  // Constrain sizeOffset to reasonable bounds (0.001 to 0.1 degrees)
   const sizeOffset = Math.max(0.001, Math.min(0.1, Math.sqrt(validArea) / 1200));
   
-  if (!Number.isFinite(sizeOffset)) {
-    console.warn(`Invalid sizeOffset calculated: ${sizeOffset}`);
-    // Fallback to default offset
-    const defaultOffset = 0.01;
-    return [
-      [baseLat - defaultOffset, baseLon - defaultOffset],
-      [baseLat + defaultOffset, baseLon - defaultOffset],
-      [baseLat + defaultOffset, baseLon + defaultOffset],
-      [baseLat - defaultOffset, baseLon + defaultOffset],
-      [baseLat - defaultOffset, baseLon - defaultOffset],
-    ];
-  }
-
   const coords = [
     [baseLat - sizeOffset, baseLon - sizeOffset],
     [baseLat + sizeOffset, baseLon - sizeOffset],
@@ -119,73 +99,32 @@ const generateFieldGeometry = (fieldIndex: number, area: number): LatLngExpressi
     [baseLat - sizeOffset, baseLon - sizeOffset],
   ];
 
-  // Final validation before returning
-  const invalidCoords = coords.filter(coord => {
-    const [lat, lon] = coord as [number, number];
-    return !Number.isFinite(lat) || !Number.isFinite(lon);
-  });
-
-  if (invalidCoords.length > 0) {
-    console.warn(`Generated invalid coordinates for field ${fieldIndex}:`, invalidCoords);
-    // Return fallback
-    return [
-      [50.9778, 11.0289],
-      [50.9779, 11.0289],
-      [50.9779, 11.0290],
-      [50.9778, 11.0290],
-      [50.9778, 11.0289],
-    ];
-  }
-
   return coords as LatLngExpression[];
 };
 
 /**
  * Get cadastral parcel geometry from GeoJSON
- * Flurstücke haben GeoJSON-Polygone mit korrekten Umrandungen
  */
 const getParcelGeometry = (parcel: CadastralParcel): LatLngExpression[] => {
   if (parcel.polygonGeoJSON) {
     try {
       const geojson = JSON.parse(parcel.polygonGeoJSON);
       if (geojson.type === 'Polygon' && geojson.coordinates?.[0]) {
-        // Convert GeoJSON coordinates [lon, lat] to Leaflet format [lat, lon]
         const coords = geojson.coordinates[0]
           .map((coord: any) => {
-            try {
-              if (!Array.isArray(coord) || coord.length < 2) return null;
-              const [lon, lat] = coord;
-              if (!Number.isFinite(lon) || !Number.isFinite(lat)) {
-                console.warn(`Invalid GeoJSON coordinate in parcel ${parcel.name}: [${lon}, ${lat}]`);
-                return null;
-              }
-              return [lat, lon] as LatLngExpression;
-            } catch (e) {
-              console.warn(`Error parsing GeoJSON coordinate in parcel ${parcel.name}:`, e);
-              return null;
-            }
+            if (!Array.isArray(coord) || coord.length < 2) return null;
+            const [lon, lat] = coord;
+            if (!Number.isFinite(lon) || !Number.isFinite(lat)) return null;
+            return [lat, lon] as LatLngExpression;
           })
-          .filter((coord: LatLngExpression | null): coord is LatLngExpression => coord !== null);
+          .filter((coord: any): coord is LatLngExpression => coord !== null);
         
-        if (coords.length >= 3) {
-          const allValid = coords.every(coord => {
-            const [lat, lon] = coord;
-            return Number.isFinite(lat) && Number.isFinite(lon);
-          });
-          
-          if (allValid) {
-            return coords;
-          } else {
-            console.warn(`GeoJSON coordinates for parcel ${parcel.name} contain invalid values`);
-          }
-        }
+        if (coords.length >= 3) return coords;
       }
     } catch (error) {
       console.warn(`Failed to parse GeoJSON for parcel ${parcel.name}:`, error);
     }
   }
-  
-  // Fallback to generated geometry if no valid GeoJSON
   return generateFieldGeometry(0, parcel.area);
 };
 
@@ -193,55 +132,31 @@ const getParcelGeometry = (parcel: CadastralParcel): LatLngExpression[] => {
  * Get field geometry from GeoJSON or generate sample
  */
 const getFieldGeometry = (field: Field, fieldIndex: number): LatLngExpression[] => {
-  // Try to use real GeoJSON data
   if (field.location?.polygonGeoJSON) {
     try {
       const geojson = JSON.parse(field.location.polygonGeoJSON);
       if (geojson.type === 'Polygon' && geojson.coordinates?.[0]) {
-        // Convert GeoJSON coordinates [lon, lat] to Leaflet format [lat, lon]
         const coords = geojson.coordinates[0]
           .map((coord: any) => {
-            try {
-              if (!Array.isArray(coord) || coord.length < 2) return null;
-              const [lon, lat] = coord;
-              if (!Number.isFinite(lon) || !Number.isFinite(lat)) {
-                console.warn(`Invalid GeoJSON coordinate in field ${field.name}: [${lon}, ${lat}]`);
-                return null;
-              }
-              return [lat, lon] as LatLngExpression;
-            } catch (e) {
-              console.warn(`Error parsing GeoJSON coordinate in field ${field.name}:`, e);
-              return null;
-            }
+            if (!Array.isArray(coord) || coord.length < 2) return null;
+            const [lon, lat] = coord;
+            if (!Number.isFinite(lon) || !Number.isFinite(lat)) return null;
+            return [lat, lon] as LatLngExpression;
           })
-          .filter((coord: LatLngExpression | null): coord is LatLngExpression => coord !== null);
+          .filter((coord: any): coord is LatLngExpression => coord !== null);
         
-        if (coords.length >= 3) {
-          const allValid = coords.every(coord => {
-            const [lat, lon] = coord;
-            return Number.isFinite(lat) && Number.isFinite(lon);
-          });
-          
-          if (allValid) {
-            return coords;
-          } else {
-            console.warn(`GeoJSON coordinates for field ${field.name} contain invalid values after filtering`);
-          }
-        }
+        if (coords.length >= 3) return coords;
       }
     } catch (error) {
       console.warn(`Failed to parse GeoJSON for field ${field.name}:`, error);
     }
   }
-  
-  // Fallback to generated geometry
-  return generateFieldGeometry(fieldIndex, field.totalArea);
+  return generateFieldGeometry(fieldIndex, field.area);
 };
 
 const getFieldGeometryFromParcels = (field: Field, allParcels: CadastralParcel[]): LatLngExpression[] => {
   if (field.cadastralParcelIds && field.cadastralParcelIds.length > 0) {
     const parcelGeoms: LatLngExpression[] = [];
-    
     for (const parcelId of field.cadastralParcelIds) {
       const parcel = allParcels.find(p => p.id === parcelId);
       if (parcel) {
@@ -251,14 +166,8 @@ const getFieldGeometryFromParcels = (field: Field, allParcels: CadastralParcel[]
         }
       }
     }
-    
-    // Return combined geometry if we have data from parcels
-    if (parcelGeoms.length >= 3) {
-      return parcelGeoms;
-    }
+    if (parcelGeoms.length >= 3) return parcelGeoms;
   }
-  
-  // Fallback to existing field geometry or generated
   return getFieldGeometry(field, 0);
 };
 
@@ -302,17 +211,11 @@ export function MapClientContent() {
   const cultureLayerRef = useRef<any>(null);
   const observationLayerRef = useRef<any>(null);
 
-  const mapStyle = { height: '100%', width: '100%' };
-
-  const resetParcelForm = () => {
-    setParcelForm(emptyParcelForm);
-  };
+  const resetParcelForm = () => setParcelForm(emptyParcelForm);
 
   const clearDrawLayer = () => {
     const drawLayer = drawLayerRef.current;
-    if (drawLayer) {
-      drawLayer.clearLayers();
-    }
+    if (drawLayer) drawLayer.clearLayers();
   };
 
   const handleOpenAlkis = () => {
@@ -344,13 +247,9 @@ export function MapClientContent() {
         },
       });
       drawer.enable();
-      toast({ title: 'Zeichnen gestartet', description: 'Polygon auf der Karte zeichnen.' });
+      toast({ title: 'Zeichnen gestartet' });
     } catch (error) {
-      toast({
-        variant: 'destructive',
-        title: 'Zeichnen fehlgeschlagen',
-        description: error instanceof Error ? error.message : 'Unbekannter Fehler',
-      });
+      console.error(error);
     }
   };
 
@@ -373,21 +272,14 @@ export function MapClientContent() {
       url.searchParams.set('CQL_FILTER', `flurstuecksnummer='${parcelNumber}'`);
 
       const response = await fetch(url.toString());
-      if (!response.ok) {
-        throw new Error(`ALKIS Import fehlgeschlagen (${response.status})`);
-      }
-
       const data = await response.json();
       const feature = data?.features?.[0];
-      if (!feature?.geometry) {
-        throw new Error('Kein Flurstück gefunden.');
-      }
+      if (!feature?.geometry) throw new Error('Kein Flurstück gefunden.');
 
-      const geometry = JSON.stringify(feature.geometry);
       setParcelForm((prev) => ({
         ...prev,
         name: prev.name || `Flurstück ${prev.parcelNumber}`,
-        polygonGeoJSON: geometry,
+        polygonGeoJSON: JSON.stringify(feature.geometry),
       }));
 
       const drawLayer = drawLayerRef.current;
@@ -395,23 +287,12 @@ export function MapClientContent() {
       if (drawLayer && L) {
         drawLayer.clearLayers();
         L.geoJSON(feature.geometry, {
-          style: {
-            color: '#ff9800',
-            weight: 2,
-            dashArray: '5, 5',
-            fillColor: '#fff3e0',
-            fillOpacity: 0.2,
-          },
+          style: { color: '#ff9800', weight: 2, dashArray: '5, 5', fillColor: '#fff3e0', fillOpacity: 0.2 },
         }).addTo(drawLayer);
       }
-
       toast({ title: 'ALKIS-Geometrie geladen' });
     } catch (error) {
-      toast({
-        variant: 'destructive',
-        title: 'Import fehlgeschlagen',
-        description: error instanceof Error ? error.message : 'Unbekannter Fehler',
-      });
+      toast({ variant: 'destructive', title: 'Import fehlgeschlagen' });
     } finally {
       setIsImporting(false);
     }
@@ -419,46 +300,18 @@ export function MapClientContent() {
 
   const handleSaveParcel = async () => {
     if (!activeCompany) return;
-
-    if (!parcelForm.name || !parcelForm.parcelNumber || !parcelForm.district || !parcelForm.municipality) {
-      toast({
-        variant: 'destructive',
-        title: 'Pflichtfelder fehlen',
-        description: 'Bitte Name, Flurstücksnummer, Gemarkung und Gemeinde ausfüllen.',
-      });
-      return;
-    }
-
-    if (!Number.isFinite(parcelForm.area) || parcelForm.area <= 0) {
-      toast({
-        variant: 'destructive',
-        title: 'Fläche fehlt',
-        description: 'Bitte eine gültige Fläche in ha angeben.',
-      });
-      return;
-    }
-
     try {
-      const newParcel = await dataService.addCadastralParcel(
-        activeCompany.tenantId,
-        activeCompany.id,
-        parcelForm
-      );
+      const newParcel = await dataService.addCadastralParcel(activeCompany.tenantId, activeCompany.id, parcelForm);
       setParcels((prev) => [...prev, newParcel]);
       toast({ title: 'Flurstück gespeichert' });
       setParcelEditorOpen(false);
       resetParcelForm();
       clearDrawLayer();
     } catch (error) {
-      toast({
-        variant: 'destructive',
-        title: 'Speichern fehlgeschlagen',
-        description: error instanceof Error ? error.message : 'Unbekannter Fehler',
-      });
+      toast({ variant: 'destructive', title: 'Speichern fehlgeschlagen' });
     }
   };
 
-  // Fetch data - including cadastral parcels
   useEffect(() => {
     if (activeCompany) {
       const fetchData = async () => {
@@ -479,35 +332,22 @@ export function MapClientContent() {
     }
   }, [activeCompany]);
 
-  // Map initialization
   useEffect(() => {
-    let map: any;
     let initTimer: ReturnType<typeof setTimeout> | null = null;
     
-    const initMap = async () => {
-      if (!mapContainerRef.current) {
-        initTimer = setTimeout(initMap, 50);
+    const initMap = () => {
+      // Access global L from CDN script tags
+      const L = (window as any).L;
+      const proj4 = (window as any).proj4;
+
+      // Wait until Leaflet and all plugins are ready on the window object
+      if (!mapContainerRef.current || !L || !L.Proj || !L.Proj.CRS || !proj4) {
+        initTimer = setTimeout(initMap, 100);
         return;
       }
 
       try {
-        const L_module = await import('leaflet');
-        const L = L_module.default;
-        // Make L available globally for plugins loaded via script tags in layout.tsx
-        (window as any).L = L;
-        
-        await import('leaflet-defaulticon-compatibility');
-
-        // Global proj4 is loaded via CDN in layout.tsx
-        const proj4 = (window as any).proj4;
-        
-        if (!proj4) {
-          console.warn('proj4 not found on window, trying to wait...');
-          initTimer = setTimeout(initMap, 100);
-          return;
-        }
-
-        const epsg25832 = new (L as any).Proj.CRS(
+        const epsg25832 = new L.Proj.CRS(
           'EPSG:25832',
           '+proj=utm +zone=32 +ellps=GRS80 +units=m +no_defs',
           {
@@ -516,278 +356,101 @@ export function MapClientContent() {
           }
         );
 
-        map = L.map(mapContainerRef.current!, {
+        const map = L.map(mapContainerRef.current!, {
           center: MAP_DEFAULT_CENTER,
-          zoom: Math.min(8, UTM32_MAX_ZOOM),
+          zoom: 8,
           minZoom: UTM32_MIN_ZOOM,
           maxZoom: UTM32_MAX_ZOOM,
-          scrollWheelZoom: true,
           crs: epsg25832,
         });
         mapInstanceRef.current = map;
 
-        setTimeout(() => {
-          map.invalidateSize();
-        }, 0);
+        // Base layers
+        const dopLayer = L.tileLayer.wms("https://www.geoproxy.geoportal-th.de/geoproxy/services/DOP20", {
+          layers: 'th_dop',
+          format: 'image/jpeg',
+          attribution: "DOP &copy; TLBG",
+          maxZoom: UTM32_MAX_ZOOM,
+        }).addTo(map);
 
-      // Base maps
-      const createWmsLayer = (label: string, url: string, options: Record<string, unknown>) => {
-        const layer = L.tileLayer.wms(url, {
-          ...options,
-          uppercase: true,
-          crossOrigin: true,
-          crs: map.options.crs,
+        const bkgBaseMapLayer = L.tileLayer.wms("https://sgx.geodatenzentrum.de/wms_basemapde", {
+          layers: 'de_basemapde_web_raster_farbe',
+          format: 'image/png',
+          attribution: "© GeoBasis-DE / BKG",
+          maxZoom: UTM32_MAX_ZOOM,
         });
 
-        layer.on('tileerror', (event: { tile?: HTMLImageElement }) => {
-          const tileUrl = event?.tile?.src;
-          console.warn(`WMS tile error for ${label}`, tileUrl || url);
-          toast({
-            variant: 'destructive',
-            title: tDebug('layerErrorTitle'),
-            description: tDebug('layerErrorDescription', { layerName: label }),
-          });
-        });
+        // Feature layers
+        const fieldLayer = L.featureGroup().addTo(map);
+        const parcelLayer = L.featureGroup().addTo(map);
+        const drawLayer = L.featureGroup().addTo(map);
+        const profitabilityLayer = L.featureGroup();
+        const cultureLayer = L.featureGroup();
+        const observationLayer = L.featureGroup();
 
-        return layer;
-      };
+        fieldLayerRef.current = fieldLayer;
+        parcelLayerRef.current = parcelLayer;
+        drawLayerRef.current = drawLayer;
+        profitabilityLayerRef.current = profitabilityLayer;
+        cultureLayerRef.current = cultureLayer;
+        observationLayerRef.current = observationLayer;
 
-      // Base layer: DOP20 (Digital Orthophoto 20cm)
-      const dopLayer = createWmsLayer('DOP20', "https://www.geoproxy.geoportal-th.de/geoproxy/services/DOP20", {
-        layers: 'th_dop',
-        format: 'image/jpeg',
-        transparent: false,
-        version: '1.1.1',
-        attribution: "DOP &copy; TLBG",
-        maxZoom: UTM32_MAX_ZOOM,
-      });
+        if (L.control && L.control.groupedLayers) {
+          L.control.groupedLayers({
+            'Orthofoto (DOP20)': dopLayer,
+            'BKG Basemap': bkgBaseMapLayer,
+          }, {
+            'Betrieb': {
+              'Felder': fieldLayer,
+              'Flurstücke (manuell)': parcelLayer,
+              'Wirtschaftlichkeit': profitabilityLayer,
+              'Kulturkarte': cultureLayer,
+              'Beobachtungen': observationLayer,
+            }
+          }).addTo(map);
+        }
 
-      dopLayer.addTo(map);
-
-      // BKG Basemap.de
-      const bkgBaseMapLayer = createWmsLayer('BKG Basemap', "https://sgx.geodatenzentrum.de/wms_basemapde", {
-        layers: 'de_basemapde_web_raster_farbe',
-        format: 'image/png',
-        transparent: false,
-        version: '1.3.0',
-        attribution: "© GeoBasis-DE / BKG CC BY 4.0",
-        maxZoom: UTM32_MAX_ZOOM,
-      });
-
-      // ALKIS Simplified (ALKISV)
-      const alkisParcelLayer = createWmsLayer('ALKIS Flurstücke Grenzen', "https://www.geoproxy.geoportal-th.de/geoproxy/services/ALKISV", {
-        layers: 'FlurstueckGrenzpunkt',
-        format: 'image/png',
-        transparent: true,
-        version: '1.3.0',
-        styles: 'adv:AX_Flurstueck',
-        attribution: "ALKIS &copy; TLBG",
-        maxZoom: UTM32_MAX_ZOOM,
-      });
-
-      const alkisLabelsLayer = createWmsLayer('ALKIS Flurstücke Beschriftung', "https://www.geoproxy.geoportal-th.de/geoproxy/services/ALKISV", {
-        layers: 'AngabenZumFlurstueck',
-        format: 'image/png',
-        transparent: true,
-        version: '1.3.0',
-        attribution: "ALKIS &copy; TLBG",
-        maxZoom: UTM32_MAX_ZOOM,
-      });
-
-      // Combine both Flurstücke layers into a single LayerGroup
-      const alkisLayer = L.layerGroup([alkisParcelLayer, alkisLabelsLayer]);
-
-      // ALKIS Vegetation
-      const vegetationLayer = createWmsLayer('Vegetation', "https://www.geoproxy.geoportal-th.de/geoproxy/services/ALKISV", {
-        layers: 'Vegetation',
-        format: 'image/png',
-        transparent: true,
-        version: '1.3.0',
-        attribution: "ALKIS &copy; TLBG",
-        maxZoom: UTM32_MAX_ZOOM,
-      });
-
-      // Administrative boundaries
-      const flurenLayer = createWmsLayer('Fluren', "https://www.geoproxy.geoportal-th.de/geoproxy/services/GRENZUEB", {
-        layers: 'gmkueb_flur,gmkueb_flur_name',
-        format: 'image/png',
-        transparent: true,
-        version: '1.3.0',
-        attribution: "ALKIS &copy; TLBG",
-        maxZoom: UTM32_MAX_ZOOM,
-      });
-
-      const gemarkungenLayer = createWmsLayer('Gemarkungen', "https://www.geoproxy.geoportal-th.de/geoproxy/services/GRENZUEB", {
-        layers: 'gmkueb_gmk,gmkueb_gmk_name',
-        format: 'image/png',
-        transparent: true,
-        version: '1.3.0',
-        attribution: "ALKIS &copy; TLBG",
-        maxZoom: UTM32_MAX_ZOOM,
-      });
-
-      // Agrar WMS layers
-      const feldblockLayer = createWmsLayer('Feldblöcke', "https://www.geoproxy.geoportal-th.de/geoproxy/services/agrar/feldblock", {
-        layers: 'Feldblock',
-        format: 'image/png',
-        transparent: true,
-        version: '1.3.0',
-        attribution: "Feldblöcke &copy; GDI-Th",
-        maxZoom: UTM32_MAX_ZOOM,
-      });
-
-      const nitratLayer = createWmsLayer('Nitratkulisse', "https://www.geoproxy.geoportal-th.de/geoproxy/services/agrar/agrar", {
-        layers: 'Nitratkulisse',
-        format: 'image/png',
-        transparent: true,
-        version: '1.3.0',
-        attribution: "Agrar &copy; GDI-Th",
-        maxZoom: UTM32_MAX_ZOOM,
-      });
-
-      const phosphatLayer = createWmsLayer('Phosphatkulisse', "https://www.geoproxy.geoportal-th.de/geoproxy/services/agrar/agrar", {
-        layers: 'Phosphatkulisse',
-        format: 'image/png',
-        transparent: true,
-        version: '1.3.0',
-        attribution: "Agrar &copy; GDI-Th",
-        maxZoom: UTM32_MAX_ZOOM,
-      });
-
-
-      // Feature layers
-      const fieldLayer = L.featureGroup();
-      const parcelLayer = L.featureGroup();
-      const drawLayer = L.featureGroup();
-      const profitabilityLayer = L.featureGroup();
-      const cultureLayer = L.featureGroup();
-      const observationLayer = L.featureGroup();
-
-      fieldLayer.addTo(map);
-      parcelLayer.addTo(map);
-      drawLayer.addTo(map);
-
-      fieldLayerRef.current = fieldLayer;
-      parcelLayerRef.current = parcelLayer;
-      drawLayerRef.current = drawLayer;
-      profitabilityLayerRef.current = profitabilityLayer;
-      cultureLayerRef.current = cultureLayer;
-      observationLayerRef.current = observationLayer;
-
-      // Layer control
-      const baseLayers = {
-        'Orthofoto (DOP20)': dopLayer,
-        'BKG Basemap': bkgBaseMapLayer,
-      };
-
-      const groupedOverlays = {
-        'Betrieb': {
-          [t('fieldsLayer') || 'Felder']: fieldLayer,
-          'Flurstücke (manuell)': parcelLayer,
-          [t('profitabilityLayer') || 'Wirtschaftlichkeit']: profitabilityLayer,
-          [t('cultureLayer') || 'Kulturkarte']: cultureLayer,
-          [t('observationsLayer') || 'Beobachtungen']: observationLayer,
-        },
-        'Amtliche Daten': {
-          'Flurstücke (ALKIS)': alkisLayer,
-          'Vegetation': vegetationLayer,
-          'Fluren': flurenLayer,
-          'Gemarkungen': gemarkungenLayer,
-        },
-        'Agrar-Kulissen': {
-          'Feldblöcke (WMS)': feldblockLayer,
-          'Nitratkulisse': nitratLayer,
-          'Phosphatkulisse': phosphatLayer,
-        },
-      };
-
-      // groupedLayers is loaded from script in layout.tsx
-      if (L.control && (L.control as any).groupedLayers) {
-        (L.control as any).groupedLayers(baseLayers, groupedOverlays, { collapsed: true }).addTo(map);
-      } else {
-        L.control.layers(baseLayers, {
-          'Felder': fieldLayer,
-          'Flurstücke': parcelLayer,
-          'Wirtschaftlichkeit': profitabilityLayer,
-          'Kulturkarte': cultureLayer,
-          'Beobachtungen': observationLayer
-        }, { collapsed: true }).addTo(map);
-      }
-
-      map.on('draw:created', (event: any) => {
-        try {
+        map.on('draw:created', (event: any) => {
           const layer = event?.layer;
           if (!layer) return;
           drawLayer.clearLayers();
           drawLayer.addLayer(layer);
           const geojson = layer.toGeoJSON();
           if (geojson?.geometry) {
-            setParcelForm((prev) => ({
-              ...prev,
-              polygonGeoJSON: JSON.stringify(geojson.geometry),
-            }));
+            setParcelForm((prev) => ({ ...prev, polygonGeoJSON: JSON.stringify(geojson.geometry) }));
             setParcelEditorMode('draw');
             setParcelEditorOpen(true);
           }
-        } catch (error) {
-          console.warn('Failed to capture draw geometry:', error);
-        }
-      });
+        });
 
-      // Add error handling for map zoom/pan events
-      map.on('baselayerchange', (e: any) => {
-        try {
-          if (e.layer && e.layer.options && !Number.isFinite(e.layer.options.maxZoom)) {
-            e.layer.options.maxZoom = UTM32_MAX_ZOOM;
-          }
-        } catch (error) {
-          console.warn('Error handling base layer change:', error);
-        }
-      });
-
-      // Prevent coordinate errors during zoom by validating before render
-      const originalFitBounds = map.fitBounds.bind(map);
-      map.fitBounds = function(bounds: any, options?: any) {
-        try {
-          if (!bounds || !bounds.isValid || !bounds.isValid()) {
-            console.warn('Invalid bounds passed to fitBounds, skipping');
-            return map;
-          }
-          return originalFitBounds(bounds, options);
-        } catch (error) {
-          console.warn('Error in fitBounds:', error);
-          return map;
-        }
-      };
+        map.invalidateSize();
       } catch (error) {
         console.error('Failed to initialize map:', error);
-        setMapError(error instanceof Error ? error.message : 'Karte konnte nicht initialisiert werden');
+        setMapError('Kartenfehler');
       }
     };
     
     initMap();
 
     return () => {
-      if (initTimer) {
-        clearTimeout(initTimer);
-      }
+      if (initTimer) clearTimeout(initTimer);
       if (mapInstanceRef.current) {
         mapInstanceRef.current.remove();
         mapInstanceRef.current = null;
       }
     };
-  }, [t, tDebug, toast]);
+  }, []);
 
-  // Update layers when data changes
   useEffect(() => {
     const map = mapInstanceRef.current;
+    const L = (window as any).L;
+    if (!map || !L || !fieldLayerRef.current) return;
+
     const fieldLayer = fieldLayerRef.current;
     const parcelLayer = parcelLayerRef.current;
     const profitabilityLayer = profitabilityLayerRef.current;
     const cultureLayer = cultureLayerRef.current;
     const observationLayer = observationLayerRef.current;
-
-    if (!map || !fieldLayer || !parcelLayer || !profitabilityLayer || !cultureLayer || !observationLayer) return;
 
     fieldLayer.clearLayers();
     parcelLayer.clearLayers();
@@ -795,502 +458,75 @@ export function MapClientContent() {
     cultureLayer.clearLayers();
     observationLayer.clearLayers();
 
-    const updateLayers = async () => {
-      try {
-        const L = (window as any).L;
-        if (!L) return;
-        const { latLngBounds } = L;
-
-        const getProfitabilityColor = (fieldId: string, area: number) => {
-          const economics = fieldEconomics[fieldId];
-          if (!economics || area === 0) return '#808080';
-          const marginPerHa = economics.contributionMargin / area;
-          
-          if (marginPerHa > 300) return '#16a34a';
-          if (marginPerHa > 200) return '#84cc16';
-          if (marginPerHa > 100) return '#facc15';
-          if (marginPerHa >= 0) return '#f97316';
-          return '#dc2626';
-        };
-
-        const getCultureColor = (cropType: string | undefined) => {
-          const colors: Record<string, string> = {
-            'wheat': '#DAA520',      // Goldenrod (Weizen)
-            'barley': '#D2691E',     // Chocolate (Gerste)
-            'rye': '#B8860B',        // DarkGoldenrod (Roggen)
-            'corn': '#FF8C00',       // DarkOrange (Mais)
-            'rapeseed': '#FFD700',   // Gold (Raps)
-            'peas': '#90EE90',       // LightGreen (Erbsen)
-            'beans': '#98FB98',      // PaleGreen (Bohnen)
-            'sugar_beet': '#FFC0CB', // Pink (Zuckerrübe)
-            'potato': '#F0E68C',     // Khaki (Kartoffeln)
-            'grass': '#7CFC00',      // LawnGreen (Grasland)
-            'clover': '#00FF7F',     // SpringGreen (Klee)
-            'other': '#A9A9A9',      // DarkGray (Sonstige)
-          };
-          return colors[cropType || ''] || '#4A90E2';
-        };
-
-        // Render cadastral parcels (Flurstücke) with their correct boundaries
-        parcels.forEach((parcel) => {
-          try {
-            const geometry = getParcelGeometry(parcel);
-            
-            if (!geometry || geometry.length < 3) {
-              console.warn(`Parcel ${parcel.name} has invalid geometry`);
-              return;
-            }
-
-            const validGeometry = geometry.filter(coord => {
-              try {
-                if (!Array.isArray(coord) || coord.length < 2) return false;
-                const [lat, lon] = coord;
-                return Number.isFinite(lat) && Number.isFinite(lon);
-              } catch (e) {
-                return false;
-              }
-            });
-
-            if (validGeometry.length < 3) {
-              console.warn(`Parcel ${parcel.name} has insufficient coordinates`);
-              return;
-            }
-
-            // Color for parcels (light gray with orange border)
-            L.polygon(validGeometry as L.LatLngExpression[], {
-              color: '#ff9800',       // Orange border
-              weight: 2,
-              fillColor: '#fff3e0',   // Very light orange fill
-              fillOpacity: 0.3,
-              dashArray: '5, 5'       // Dashed line for parcels
-            })
-              .bindPopup(`<strong>${parcel.name}</strong><br/>Flurstück: ${parcel.parcelNumber}<br/>Eigentümer: ${parcel.owner}<br/>Fläche: ${parcel.area.toFixed(2)} ha`)
-              .addTo(parcelLayer);
-          } catch (error) {
-            console.error(`Failed to create parcel polygon for ${parcel.name}:`, error);
-          }
-        });
-
-    // Render fields with proper geometries from cadastral parcels
-    fields.forEach((field, index) => {
-      try {
-        // Use parcel geometries if available, otherwise fall back to field geometry
-        const geometry = getFieldGeometryFromParcels(field, parcels);
-        const cropName = field.currentCrop || 'Keine Kultur';
-
-        // Validate geometry before rendering (must have at least 3 valid coordinates)
-        if (!geometry || !Array.isArray(geometry) || geometry.length < 3) {
-          console.warn(`Field ${field.name} has invalid geometry, skipping`);
-          return;
-        }
-
-        // Filter out invalid coordinates from geometry
-        const validGeometry = geometry.filter(coord => {
-          try {
-            if (!Array.isArray(coord) || coord.length < 2) return false;
-            const [lat, lon] = coord;
-            const isValid = Number.isFinite(lat) && Number.isFinite(lon);
-            if (!isValid) {
-              console.warn(`Invalid coordinate [${lat}, ${lon}] in field ${field.name}`);
-            }
-            return isValid;
-          } catch (e) {
-            console.warn(`Exception filtering coordinate in field ${field.name}:`, e);
-            return false;
-          }
-        });
-
-        // Skip if not enough valid coordinates
-        if (validGeometry.length < 3) {
-          console.warn(`Field ${field.name} has insufficient valid coordinates: ${validGeometry.length}/3, skipping`);
-          return;
-        }
-
-        // Validate the geometry array itself before passing to Leaflet
-        const geometryIsValid = validGeometry.every((coord, idx) => {
-          if (!Array.isArray(coord) || coord.length < 2) {
-            console.warn(`Geometry validation failed at index ${idx}: not an array or missing coordinates`);
-            return false;
-          }
-          const [lat, lon] = coord;
-          if (!Number.isFinite(lat) || !Number.isFinite(lon)) {
-            console.warn(`Geometry validation failed at index ${idx}: [${lat}, ${lon}] not finite`);
-            return false;
-          }
-          return true;
-        });
-
-        if (!geometryIsValid) {
-          console.warn(`Field ${field.name} geometry validation failed, skipping`);
-          return;
-        }
-
-        // Field layer
-        try {
-          L.polygon(validGeometry as L.LatLngExpression[], {
-            color: 'hsl(var(--primary))',
-            weight: 2,
-            fillOpacity: 0.2,
-          })
-            .bindPopup(`<strong>${field.name}</strong><br/>${cropName} - ${field.totalArea} ha`)
-            .addTo(fieldLayer);
-        } catch (polygonError) {
-          console.error(`Failed to create polygon for field ${field.name}:`, polygonError, 'geometry:', validGeometry);
-          return;
-        }
-
-        // Profitability layer
-        try {
-          const color = getProfitabilityColor(field.id, field.totalArea);
-          const economics = fieldEconomics[field.id];
-          const marginPerHa = economics?.contributionMargin && field.totalArea > 0
-            ? (economics.contributionMargin / field.totalArea).toFixed(0)
-            : 'N/A';
-
-          L.polygon(validGeometry as L.LatLngExpression[], {
-            color: color,
-            fillColor: color,
-            fillOpacity: 0.6,
-            weight: 2,
-          })
-            .bindPopup(`<strong>${field.name}</strong><br/>DB II: ${marginPerHa} €/ha`)
-            .addTo(profitabilityLayer);
-        } catch (profitabilityError) {
-          console.error(`Failed to create profitability polygon for field ${field.name}:`, profitabilityError);
-        }
-
-        // Culture layer (Kulturkarte)
-        try {
-          const cultureColor = getCultureColor(field.currentCrop);
-          const cropLabel = cropName || 'Keine Kultur';
-
-          L.polygon(validGeometry as L.LatLngExpression[], {
-            color: cultureColor,
-            fillColor: cultureColor,
-            fillOpacity: 0.7,
-            weight: 2,
-          })
-            .bindPopup(`<strong>${field.name}</strong><br/>Kultur: ${cropLabel}<br/>Fläche: ${field.totalArea} ha`)
-            .addTo(cultureLayer);
-        } catch (cultureError) {
-          console.error(`Failed to create culture polygon for field ${field.name}:`, cultureError);
-        }
-      } catch (fieldError) {
-        console.error(`Unexpected error processing field ${field.name || index}:`, fieldError);
+    parcels.forEach((parcel) => {
+      const geometry = getParcelGeometry(parcel);
+      if (geometry.length >= 3) {
+        L.polygon(geometry, { color: '#ff9800', weight: 2, fillColor: '#fff3e0', fillOpacity: 0.3, dashArray: '5, 5' })
+          .bindPopup(`<strong>${parcel.name}</strong><br/>${parcel.area} ha`)
+          .addTo(parcelLayer);
       }
     });
 
-      // Render observations
-      observations
-        .filter(o => {
-          try {
-            return o.latitude && o.longitude && 
-                   Number.isFinite(o.latitude) && 
-                   Number.isFinite(o.longitude);
-          } catch (e) {
-            return false;
-          }
-        })
-        .forEach(obs => {
-          if (!isValidCoordinate([obs.latitude, obs.longitude])) {
-            console.warn(`Observation ${obs.title} has invalid coordinates, skipping`);
-            return;
-          }
-          try {
-            L.circleMarker([obs.latitude!, obs.longitude!], {
-              radius: 6,
-              fillColor: 'hsl(var(--warning))',
-              color: '#000',
-              weight: 1,
-              fillOpacity: 0.8,
-            })
-              .bindPopup(`${obs.title}<br/>${new Date(obs.date).toLocaleDateString()}`)
-              .addTo(observationLayer);
-          } catch (e) {
-            console.warn(`Failed to render observation ${obs.title}:`, e);
-          }
-        });
-
-      // Fit bounds
-      let bounds = L.latLngBounds([
-        [50.9778, 11.0289], 
-        [50.9779, 11.0290] 
-      ]);
-      let hasValidBounds = false;
-      
-      fields.forEach((field) => {
-        const geometry = getFieldGeometryFromParcels(field, parcels);
-        if (geometry && Array.isArray(geometry) && geometry.length >= 3) {
-          const validCoords = geometry.filter(coord => {
-            try {
-              if (!Array.isArray(coord) || coord.length < 2) return false;
-              const [lat, lon] = coord;
-              return Number.isFinite(lat) && Number.isFinite(lon);
-            } catch (e) {
-              return false;
-            }
-          });
-          
-          if (validCoords.length >= 3) {
-            validCoords.forEach(coord => {
-              bounds.extend(coord as [number, number]);
-              hasValidBounds = true;
-            });
-          }
-        }
-      });
-
-      parcels.forEach((parcel) => {
-        const geometry = getParcelGeometry(parcel);
-        if (geometry && Array.isArray(geometry) && geometry.length >= 3) {
-          const validCoords = geometry.filter(coord => {
-            try {
-              if (!Array.isArray(coord) || coord.length < 2) return false;
-              const [lat, lon] = coord;
-              return Number.isFinite(lat) && Number.isFinite(lon);
-            } catch (e) {
-              return false;
-            }
-          });
-          
-          if (validCoords.length >= 3) {
-            validCoords.forEach(coord => {
-              bounds.extend(coord as [number, number]);
-              hasValidBounds = true;
-            });
-          }
-        }
-      });
-
-      if (hasValidBounds && (bounds as any).isValid()) {
-        try {
-          map.fitBounds(bounds.pad(0.1));
-        } catch (e) {
-          console.warn('Failed to fit bounds:', e);
-        }
+    fields.forEach((field) => {
+      const geometry = getFieldGeometryFromParcels(field, parcels);
+      if (geometry.length >= 3) {
+        L.polygon(geometry, { color: 'hsl(var(--primary))', weight: 2, fillOpacity: 0.2 })
+          .bindPopup(`<strong>${field.name}</strong><br/>${field.crop} - ${field.area} ha`)
+          .addTo(fieldLayer);
       }
-      } catch (updateError) {
-        console.error('Error updating layers:', updateError);
+    });
+
+    observations.forEach(obs => {
+      if (obs.latitude && obs.longitude) {
+        L.circleMarker([obs.latitude, obs.longitude], { radius: 6, fillColor: 'hsl(var(--warning))', color: '#000', weight: 1, fillOpacity: 0.8 })
+          .bindPopup(`<strong>${obs.title}</strong><br/>${obs.date}`)
+          .addTo(observationLayer);
       }
-    };
-    updateLayers();
+    });
+
+    const bounds = fieldLayer.getBounds();
+    if (bounds.isValid()) map.fitBounds(bounds.pad(0.1));
+
   }, [fields, parcels, observations, fieldEconomics]);
 
-  // Search handler
-  const handleSearch = async () => {
-    if (!searchQuery.trim()) return;
+  const handleSearch = () => {
     const field = fields.find(f => f.name.toLowerCase().includes(searchQuery.toLowerCase()));
-    if (field) {
+    if (field && mapInstanceRef.current) {
       const geometry = getFieldGeometryFromParcels(field, parcels);
-      const validGeometry = geometry.filter(coord => {
-        try {
-          if (!Array.isArray(coord) || coord.length < 2) return false;
-          const [lat, lon] = coord;
-          return Number.isFinite(lat) && Number.isFinite(lon);
-        } catch (e) {
-          return false;
-        }
-      });
-
-      if (validGeometry.length < 3) {
-        toast({ variant: 'destructive', title: 'Ungültige Feldkoordinaten' });
-        return;
+      if (geometry.length >= 3) {
+        mapInstanceRef.current.fitBounds((window as any).L.latLngBounds(geometry).pad(0.1));
       }
-
-      try {
-        const L = (window as any).L;
-        if (!L) return;
-        
-        let bounds = L.latLngBounds(validGeometry as [number, number][]);
-        if (mapInstanceRef.current && (bounds as any).isValid()) {
-          mapInstanceRef.current.fitBounds(bounds.pad(0.1));
-          toast({ title: `Schlag: ${field.name}`, description: `${field.totalArea} ha` });
-        }
-      } catch (e) {
-        console.error('Search failed:', e);
-        toast({ variant: 'destructive', title: 'Fehler bei der Suche', description: 'Die Feldkoordinaten konnten nicht verarbeitet werden' });
-      }
-    } else {
-      toast({ variant: 'destructive', title: 'Schlag nicht gefunden' });
     }
   };
 
-  if (sessionLoading || loading) {
-    return <MapSkeleton />;
-  }
-
-  if (mapError) {
-    return <MapError message={mapError} onRetry={() => setMapError(null)} />;
-  }
+  if (sessionLoading || loading) return <MapSkeleton />;
+  if (mapError) return <MapError message={mapError} onRetry={() => window.location.reload()} />;
 
   return (
     <div className="relative w-full h-full">
-      <div ref={mapContainerRef} style={mapStyle} />
-      
-      {/* Search panel */}
+      <div ref={mapContainerRef} className="w-full h-full" />
       <div className="absolute top-4 left-4 bg-white rounded-lg shadow-lg p-3 z-[9999] max-w-xs flex gap-2">
-        <Input
-          placeholder="Schlag suchen..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-          className="text-sm"
-        />
-        <Button size="sm" onClick={handleSearch}>
-          <Search className="h-4 w-4" />
-        </Button>
+        <Input placeholder="Schlag suchen..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && handleSearch()} />
+        <Button size="sm" onClick={handleSearch}><Search className="h-4 w-4" /></Button>
       </div>
-
-      {/* Parcel tools */}
       <div className="absolute top-4 right-4 bg-white rounded-lg shadow-lg p-3 z-[9999] flex flex-col gap-2">
-        <Button size="sm" onClick={handleOpenAlkis}>
-          ALKIS Import
-        </Button>
-        <Button size="sm" variant="outline" onClick={handleStartDraw}>
-          Flurstück zeichnen
-        </Button>
+        <Button size="sm" onClick={handleOpenAlkis}>ALKIS Import</Button>
+        <Button size="sm" variant="outline" onClick={handleStartDraw}>Zeichnen</Button>
       </div>
-
-      <Sheet
-        open={parcelEditorOpen}
-        onOpenChange={(open) => {
-          setParcelEditorOpen(open);
-          if (!open) {
-            resetParcelForm();
-            clearDrawLayer();
-          }
-        }}
-      >
+      <Sheet open={parcelEditorOpen} onOpenChange={setParcelEditorOpen}>
         <SheetContent className="overflow-y-auto">
-          <SheetHeader>
-            <SheetTitle>
-              {parcelEditorMode === 'alkis'
-                ? 'ALKIS-Import'
-                : parcelEditorMode === 'draw'
-                  ? 'Flurstück zeichnen'
-                  : 'Flurstück anlegen'}
-            </SheetTitle>
-          </SheetHeader>
+          <SheetHeader><SheetTitle>Flurstück erfassen</SheetTitle></SheetHeader>
           <div className="py-4 space-y-4">
-            {parcelEditorMode === 'alkis' && (
-              <div className="space-y-2">
-                <Label>ALKIS-Geometrie laden</Label>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleFetchAlkis}
-                  disabled={isImporting}
-                >
-                  {isImporting ? 'Lade...' : 'Geometrie laden'}
-                </Button>
-              </div>
-            )}
-            {parcelEditorMode === 'draw' && (
-              <p className="text-sm text-muted-foreground">
-                Zeichne das Polygon auf der Karte. Die Geometrie wird hier automatisch eingefügt.
-              </p>
-            )}
-            <div className="space-y-2">
-              <Label htmlFor="parcel-name">Name</Label>
-              <Input
-                id="parcel-name"
-                value={parcelForm.name}
-                onChange={(e) => setParcelForm((prev) => ({ ...prev, name: e.target.value }))}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="parcel-number">Flurstücksnummer</Label>
-              <Input
-                id="parcel-number"
-                value={parcelForm.parcelNumber}
-                onChange={(e) =>
-                  setParcelForm((prev) => ({ ...prev, parcelNumber: e.target.value }))
-                }
-              />
-            </div>
+            {parcelEditorMode === 'alkis' && <Button variant="outline" onClick={handleFetchAlkis} disabled={isImporting}>ALKIS Daten laden</Button>}
+            <div className="space-y-2"><Label>Name</Label><Input value={parcelForm.name} onChange={(e) => setParcelForm({ ...parcelForm, name: e.target.value })} /></div>
+            <div className="space-y-2"><Label>Flurstücksnummer</Label><Input value={parcelForm.parcelNumber} onChange={(e) => setParcelForm({ ...parcelForm, parcelNumber: e.target.value })} /></div>
             <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-2">
-                <Label htmlFor="parcel-subnumber">Unterflurstück</Label>
-                <Input
-                  id="parcel-subnumber"
-                  value={parcelForm.subParcelNumber || ''}
-                  onChange={(e) =>
-                    setParcelForm((prev) => ({ ...prev, subParcelNumber: e.target.value }))
-                  }
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="parcel-area">Fläche (ha)</Label>
-                <Input
-                  id="parcel-area"
-                  type="number"
-                  step="0.01"
-                  value={parcelForm.area}
-                  onChange={(e) =>
-                    setParcelForm((prev) => ({ ...prev, area: Number(e.target.value) }))
-                  }
-                />
-              </div>
+              <div className="space-y-2"><Label>Gemarkung</Label><Input value={parcelForm.district} onChange={(e) => setParcelForm({ ...parcelForm, district: e.target.value })} /></div>
+              <div className="space-y-2"><Label>Fläche (ha)</Label><Input type="number" value={parcelForm.area} onChange={(e) => setParcelForm({ ...parcelForm, area: Number(e.target.value) })} /></div>
             </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-2">
-                <Label htmlFor="parcel-county">Landkreis</Label>
-                <Input
-                  id="parcel-county"
-                  value={parcelForm.county}
-                  onChange={(e) =>
-                    setParcelForm((prev) => ({ ...prev, county: e.target.value }))
-                  }
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="parcel-municipality">Gemeinde</Label>
-                <Input
-                  id="parcel-municipality"
-                  value={parcelForm.municipality}
-                  onChange={(e) =>
-                    setParcelForm((prev) => ({ ...prev, municipality: e.target.value }))
-                  }
-                />
-              </div>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="parcel-district">Gemarkung</Label>
-              <Input
-                id="parcel-district"
-                value={parcelForm.district}
-                onChange={(e) =>
-                  setParcelForm((prev) => ({ ...prev, district: e.target.value }))
-                }
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="parcel-owner">Eigentümer</Label>
-              <Input
-                id="parcel-owner"
-                value={parcelForm.owner}
-                onChange={(e) =>
-                  setParcelForm((prev) => ({ ...prev, owner: e.target.value }))
-                }
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="parcel-geojson">GeoJSON Polygon</Label>
-              <Textarea
-                id="parcel-geojson"
-                rows={5}
-                value={parcelForm.polygonGeoJSON || ''}
-                onChange={(e) =>
-                  setParcelForm((prev) => ({ ...prev, polygonGeoJSON: e.target.value }))
-                }
-              />
-            </div>
-            <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={() => setParcelEditorOpen(false)}>
-                Abbrechen
-              </Button>
-              <Button onClick={handleSaveParcel}>Speichern</Button>
-            </div>
+            <div className="space-y-2"><Label>Eigentümer</Label><Input value={parcelForm.owner} onChange={(e) => setParcelForm({ ...parcelForm, owner: e.target.value })} /></div>
+            <div className="space-y-2"><Label>GeoJSON</Label><Textarea rows={5} value={parcelForm.polygonGeoJSON} onChange={(e) => setParcelForm({ ...parcelForm, polygonGeoJSON: e.target.value })} /></div>
+            <div className="flex justify-end gap-2"><Button variant="outline" onClick={() => setParcelEditorOpen(false)}>Abbrechen</Button><Button onClick={handleSaveParcel}>Speichern</Button></div>
           </div>
         </SheetContent>
       </Sheet>
