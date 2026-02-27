@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useSession } from '@/context/session-context';
 import dataService from '@/services';
 import { Field, FieldEconomics, Observation } from '@/services/types';
@@ -43,7 +43,7 @@ const UTM32_RESOLUTIONS = [
 ];
 const UTM32_MIN_ZOOM = 0;
 const UTM32_MAX_ZOOM = UTM32_RESOLUTIONS.length - 1;
-const MAP_DEFAULT_CENTER: [number, number] = [50.9778, 11.0289];
+const MAP_DEFAULT_CENTER: [number, number] = [50.9778, 11.0289]; // Firmenstandort (Erfurt)
 
 function MapSkeleton() {
   return <Skeleton className="w-full h-full min-h-[400px]" />;
@@ -111,20 +111,16 @@ const getParcelGeometry = (parcel: CadastralParcel): LatLngExpression[] => {
  * Get field geometry from GeoJSON or generate sample
  */
 const getFieldGeometry = (field: Field, fieldIndex: number): LatLngExpression[] => {
-  // In a real app, field would have geometry. Using mock generator for now.
   return generateFieldGeometry(fieldIndex, field.area);
 };
 
 const getFieldGeometryFromParcels = (field: Field, allParcels: CadastralParcel[]): LatLngExpression[] => {
   if (field.cadastralParcelIds && field.cadastralParcelIds.length > 0) {
-    const parcelGeoms: LatLngExpression[] = [];
     for (const parcelId of field.cadastralParcelIds) {
       const parcel = allParcels.find(p => p.id === parcelId);
       if (parcel) {
         const geom = getParcelGeometry(parcel);
         if (geom && geom.length >= 3) {
-          // Simplified: we just return the first parcel's geometry for visualization
-          // In a production app, we would union the polygons
           return geom;
         }
       }
@@ -159,6 +155,7 @@ export function MapClientContent() {
   const [parcelEditorMode, setParcelEditorMode] = useState<'alkis' | 'draw' | 'manual'>('manual');
   const [parcelForm, setParcelForm] = useState<CadastralParcelFormData>(emptyParcelForm);
   const [isImporting, setIsImporting] = useState(false);
+  const [isLocating, setIsLocating] = useState(false);
   
   const t = useTranslations('MapPage');
   const { toast } = useToast();
@@ -178,6 +175,71 @@ export function MapClientContent() {
     const drawLayer = drawLayerRef.current;
     if (drawLayer) drawLayer.clearLayers();
   };
+
+  /**
+   * Tries to find and center the map on the user's location
+   */
+  const handleLocate = useCallback((options: { initial?: boolean } = {}) => {
+    const map = mapInstanceRef.current;
+    if (!map) return;
+
+    if (!navigator.geolocation) {
+      if (!options.initial) {
+        toast({
+          variant: 'destructive',
+          title: 'GPS nicht verfügbar',
+          description: 'Ihr Browser unterstützt keine Geolocation.',
+        });
+      }
+      return;
+    }
+
+    setIsLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        map.setView([latitude, longitude], 15);
+        
+        // Add a marker for user position if it doesn't exist
+        const L = (window as any).L;
+        if (L) {
+          L.circleMarker([latitude, longitude], {
+            radius: 8,
+            fillColor: '#3b82f6',
+            color: '#fff',
+            weight: 2,
+            fillOpacity: 1,
+          })
+          .bindPopup('Ihr aktueller Standort')
+          .addTo(map);
+        }
+        
+        setIsLocating(false);
+        if (!options.initial) {
+          toast({ title: 'Standort gefunden' });
+        }
+      },
+      (error) => {
+        setIsLocating(false);
+        if (!options.initial) {
+          let message = 'Standort konnte nicht ermittelt werden.';
+          if (error.code === error.PERMISSION_DENIED) {
+            message = 'Standortzugriff wurde verweigert.';
+          }
+          toast({
+            variant: 'destructive',
+            title: 'GPS-Fehler',
+            description: message,
+          });
+        }
+        // If initial load failed, center on company location
+        if (options.initial) {
+          map.setView(MAP_DEFAULT_CENTER, 13);
+        }
+      },
+      { enableHighAccuracy: true, timeout: 5000 }
+    );
+  }, [toast]);
 
   const handleOpenAlkis = () => {
     resetParcelForm();
@@ -318,7 +380,7 @@ export function MapClientContent() {
 
         const map = L.map(mapContainerRef.current!, {
           center: MAP_DEFAULT_CENTER,
-          zoom: 10,
+          zoom: 13,
           minZoom: UTM32_MIN_ZOOM,
           maxZoom: UTM32_MAX_ZOOM,
           crs: epsg25832,
@@ -386,12 +448,12 @@ export function MapClientContent() {
           }
         });
 
-        // Fix gray screen by forcing resize after initialization
+        // Fix gray screen by forcing resize
         setTimeout(() => {
           map.invalidateSize();
+          handleLocate({ initial: true }); // Initial centering attempt
         }, 200);
 
-        // Handle window resize or container resize
         resizeObserver = new ResizeObserver(() => {
           if (map) map.invalidateSize();
         });
@@ -413,7 +475,7 @@ export function MapClientContent() {
         mapInstanceRef.current = null;
       }
     };
-  }, []);
+  }, [handleLocate]);
 
   useEffect(() => {
     const map = mapInstanceRef.current;
@@ -454,15 +516,12 @@ export function MapClientContent() {
       }
     });
 
-    // Fit bounds only if we have geometry
+    // We only auto-zoom if there are objects and we are at company center or GPS center hasn't moved yet
     const bounds = fieldLayer.getBounds();
-    if (bounds && bounds.isValid()) {
+    if (bounds && bounds.isValid() && fields.length > 0) {
+      // If we've already positioned via GPS, we don't necessarily want to force fit bounds
+      // but usually for farm overview it is better.
       map.fitBounds(bounds.pad(0.1));
-    } else {
-      const parcelBounds = parcelLayer.getBounds();
-      if (parcelBounds && parcelBounds.isValid()) {
-        map.fitBounds(parcelBounds.pad(0.1));
-      }
     }
 
   }, [fields, parcels, observations, fieldEconomics]);
@@ -503,6 +562,10 @@ export function MapClientContent() {
 
       <div className="absolute top-4 right-4 flex flex-col gap-2 z-[1000]">
         <Card className="bg-white/90 backdrop-blur shadow-lg p-2 flex flex-col gap-2 border-primary/20">
+          <Button size="sm" variant="outline" onClick={() => handleLocate()} disabled={isLocating} className="justify-start border-primary/30">
+            <LocateFixed className={`h-4 w-4 mr-2 ${isLocating ? 'animate-pulse' : ''}`} />
+            Standort
+          </Button>
           <Button size="sm" variant="default" onClick={handleOpenAlkis} className="justify-start">
             <PlusCircle className="h-4 w-4 mr-2" />
             ALKIS Import
